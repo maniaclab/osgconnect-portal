@@ -1,0 +1,103 @@
+{%extends "base.html"%}
+
+{%block title%}
+  Create Project
+{%endblock%}
+
+{%block body%}
+<section id="create-project" class="bg-light">
+  <div class="container col-lg-12">
+    <!-- <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="#">Home</a></li>
+      <li class="breadcrumb-item active">Profile</li>
+    </ol> -->
+    {%include 'messages.html'%}
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        <h2>Request Project Creation</h2>
+        <hr/>
+        <form role="form" action="#" method="POST">
+          <div class="form-group">
+            <label for="name">Project Name *</label>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              name="name"
+              placeholder="Name of Research Project"
+              required="required"
+              tabindex="1"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-control"
+              placeholder="{{session['email']}}"
+              required="required"
+              tabindex="2"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="institution">Institution *</label>
+            <input
+              type="text"
+              id="institution"
+              name="institution"
+              class="form-control"
+              placeholder="Institution Name"
+              required="required"
+              tabindex="3"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="field-of-science">Field of Science *</label>
+            <select class="form-control" id="field-of-science" name="field-of-science" required="required" tabindex="4">
+              <option value="" selected disabled>Select Field of Science</option>
+              <option value="">List of sciences</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description <span id="asterik">*</span></label>
+            <textarea
+              placeholder="Brief description of your project"
+              name="description"
+              required
+              tabindex="5"
+              style="background-color:white; color:black; border-radius:4px; border-color:lightgrey;"
+              value=""
+              ></textarea>
+          </div>
+
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </form>
+      </div> <!-- Profile Form Container -->
+    </div> <!-- row -->
+
+  </div>
+</section>
+
+<script>
+var name = {{session['name']|tojson}};
+var email = {{session['email']|tojson}};
+var institution = {{session['institution']|tojson}};
+
+window.onload = setFormFields(email, institution);
+
+function setFormFields(email, institution){
+  // document.getElementById('name').value = name;
+  document.getElementById('email').value = email;
+  document.getElementById('institution').value = institution;
+}
+
+</script>
+{%endblock%}

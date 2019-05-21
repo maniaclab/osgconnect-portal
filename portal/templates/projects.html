@@ -1,0 +1,53 @@
+{%extends "base.html"%}
+
+{%block title%}Projects{%endblock%}
+
+{%block body%}
+
+<section id="projets">
+  <div class="container col-lg-12 mx-auto">
+
+    <div class='row'>
+      <div class="col-lg-12 mx-auto">
+        <!-- <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="#">Home</a></li>
+          <li class="breadcrumb-item active">Projects</li>
+        </ol> -->
+
+        <div class="table-responsive">
+          <h4>Projects in CI Connect</h4>
+          <table class="table" id="projects-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
+            <thead>
+              <tr>
+                <th data-field="name" data-sortable="true">Name</th>
+                <th data-field="pi" data-sortable="true">PI</th>
+                <th data-field="email" data-sortable="true">Email</th>
+                <th data-field="field-of-science" data-sortable="true">Field of Science</th>
+                <th data-field="organization" data-sortable="true">Organization</th>
+              </tr>
+            </thead>
+            <tbody data-link="row" class="rowlink" style="font-size:14px;">
+              <tr>
+                <td><a href="#"></a></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+  </div> <!-- container -->
+</section>
+
+<script>
+$(document).ready(function() {
+    $('#projects-table').DataTable();
+});
+</script>
+{%endblock%}

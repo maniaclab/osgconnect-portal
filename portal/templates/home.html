@@ -1,0 +1,27 @@
+{%extends "base.html"%}
+
+{%block title%}Home{%endblock%}
+
+{%block body%}
+
+<!-- Page Header -->
+
+<header class="text-white" style="height: 100%;" id="hero">
+  <div class="container text-center">
+    <img src="{{url_for('static', filename='img/CIConnectLogo3-infinity.png')}}" style="width:30%;">
+    <h1>Cyberinfrastructure for accelerated research</h1>
+    <!-- <p class="lead">Efficiently connect your science to cycles and data.</p> -->
+    <h4 class="lead">
+      <span class="rotating text-muted">
+        Connecting Science to Cycles and Data/ Reliable, High Performance CI
+        Services/ Connected environments from hosted services/ Cycles and Data
+        Virtually in One Place
+      </span>
+    </h4>
+    <a role="button" href="{{url_for('login')}}" class="btn btn-primary">Login</a>
+    <a role="button" href="{{url_for('signup')}}" class="btn btn-primary">Sign Up</a>
+  </div>
+</header>
+
+
+{%endblock%}

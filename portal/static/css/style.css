@@ -1,0 +1,89 @@
+/*!
+ * Start Bootstrap - Scrolling Nav (https://startbootstrap.com/template-overviews/scrolling-nav)
+ * Copyright 2013-2017 Start Bootstrap
+ * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-scrolling-nav/blob/master/LICENSE)
+ */
+html, body {
+  height: 100%;
+  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 400;
+  color: #333;
+}
+
+p {
+  line-height: 1.5;
+  margin: 30px 0;
+  color: #999;
+}
+
+.nav-link {
+  color: #FFFFFF;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+  color: #f4a62b;
+}
+
+/* Fixes dropdown menus placed on the right side */
+.ml-auto {
+  left: auto !important;
+  right: 0px;
+}
+
+header {
+  padding: 154px 0 100px;
+}
+
+@media (min-width: 992px) {
+  header {
+    padding: 156px 0 100px;
+  }
+}
+
+section {
+  padding-top: 55px;
+  height: 100%;
+  /* padding-bottom: 55px; */
+}
+
+section .container {
+  padding: 50px;
+}
+
+pre {
+  background-color: #f8f8f8;
+  font-weight: bold;
+  tab-size: 4;
+  display: block;
+  margin: 20px 0;
+  padding: 15px;
+  position: relative;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.lead {
+  font-size: 1.2rem;
+  padding: 10px;
+}
+
+footer {
+  position:fixed;
+  left:0px;
+  bottom:0px;
+  width:100%;
+}
+
+.card-header {
+  background-color: transparent;
+  border-bottom: none;
+}
