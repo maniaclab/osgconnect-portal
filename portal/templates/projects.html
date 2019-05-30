@@ -20,20 +20,22 @@
             <thead>
               <tr>
                 <th data-field="name" data-sortable="true">Name</th>
-                <th data-field="pi" data-sortable="true">PI</th>
                 <th data-field="email" data-sortable="true">Email</th>
+                <th data-field="phone" data-sortable="true">Phone</th>
                 <th data-field="field-of-science" data-sortable="true">Field of Science</th>
-                <th data-field="organization" data-sortable="true">Organization</th>
+                <th data-field="description" data-sortable="true">Description</th>
               </tr>
             </thead>
             <tbody data-link="row" class="rowlink" style="font-size:14px;">
+              {% for project in projects %}
               <tr>
-                <td><a href="#"></a></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td><a href="#">{{project['name']}}</a></td>
+                <td>{{project['email']}}</td>
+                <td>{{project['phone']}}</td>
+                <td>{{project['field_of_science']}}</td>
+                <td>{{project['description']}}</td>
               </tr>
+              {% endfor %}
             </tbody>
 
           </table>

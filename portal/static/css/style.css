@@ -25,12 +25,12 @@ p {
 }
 
 .nav-link {
-  color: #FFFFFF;
+  color: #155F83;
 }
 
 .nav-link:hover,
 .nav-link:focus {
-  color: #f4a62b;
+  color: #155F83;
 }
 
 /* Fixes dropdown menus placed on the right side */

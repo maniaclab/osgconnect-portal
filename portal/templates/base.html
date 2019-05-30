@@ -68,6 +68,14 @@
   		// look to update the full a[href=''] uri below
   		$('nav > ul > li > a[href="'+pathname+'"]').parent().addClass('active');
   	}
+    let url_root = ({{session['url_root']}} === undefined) ? url_root : "None";
+    if (String(url_root).includes('local') ){
+      document.getElementById("connect-brand").src="{{url_for('static', filename='img/atlas-connect-logo.png')}}";
+      console.log(url_root)
+    } else {
+      document.getElementById("connect-brand").src="{{url_for('static', filename='img/CIConnectLogo3-infinity.png')}}";
+      console.log("nah")
+    }
   	})
   	</script>
 
@@ -78,7 +86,11 @@
       <div id="content">
         <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
           <a class="navbar-brand" href="{{url_for('home')}}">
-            <img src="{{url_for('static', filename='img/CIConnectLogo3-infinity.png')}}" width="120" height="40" class="d-inline-block align-top" alt="">
+            {% if 'local' in session['url_root'] %}
+            <img src="{{url_for('static', filename='img/atlas-connect-logo.png')}}" id="connect-brand" width="180" height="40" class="d-inline-block align-top" alt="">
+            {% else %}
+            <img src="{{url_for('static', filename='img/CIConnectLogo3-infinity.png')}}" id="connect-brand" width="120" height="40" class="d-inline-block align-top" alt="">
+            {% endif %}
           </a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
