@@ -34,47 +34,47 @@ def home():
     return render_template('home.html')
 
 
-@app.route('/projects', methods=['GET'])
-def projects():
-    """OSG Connect Projects"""
+@app.route('/groups', methods=['GET'])
+def groups():
+    """OSG Connect groups"""
     if request.method == 'GET':
         query = {'token': ciconnect_api_token}
-        projects = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups', params=query)
-        projects = projects.json()['groups']
-        return render_template('projects.html', projects=projects)
+        groups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups', params=query)
+        groups = groups.json()['groups']
+        return render_template('groups.html', groups=groups)
 
 
-@app.route('/projects/new', methods=['GET', 'POST'])
+@app.route('/groups/new', methods=['GET', 'POST'])
 @authenticated
-def create_project():
-    """Create Projects"""
+def create_group():
+    """Create groups"""
     query = {'token': ciconnect_api_token}
     if request.method == 'GET':
-        return render_template('projects_create.html')
+        return render_template('groups_create.html')
     elif request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
         phone = request.form['phone']
-        field_of_science = "testing science"
+        field_of_science = "Logic"
         description = request.form['description']
 
-        put_project = {"apiVersion": 'v1alpha1',
-                    "kind": 'Group',
-                    'metadata': {'name': name, 'field_of_science': field_of_science,
+        put_group = {"apiVersion": 'v1alpha1', "kind": "Group",
+                        'metadata': {'name': name,
+                                    'field_of_science': field_of_science,
                                     'email': email, 'phone': phone,
                                     'description': description}}
-        print(query)
-        create_project = requests.put(ciconnect_api_endpoint + '/v1alpha1/groups/root/subgroups/osg', params=query, json=put_project)
-        print(create_project.url)
-        print("CREATED PROJECT: {}".format(create_project))
-        return redirect(url_for('projects'))
+        create_group = requests.put(ciconnect_api_endpoint + '/v1alpha1/groups/root/subgroups/' + name, params=query, json=put_group)
+        print(create_group.url)
+        print("CREATED group: {}".format(create_group.content))
+        return redirect(url_for('groups'))
 
-@app.route('/projects/some', methods=['GET', 'POST'])
+
+@app.route('/groups/some', methods=['GET', 'POST'])
 @authenticated
-def view_project():
-    """Detailed view of specific projects"""
+def view_group():
+    """Detailed view of specific groups"""
     if request.method == 'GET':
-        return render_template('project_profile.html')
+        return render_template('group_profile.html')
 
 
 @app.route('/signup', methods=['GET'])

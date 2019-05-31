@@ -1,11 +1,11 @@
 {%extends "base.html"%}
 
 {%block title%}
-  Create Project
+  Create Group
 {%endblock%}
 
 {%block body%}
-<section id="create-project" class="bg-light">
+<section id="create-group" class="bg-light">
   <div class="container col-lg-12">
     <!-- <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -14,17 +14,17 @@
     {%include 'messages.html'%}
     <div class="row">
       <div class="col-lg-8 mx-auto">
-        <h2>Request Project Creation {{session['access_token']}}</h2>
+        <h2>Request Group Creation {{session['access_token']}}</h2>
         <hr/>
-        <form role="form" action="{{url_for('create_project')}}" method="POST">
+        <form role="form" action="{{url_for('create_group')}}" method="POST">
           <div class="form-group">
-            <label for="name">Project Name *</label>
+            <label for="name">Group Name *</label>
             <input
               type="text"
               class="form-control"
               id="name"
               name="name"
-              placeholder="Name of Research Project"
+              placeholder="Name of Research Group"
               required="required"
               tabindex="1"
             >
@@ -67,7 +67,7 @@
           <div class="form-group">
             <label for="description">Description <span id="asterik">*</span></label>
             <textarea
-              placeholder="Brief description of your project"
+              placeholder="Brief description of your group"
               name="description"
               required
               tabindex="5"

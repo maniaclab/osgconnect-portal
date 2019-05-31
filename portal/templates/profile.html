@@ -15,7 +15,6 @@
     <div class="row">
       <div class="col-lg-12 mx-auto">
         <h1>Profile</h1>
-        {{session['access_token']}}
         <hr/>
         <div class="row">
           <div class="col-sm-12 col-md-6">
@@ -39,16 +38,16 @@
           <div class="col-sm-12 col-md-6">
             <div class="card h-100">
               <div class="card-header">
-                Projects <i class="fas fa-users float-right"></i>
+                Groups <i class="fas fa-users float-right"></i>
               </div>
               <div class="card-body">
                 <!-- <h5 class="card-title" style="text-align: center"><i class="fas fa-users fa-2x"></i></h5> -->
                 <ul class="list-unstyled">
-                  {% for project in profile['group_memberships'] %}
-                  <li>{{project}}</li>
+                  {% for group in profile['group_memberships'] %}
+                  <li>{{group}}</li>
                   {% endfor %}
                 </ul>
-                <a href="{{url_for('create_project')}}" class="btn btn-primary btn-sm">Create a project</a>
+                <a href="{{url_for('create_group')}}" class="btn btn-primary btn-sm">Create a group</a>
               </div>
             </div>
           </div>
