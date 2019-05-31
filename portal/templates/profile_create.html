@@ -15,6 +15,7 @@
     <div class="row">
       <div class="col-lg-6 mx-auto">
         <h2>Create CI Connect Profile</h2>
+        {{session['primary_identity']}}
         <hr/>
         <form role="form" action="#" method="POST">
           <div class="form-group">
@@ -31,6 +32,19 @@
           </div>
 
           <div class="form-group">
+            <label for="unix_name">UNIX User Name *</label>
+            <input
+              type="text"
+              class="form-control"
+              id="unix_name"
+              name="unix_name"
+              placeholder="UNIX alpha-numeric and underscore"
+              required="required"
+              tabindex="2"
+            >
+          </div>
+
+          <div class="form-group">
             <label for="email">Email *</label>
             <input
               type="email"
@@ -39,12 +53,12 @@
               class="form-control"
               placeholder="{{session['email']}}"
               required="required"
-              tabindex="2"
+              tabindex="3"
             >
           </div>
 
           <div class="form-group">
-            <label for="phone-number">Email *</label>
+            <label for="phone-number">Phone *</label>
             <input
               type="tel"
               id="phone-number"
@@ -52,7 +66,7 @@
               class="form-control"
               placeholder="111 111 1111"
               required="required"
-              tabindex="3"
+              tabindex="4"
             >
           </div>
 
@@ -65,7 +79,7 @@
               class="form-control"
               placeholder="Institution Name"
               required="required"
-              tabindex="4"
+              tabindex="5"
             >
           </div>
 
@@ -76,7 +90,7 @@
               name="sshpubstring"
               id="sshpubstring"
               required
-              tabindex="5"
+              tabindex="6"
               style="background-color:white; color:black; border-radius:4px; border-color:lightgrey;"
               value=""
               ></textarea>

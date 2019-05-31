@@ -19,7 +19,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
 
-    <title>CI Connect - {%block title%}{%endblock%}</title>
+    <title>{% if 'atlas' in session['url_root'] %}Atlas {% elif 'osg' in session['url_root'] %}OSG {% elif 'cms' in session['url_root'] %}CMS {% else %}CI {% endif %}Connect - {%block title%}{%endblock%}</title>
 
     {# CSS files #}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
@@ -87,7 +87,11 @@
         <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
           <a class="navbar-brand" href="{{url_for('home')}}">
             {% if 'atlas' in session['url_root'] %}
-            <img src="{{url_for('static', filename='img/atlas-connect-logo.png')}}" id="connect-brand" width="180" height="40" class="d-inline-block align-top" alt="">
+            <img src="{{url_for('static', filename='img/atlas-connect-logo_trans.png')}}" id="connect-brand" width="180" height="40" class="d-inline-block align-top" alt="">
+            {% elif 'osg' in session['url_root'] %}
+            <img src="{{url_for('static', filename='img/osg-logo.png')}}" id="connect-brand" width="220" height="40" class="d-inline-block align-top" alt="">
+            {% elif 'cms' in session['url_root'] %}
+            <img src="{{url_for('static', filename='img/cms-connectlogo.png')}}" id="connect-brand" width="180" height="40" class="d-inline-block align-top" alt="">
             {% else %}
             <img src="{{url_for('static', filename='img/CIConnectLogo3-infinity.png')}}" id="connect-brand" width="120" height="40" class="d-inline-block align-top" alt="">
             {% endif %}

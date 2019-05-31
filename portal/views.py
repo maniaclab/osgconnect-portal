@@ -140,6 +140,7 @@ def create_profile():
 
     elif request.method == 'POST':
         name = request.form['name']
+        unix_name = request.form['unix_name']
         email = request.form['email']
         phone = request.form['phone-number']
         institution = request.form['institution']
@@ -152,7 +153,8 @@ def create_profile():
         post_user = {"apiVersion": 'v1alpha1',
                     'metadata': {'globusID': globus_id, 'name': name, 'email': email,
                                  'phone': phone, 'institution': institution,
-                                 'public_key': public_key, 'superuser': superuser,
+                                 'public_key': public_key,
+                                 'unix_name': unix_name, 'superuser': superuser,
                                  'service_account': service_account}}
 
         r = requests.post(ciconnect_api_endpoint + '/v1alpha1/users', params=query, json=post_user)
@@ -171,9 +173,12 @@ def create_profile():
 @authenticated
 def edit_profile(user_id):
     identity_id = session.get('primary_identity')
-    access_token = session.get('access_token')
-    query = {'token': access_token,
+    query = {'token': ciconnect_api_token,
              'globus_id': identity_id}
+    user = requests.get(
+                ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
+    user_id = user.json()['metadata']['id']
+
     if request.method == 'GET':
         # Get user info, pass through as args, convert to json and load input fields
         profile = requests.get(
@@ -334,6 +339,7 @@ def authcallback():
             session['access_token'] = profile['access_token']
             session['url_root'] = request.url_root
         else:
+            session['url_root'] = request.url_root
             return redirect(url_for('create_profile',
                             next=url_for('profile')))
 
