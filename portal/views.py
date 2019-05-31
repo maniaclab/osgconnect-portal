@@ -14,11 +14,11 @@ from portal.utils import (load_portal_client, get_portal_tokens,
 
 # Use these four lines on container
 import sys
-sys.path.insert(0, '/etc/ciconnect/secrets')
+sys.path.insert(0, '/etc/ci-connect/secrets')
 
 try:
-    f = open("/etc/ciconnect/secrets/ciconnect_api_token.txt", "r")
-    g = open("ciconnect_api_endpoint.txt", "r")
+    f = open("/etc/ci-connect/secrets/ciconnect_api_token.txt", "r")
+    g = open("/etc/ci-connect/secrets/ciconnect_api_endpoint.txt", "r")
 except:
     # Use these two lines below on local
     f = open("/Users/JeremyVan/Documents/Programming/UChicago/CI_Connect/secrets/ciconnect_api_token.txt", "r")
@@ -41,7 +41,6 @@ def projects():
         query = {'token': ciconnect_api_token}
         projects = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups', params=query)
         projects = projects.json()['groups']
-        print(projects)
         return render_template('projects.html', projects=projects)
 
 
@@ -49,9 +48,25 @@ def projects():
 @authenticated
 def create_project():
     """Create Projects"""
+    query = {'token': ciconnect_api_token}
     if request.method == 'GET':
         return render_template('projects_create.html')
     elif request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        phone = request.form['phone']
+        field_of_science = "testing science"
+        description = request.form['description']
+
+        put_project = {"apiVersion": 'v1alpha1',
+                    "kind": 'Group',
+                    'metadata': {'name': name, 'field_of_science': field_of_science,
+                                    'email': email, 'phone': phone,
+                                    'description': description}}
+        print(query)
+        create_project = requests.put(ciconnect_api_endpoint + '/v1alpha1/groups/root/subgroups/osg', params=query, json=put_project)
+        print(create_project.url)
+        print("CREATED PROJECT: {}".format(create_project))
         return redirect(url_for('projects'))
 
 @app.route('/projects/some', methods=['GET', 'POST'])
@@ -128,6 +143,7 @@ def create_profile():
         email = request.form['email']
         phone = request.form['phone-number']
         institution = request.form['institution']
+        public_key = request.form['sshpubstring']
         globus_id = session['primary_identity']
 
         superuser = False
@@ -156,9 +172,8 @@ def create_profile():
 def edit_profile(user_id):
     identity_id = session.get('primary_identity')
     access_token = session.get('access_token')
-    globus_id = identity_id
     query = {'token': access_token,
-             'globus_id': globus_id}
+             'globus_id': identity_id}
     if request.method == 'GET':
         # Get user info, pass through as args, convert to json and load input fields
         profile = requests.get(
@@ -296,17 +311,19 @@ def authcallback():
         globus_id = session['primary_identity']
         query = {'token': ciconnect_api_token,
                  'globus_id': globus_id}
-
-        r = requests.get(
-            ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
-        # print("AUTH: {}".format(r.json()))
-        user_info = r.json()
-        user_access_token = user_info['metadata']['access_token']
-        user_id = user_info['metadata']['id']
-        profile = requests.get(
-                    ciconnect_api_endpoint + '/v1alpha1/users/' + user_id, params=query)
-        profile = profile.json()
-        # print("PROFILE: {}".format(profile))
+        try:
+            r = requests.get(
+                ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
+            print("AUTH: {}".format(r.json()))
+            user_info = r.json()
+            user_access_token = user_info['metadata']['access_token']
+            user_id = user_info['metadata']['id']
+            profile = requests.get(
+                        ciconnect_api_endpoint + '/v1alpha1/users/' + user_id, params=query)
+            profile = profile.json()
+            # print("PROFILE: {}".format(profile))
+        except:
+            profile = None
 
         if profile:
             profile = profile['metadata']

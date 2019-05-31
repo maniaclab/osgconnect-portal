@@ -14,9 +14,9 @@
     {%include 'messages.html'%}
     <div class="row">
       <div class="col-lg-8 mx-auto">
-        <h2>Request Project Creation</h2>
+        <h2>Request Project Creation {{session['access_token']}}</h2>
         <hr/>
-        <form role="form" action="#" method="POST">
+        <form role="form" action="{{url_for('create_project')}}" method="POST">
           <div class="form-group">
             <label for="name">Project Name *</label>
             <input
@@ -44,13 +44,13 @@
           </div>
 
           <div class="form-group">
-            <label for="institution">Institution *</label>
+            <label for="phone">Phone *</label>
             <input
-              type="text"
-              id="institution"
-              name="institution"
+              type="tel"
+              id="phone"
+              name="phone"
               class="form-control"
-              placeholder="Institution Name"
+              placeholder="888 888 8888"
               required="required"
               tabindex="3"
             >
@@ -89,14 +89,13 @@
 <script>
 var name = {{session['name']|tojson}};
 var email = {{session['email']|tojson}};
-var institution = {{session['institution']|tojson}};
 
-window.onload = setFormFields(email, institution);
+window.onload = setFormFields(email);
 
-function setFormFields(email, institution){
+function setFormFields(email){
   // document.getElementById('name').value = name;
   document.getElementById('email').value = email;
-  document.getElementById('institution').value = institution;
+  // document.getElementById('phone').value = phone;
 }
 
 </script>
