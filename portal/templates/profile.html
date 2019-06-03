@@ -45,7 +45,9 @@
                 <!-- <h5 class="card-title" style="text-align: center"><i class="fas fa-users fa-2x"></i></h5> -->
                 <ul class="list-unstyled">
                   {% for group in profile['group_memberships'] %}
-                  <li>{{group}}</li>
+                    {% if group['name'] != 'root'%}
+                  <li>{{'-'.join(group['name'].split('.')[1:])}} - {{group['state']}}</li>
+                    {% endif %}
                   {% endfor %}
                 </ul>
                 <a href="{{url_for('create_group')}}" class="btn btn-primary btn-sm">Create a group</a>
