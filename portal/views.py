@@ -100,8 +100,30 @@ def view_group(group_name):
     if request.method == 'GET':
         group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=query)
         group = group.json()['metadata']
+        # Remove 'root' and join group naming
+        group_name = group['name'].split('.')[1:]
+        group_name = '-'.join(group_name)
 
-        return render_template('group_profile.html', group=group)
+        return render_template('group_profile.html', group=group, group_name=group_name)
+
+
+@app.route('/groups/<group_name>/members', methods=['GET', 'POST'])
+@authenticated
+def view_group_members(group_name):
+    """Detailed view of group's members"""
+    query = {'token': ciconnect_api_token}
+    if request.method == 'GET':
+        print(group_name)
+        group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=query)
+        memberships = group_members.json()['memberships']
+        members = []
+        for user in memberships:
+            user_id = user['id']
+            user_info = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + user_id, params=query)
+            user_info = user_info.json()['metadata']
+            members.append(user_info)
+
+        return render_template('group_profile_members.html', group_members=members, group_name=group_name)
 
 
 @app.route('/signup', methods=['GET'])
