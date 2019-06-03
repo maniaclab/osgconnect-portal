@@ -10,7 +10,7 @@
   <div class="container text-center">
     {% if session.get('is_authenticated') %}
 
-      {% if 'local' in session['url_root'] %}
+      {% if 'connect' in session['url_root'] %}
     <img src="{{url_for('static', filename='img/CIConnectLogo3-infinity.png')}}" style="width:30%;">
     <h1>Cyberinfrastructure for accelerated research</h1>
     <!-- <p class="lead">Efficiently connect your science to cycles and data.</p> -->
