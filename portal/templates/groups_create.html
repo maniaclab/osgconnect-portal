@@ -14,7 +14,7 @@
     {%include 'messages.html'%}
     <div class="row">
       <div class="col-lg-8 mx-auto">
-        <h2>Request Group Creation {{session['access_token']}}</h2>
+        <h2>Request Group Creation</h2>
         <hr/>
         <form role="form" action="{{url_for('create_group')}}" method="POST">
           <div class="form-group">
@@ -57,10 +57,12 @@
           </div>
 
           <div class="form-group">
-            <label for="field-of-science">Field of Science *</label>
-            <select class="form-control" id="field-of-science" name="field-of-science" required="required" tabindex="4">
+            <label for="field_of_science">Field of Science *</label>
+            <select class="form-control" id="field_of_science" name="field_of_science" required="required" tabindex="4" onmousedown="if(this.options.length>6){this.size=6;}"  onchange='this.size=0;' onblur="this.size=0;">
               <option value="" selected disabled>Select Field of Science</option>
-              <option value="">List of sciences</option>
+              {% for science in sciences %}
+              <option value="{{science}}">{{science}}</option>
+              {% endfor %}
             </select>
           </div>
 

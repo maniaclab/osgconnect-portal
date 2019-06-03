@@ -1,6 +1,6 @@
 from flask import (abort, flash, redirect, render_template, request,
                    session, url_for)
-import requests, traceback, json
+import requests, traceback, json, time
 
 try:
     from urllib.parse import urlencode
@@ -71,12 +71,14 @@ def create_group():
     """Create groups"""
     query = {'token': ciconnect_api_token}
     if request.method == 'GET':
-        return render_template('groups_create.html')
+        sciences = requests.get(ciconnect_api_endpoint + '/v1alpha1/fields_of_science')
+        sciences = sciences.json()['fields_of_science']
+        return render_template('groups_create.html', sciences=sciences)
     elif request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
         phone = request.form['phone']
-        field_of_science = "Logic"
+        field_of_science = request.form['field_of_science']
         description = request.form['description']
 
         put_group = {"apiVersion": 'v1alpha1', "kind": "Group",
@@ -90,10 +92,11 @@ def create_group():
         return redirect(url_for('groups'))
 
 
-@app.route('/groups/some', methods=['GET', 'POST'])
+@app.route('/groups/<group_name>', methods=['GET', 'POST'])
 @authenticated
-def view_group():
+def view_group(group_name):
     """Detailed view of specific groups"""
+    query = {'token': ciconnect_api_token}
     if request.method == 'GET':
         return render_template('group_profile.html')
 
