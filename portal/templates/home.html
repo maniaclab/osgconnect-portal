@@ -10,7 +10,7 @@
   <div class="container text-center">
     {% if session.get('is_authenticated') %}
 
-      {% if 'connect' in session['url_root'] %}
+      {% if 'ci-connect' in session['url_root'] or 'local' in session['url_root'] %}
     <img src="{{url_for('static', filename='img/CIConnectLogo3-infinity.png')}}" style="width:30%;">
     <h1>Cyberinfrastructure for accelerated research</h1>
     <!-- <p class="lead">Efficiently connect your science to cycles and data.</p> -->
@@ -19,6 +19,16 @@
         Connecting Science to Cycles and Data/ Reliable, High Performance CI
         Services/ Connected environments from hosted services/ Cycles and Data
         Virtually in One Place
+      </span>
+    </h4>
+    {% elif 'atlas' in session['url_root'] %}
+    <img src="{{url_for('static', filename='img/atlas-connect-logo_trans.png')}}" style="width:30%;">
+    <h1>Welcome to Atlas Connect</h1>
+    <!-- <p class="lead">Efficiently connect your science to cycles and data.</p> -->
+    <h4 class="lead">
+      <span class="rotating text-muted">
+        Connect Virtual Cluster Service/ Connect Cluster Service/
+        Connect Storage Service
       </span>
     </h4>
       {% endif %}
@@ -33,9 +43,9 @@
         Virtually in One Place
       </span>
     </h4>
-    {% endif %}
     <a role="button" href="{{url_for('login')}}" class="btn btn-primary">Login</a>
     <a role="button" href="{{url_for('signup')}}" class="btn btn-primary">Sign Up</a>
+    {% endif %}
   </div>
 </header>
 

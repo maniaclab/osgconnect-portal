@@ -1,7 +1,7 @@
 {%extends "base.html"%}
 
 {%block title%}
-  Group - {{name}}
+  Group -
 {%endblock%}
 
 {%block body%}
@@ -14,7 +14,8 @@
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="#">Home</a></li>
           <li class="breadcrumb-item"><a href="{{url_for('groups')}}">Groups</a></li>
-          <li class="breadcrumb-item active">{{display_name}}</li>
+          <li class="breadcrumb-item"><a href="{{url_for('view_group', group_name=group_name)}}">{{display_name}}</a></li>
+          <li class="breadcrumb-item active">Subgroups</li>
         </ol>
         <h2>Group: {{display_name}}</h2>
         <br>
@@ -45,50 +46,44 @@
 
         <ul class="nav nav-tabs">
           <li class="nav-item">
-            <a class="nav-link active" href="#"><i class="fas fa-cubes"></i> Overview</a>
+            <a class="nav-link" href="{{url_for('view_group', group_name=group_name)}}"><i class="fas fa-cubes"></i> Overview</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{{url_for('view_group_members', group_name=group_name)}}"><i class="fas fa-user-friends"></i> Members</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{url_for('view_group_subgroups', group_name=group_name)}}"><i class="fas fa-project-diagram"></i> Subgroups</a>
+            <a class="nav-link active" href="#"><i class="fas fa-project-diagram"></i> Subgroups</a>
           </li>
         </ul>
         <br>
 
         <div class="row">
-          <div class="col-sm-6">
-            <div class="card h-100">
-              <div class="card-header">
-                Group Information:
-              </div>
-              <div class="card-body">
-                <p class="">
-                  <strong>Contact Email:</strong> <a href="mailto:#">{{group['email']}}</a>
-                </p>
-                <p class="">
-                  <strong>Phone Number:</strong> {{group['phone']}}
-                </p>
-                <p class="">
-                  <strong>Field of Science:</strong> {{group['field_of_science']}}
-                </p>
-                <p class="">
-                  <strong>Description:</strong> {{group['description']}}
-                </p>
-              </div>
-            </div>
-          </div>
+          <div class="col-sm-12">
+            <div class="table-responsive">
+              <h4>Subgroups of {{display_name}}</h4>
+              <table class="table" id="groups-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
+                <thead>
+                  <tr>
+                    <th data-field="name" data-sortable="true">Name</th>
+                    <th data-field="status" data-sortable="true">Admin</th>
+                    <th data-field="email" data-sortable="true">Email</th>
+                    <th data-field="phone" data-sortable="true">Phone</th>
+                    <th data-field="field_of_science" data-sortable="true">Field of Science</th>
+                  </tr>
+                </thead>
+                <tbody data-link="row" class="rowlink" style="font-size:14px;">
+                  {% for group in subgroups %}
+                  <tr>
+                    <td>{{group['name']}}</td>
+                    <td>{{group['admin']}}</td>
+                    <td>{{group['email']}}</td>
+                    <td>{{group['phone']}}</td>
+                    <td>{{group['field_of_science']}}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
 
-          <div class="col-sm-6">
-            <div class="card h-100">
-              <div class="card-header">
-                Additional Info
-              </div>
-              <div class="card-body">
-                <ul class="list-unstyled">
-                  <li>Currently no information</li>
-                </ul>
-              </div>
+              </table>
             </div>
           </div>
         </div>
