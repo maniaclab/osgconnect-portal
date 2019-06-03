@@ -11,7 +11,7 @@
     <div class="row">
       <div class="col-lg-12 mx-auto">
         {%include 'messages.html' %}
-        <h2>Group: {{name}}</h2>
+        <h2>Group: {{group['name']}}</h2>
         <br>
         <div class="btn-toolbar" role="toolbar">
           <div class="btn-group mr-2" role="group" aria-label="first group">
@@ -47,16 +47,16 @@
               </div>
               <div class="card-body">
                 <p class="">
-                  <strong>Contact Email:</strong> <a href="mailto:#">someemail@domain.com</a>
+                  <strong>Contact Email:</strong> <a href="mailto:#">{{group['email']}}</a>
                 </p>
                 <p class="">
-                  <strong>Phone Number:</strong> 123-456-7890
+                  <strong>Phone Number:</strong> {{group['phone']}}
                 </p>
                 <p class="">
-                  <strong>Field of Science:</strong> some science
+                  <strong>Field of Science:</strong> {{group['field_of_science']}}
                 </p>
                 <p class="">
-                  <strong>Description:</strong> some description
+                  <strong>Description:</strong> {{group['description']}}
                 </p>
               </div>
             </div>

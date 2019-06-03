@@ -69,7 +69,7 @@ def groups():
 @authenticated
 def create_group():
     """Create groups"""
-    query = {'token': ciconnect_api_token}
+    query = {'token': session['access_token']}
     if request.method == 'GET':
         sciences = requests.get(ciconnect_api_endpoint + '/v1alpha1/fields_of_science')
         sciences = sciences.json()['fields_of_science']
@@ -96,9 +96,12 @@ def create_group():
 @authenticated
 def view_group(group_name):
     """Detailed view of specific groups"""
-    query = {'token': ciconnect_api_token}
+    query = {'token': session['access_token']}
     if request.method == 'GET':
-        return render_template('group_profile.html')
+        group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=query)
+        group = group.json()['metadata']
+
+        return render_template('group_profile.html', group=group)
 
 
 @app.route('/signup', methods=['GET'])
