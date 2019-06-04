@@ -11,7 +11,7 @@
     {% if session.get('is_authenticated') %}
 
       {% if 'ci-connect' in session['url_root'] or 'local' in session['url_root'] %}
-    <img src="{{url_for('static', filename='img/CIConnectLogo3-infinity.png')}}" style="width:30%;">
+    <img src="{{url_for('static', filename='img/CIConnect_logo.png')}}" style="width:30%;">
     <h1>Cyberinfrastructure for accelerated research</h1>
     <!-- <p class="lead">Efficiently connect your science to cycles and data.</p> -->
     <h4 class="lead">
@@ -24,6 +24,25 @@
     {% elif 'atlas' in session['url_root'] %}
     <img src="{{url_for('static', filename='img/atlas-connect-logo_trans.png')}}" style="width:30%;">
     <h1>Welcome to Atlas Connect</h1>
+    <!-- <p class="lead">Efficiently connect your science to cycles and data.</p> -->
+    <h4 class="lead">
+      <span class="rotating text-muted">
+        Connect Virtual Cluster Service/ Connect Cluster Service/
+        Connect Storage Service
+      </span>
+    </h4>
+    {% elif 'osg' in session['url_root'] %}
+    <img src="{{url_for('static', filename='img/OSGConnect_logo.png')}}" style="width:30%;">
+    <h1>Distributed High Throughput Computing</h1>
+    <!-- <p class="lead">Efficiently connect your science to cycles and data.</p> -->
+    <h4 class="lead">
+      <span class="rotating text-muted">
+        Researcher facilitation/ Agile, Shared Compute Systems/ Consulting Services
+      </span>
+    </h4>
+    {% elif 'cms' in session['url_root'] %}
+    <img src="{{url_for('static', filename='img/cms-connectlogo.png')}}" style="width:30%;">
+    <h1>Welcome to CMS Connect</h1>
     <!-- <p class="lead">Efficiently connect your science to cycles and data.</p> -->
     <h4 class="lead">
       <span class="rotating text-muted">

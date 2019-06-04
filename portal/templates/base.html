@@ -90,11 +90,11 @@
             {% if 'atlas' in session['url_root'] %}
             <img src="{{url_for('static', filename='img/atlas-connect-logo_trans.png')}}" id="connect-brand" width="180" height="40" class="d-inline-block align-top" alt="">
             {% elif 'osg' in session['url_root'] %}
-            <img src="{{url_for('static', filename='img/osg-logo.png')}}" id="connect-brand" width="220" height="40" class="d-inline-block align-top" alt="">
+            <img src="{{url_for('static', filename='img/OSGConnect_logo.png')}}" id="connect-brand" width="180" height="40" class="d-inline-block align-top" alt="">
             {% elif 'cms' in session['url_root'] %}
             <img src="{{url_for('static', filename='img/cms-connectlogo.png')}}" id="connect-brand" width="180" height="40" class="d-inline-block align-top" alt="">
             {% else %}
-            <img src="{{url_for('static', filename='img/CIConnectLogo3-infinity.png')}}" id="connect-brand" width="120" height="40" class="d-inline-block align-top" alt="">
+            <img src="{{url_for('static', filename='img/CIConnect_logo.png')}}" id="connect-brand" width="120" height="40" class="d-inline-block align-top" alt="">
             {% endif %}
           </a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -108,17 +108,9 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="support-dropdown-menu">
                   <a class="dropdown-item" href="https://support.opensciencegrid.org/support/home" target="_blank">Helpdesk</a>
-                  <a class="dropdown-item" href="https://support.opensciencegrid.org/support/tickets/new" target="_blank">Open Ticket</a>
+                  <a class="dropdown-item" href="mailto:user-support@opensciencegrid.org">Email Us</a>
                 </div>
               </li>
-              <!-- <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="resources-dropdown-menu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Resources
-                </a>
-                <div class="dropdown-menu" aria-labelledby="resources-dropdown-menu">
-                  <a class="dropdown-item" href="#">Accounting Summary</a>
-                </div>
-              </li> -->
               {% if session.get('is_authenticated') %}
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="connect-dropdown-menu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
