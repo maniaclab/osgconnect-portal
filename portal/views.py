@@ -62,7 +62,6 @@ def groups():
         query = {'token': ciconnect_api_token}
         groups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups', params=query)
         groups = groups.json()['groups']
-        print(groups)
         return render_template('groups.html', groups=groups)
 
 
@@ -88,9 +87,13 @@ def create_group():
                                     'email': email, 'phone': phone,
                                     'description': description}}
         create_group = requests.put(ciconnect_api_endpoint + '/v1alpha1/groups/root/subgroups/' + name, params=query, json=put_group)
-        print(create_group.url)
-        print("CREATED group: {}".format(create_group.content))
-        return redirect(url_for('groups'))
+        if create_group.status_code == requests.codes.ok:
+            flash("Successfully created group", 'success')
+            return redirect(url_for('groups'))
+        else:
+            err_message = create_group.json()['message']
+            flash('Failed to create group: {}'.format(err_message), 'warning')
+            return redirect(url_for('groups'))
 
 
 @app.route('/groups/<group_name>', methods=['GET', 'POST'])
@@ -166,7 +169,7 @@ def view_group_members(group_name):
             user_state = user['state']
             user_info = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + user_id, params=query)
             user_info = user_info.json()['metadata']
-            members.append((user_info, user_state))
+            members.append((user_info, user_id, user_state))
 
         # Get User's Group Status
         user_status = requests.get(
@@ -174,9 +177,76 @@ def view_group_members(group_name):
                         group_name + '/members/' + session['user_id'], params=query)
         user_status = user_status.json()['membership']['state']
 
+        user_super = requests.get(
+                        ciconnect_api_endpoint + '/v1alpha1/users/' + session['user_id'], params=query)
+        user_super = user_super.json()['metadata']['superuser']
+
         return render_template('group_profile_members.html',
                                 group_members=members, group_name=group_name,
-                                display_name=display_name, user_status=user_status)
+                                display_name=display_name, user_status=user_status,
+                                user_super=user_super)
+
+@app.route('/groups/<group_name>/add_group_member/<user_id>', methods=['POST'])
+@authenticated
+def add_group_member(group_name, user_id):
+    if request.method == 'POST':
+        query = {'token': session['access_token']}
+
+        put_query = {"apiVersion": 'v1alpha1',
+                        'group_membership': {'state': 'active'}}
+        user_status = requests.put(
+                        ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                        group_name + '/members/' + user_id, params=query, json=put_query)
+        # print("UPDATED MEMBERSHIP: {}".format(user_status))
+
+        if user_status.status_code == requests.codes.ok:
+            flash("Successfully added member to group", 'success')
+            return redirect(url_for('view_group', group_name=group_name))
+        else:
+            err_message = user_status.json()['message']
+            flash('Failed to add member to group: {}'.format(err_message), 'warning')
+            return redirect(url_for('view_group', group_name=group_name))
+
+
+@app.route('/groups/<group_name>/delete_group_member/<user_id>', methods=['POST'])
+@authenticated
+def remove_group_member(group_name, user_id):
+    if request.method == 'POST':
+        query = {'token': session['access_token']}
+        remove_user = requests.delete(
+                        ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                        group_name + '/members/' + user_id, params=query)
+        print("UPDATED remove_user: {}".format(remove_user))
+
+        if remove_user.status_code == requests.codes.ok:
+            flash("Successfully removed member from group", 'success')
+            return redirect(url_for('view_group', group_name=group_name))
+        else:
+            err_message = remove_user.json()['message']
+            flash('Failed to remove member from group: {}'.format(err_message), 'warning')
+            return redirect(url_for('view_group', group_name=group_name))
+
+
+@app.route('/groups/<group_name>/admin_group_member/<user_id>', methods=['POST'])
+@authenticated
+def admin_group_member(group_name, user_id):
+    if request.method == 'POST':
+        query = {'token': session['access_token']}
+
+        put_query = {"apiVersion": 'v1alpha1',
+                        'group_membership': {'state': 'admin'}}
+        user_status = requests.put(
+                        ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                        group_name + '/members/' + user_id, params=query, json=put_query)
+        # print("UPDATED MEMBERSHIP: {}".format(user_status))
+
+        if user_status.status_code == requests.codes.ok:
+            flash("Successfully updated member to admin", 'success')
+            return redirect(url_for('view_group', group_name=group_name))
+        else:
+            err_message = user_status.json()['message']
+            flash('Failed make member an admin: {}'.format(err_message), 'warning')
+            return redirect(url_for('view_group', group_name=group_name))
 
 
 @app.route('/groups/<group_name>/subgroups', methods=['GET', 'POST'])
@@ -282,10 +352,10 @@ def create_profile():
 
         r = requests.post(ciconnect_api_endpoint + '/v1alpha1/users', params=query, json=post_user)
         r = r.json()['metadata']
-        print(r)
-        # session['access_token'] = r['access_token']
-        # session['user_id'] = r['user_id']
-        print("Created User: ", r)
+        session['access_token'] = r['access_token']
+        session['user_id'] = r['id']
+        # print("Sesion: {}".format(session))
+        # print("Created User: {}".format(r))
 
         if 'next' in session:
             redirect_to = session['next']
@@ -465,6 +535,7 @@ def authcallback():
             session['email'] = profile['email']
             session['institution'] = profile['institution']
             session['access_token'] = profile['access_token']
+            session['user_id'] = profile['id']
             session['url_root'] = request.url_root
         else:
             session['url_root'] = request.url_root
