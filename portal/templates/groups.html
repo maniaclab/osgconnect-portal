@@ -1,6 +1,6 @@
 {%extends "base.html"%}
 
-{%block title%}Groups{%endblock%}
+{%block title%}{% if 'osg' in session['url_root'] %}Projects{%else%}Groups{%endif%}{%endblock%}
 
 {%block body%}
 
@@ -12,11 +12,14 @@
         {%include 'messages.html' %}
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="#">Home</a></li>
+          {% if 'osg' in session['url_root'] %}
+          <li class="breadcrumb-item">Projects</li>
+          {% else %}
           <li class="breadcrumb-item">Groups</li>
+          {% endif %}
         </ol>
 
         <div class="table-responsive">
-          <h4>Groups in CI Connect</h4>
           <table class="table" id="groups-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
             <thead>
               <tr>

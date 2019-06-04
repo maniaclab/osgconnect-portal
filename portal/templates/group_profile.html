@@ -1,7 +1,7 @@
 {%extends "base.html"%}
 
 {%block title%}
-  Group - {{name}}
+  {{display_name}}
 {%endblock%}
 
 {%block body%}
@@ -13,10 +13,14 @@
         {%include 'messages.html' %}
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="#">Home</a></li>
+          {% if 'osg' in session['url_root'] %}
+          <li class="breadcrumb-item"><a href="{{url_for('groups')}}">Projects</a></li>
+          {% else %}
           <li class="breadcrumb-item"><a href="{{url_for('groups')}}">Groups</a></li>
+          {% endif %}
           <li class="breadcrumb-item active">{{display_name}}</li>
         </ol>
-        <h2>Group: {{display_name}}</h2>
+        <h2>{{display_name}}</h2>
         <br>
         <div class="btn-toolbar" role="toolbar">
           {% if user_status == 'nonmember' %}
@@ -35,7 +39,11 @@
           </div>
           <div class="btn-group mr-2" role="group", aria-label="second group">
             <form role="form" action="{{url_for('delete_group', group_name=group_name)}}" method="POST" onsubmit="return confirm('Are you sure you want to delete this group?');">
+              {% if 'osg' in session['url_root'] %}
+              <button type="submit" name="delete_group" class="btn btn-danger btn-sm" data-submit="Deleting Project...">Delete Project</button>
+              {% else %}
               <button type="submit" name="delete_group" class="btn btn-danger btn-sm" data-submit="Deleting Group...">Delete Group</button>
+              {% endif %}
             </form>
           </div>
           {% endif %}

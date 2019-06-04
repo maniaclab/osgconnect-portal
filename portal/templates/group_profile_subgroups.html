@@ -1,7 +1,7 @@
 {%extends "base.html"%}
 
 {%block title%}
-  Group -
+  {{display_name}}
 {%endblock%}
 
 {%block body%}
@@ -13,11 +13,17 @@
         {%include 'messages.html' %}
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="#">Home</a></li>
+          {% if 'osg' in session['url_root'] %}
+          <li class="breadcrumb-item"><a href="{{url_for('groups')}}">Projects</a></li>
+          <li class="breadcrumb-item"><a href="{{url_for('view_group', group_name=group_name)}}">{{display_name}}</a></li>
+          <li class="breadcrumb-item active">Subprojects</li>
+          {% else %}
           <li class="breadcrumb-item"><a href="{{url_for('groups')}}">Groups</a></li>
           <li class="breadcrumb-item"><a href="{{url_for('view_group', group_name=group_name)}}">{{display_name}}</a></li>
           <li class="breadcrumb-item active">Subgroups</li>
+          {% endif %}
         </ol>
-        <h2>Group: {{display_name}}</h2>
+        <h2>{{display_name}}</h2>
         <br>
         <div class="btn-toolbar" role="toolbar">
           {% if user_status == 'nonmember' %}
@@ -35,9 +41,11 @@
             <a href="#" class="btn btn-secondary btn-sm">Edit Info</a>
           </div>
           <div class="btn-group mr-2" role="group", aria-label="second group">
-            <form role="form" action="{{url_for('delete_group', group_name=group_name)}}" method="POST" onsubmit="return confirm('Are you sure you want to delete this group?');">
-              <button type="submit" name="delete_group" class="btn btn-danger btn-sm" data-submit="Deleting Group...">Delete Group</button>
-            </form>
+            {% if 'osg' in session['url_root'] %}
+            <button type="submit" name="delete_group" class="btn btn-danger btn-sm" data-submit="Deleting Project...">Delete Project</button>
+            {% else %}
+            <button type="submit" name="delete_group" class="btn btn-danger btn-sm" data-submit="Deleting Group...">Delete Group</button>
+            {% endif %}
           </div>
           {% endif %}
         </div>
@@ -52,7 +60,11 @@
             <a class="nav-link" href="{{url_for('view_group_members', group_name=group_name)}}"><i class="fas fa-user-friends"></i> Members</a>
           </li>
           <li class="nav-item">
+            {% if 'osg' in session['url_root'] %}
+            <a class="nav-link active" href="#"><i class="fas fa-project-diagram"></i> Subprojects</a>
+            {% else%}
             <a class="nav-link active" href="#"><i class="fas fa-project-diagram"></i> Subgroups</a>
+            {% endif %}
           </li>
         </ul>
         <br>
