@@ -100,7 +100,7 @@ def create_group():
 @authenticated
 def view_group(group_name):
     """Detailed view of specific groups"""
-    query = {'token': session['access_token'],
+    query = {'token': ciconnect_api_token,
              'globus_id': session['primary_identity']}
 
     user = requests.get(ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
@@ -120,10 +120,13 @@ def view_group(group_name):
                         group_name + '/members/' + user_id, params=query)
         user_status = user_status.json()['membership']['state']
         # print("USER STATUS: {}".format(user_status))
+        subgroups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroups', params=query)
+        subgroups = subgroups.json()['groups']
+        print(subgroups)
 
         return render_template('group_profile.html', group=group,
                                 group_name=group_name, display_name=display_name,
-                                user_status=user_status)
+                                user_status=user_status, subgroups=subgroups)
     elif request.method == 'POST':
         put_query = {"apiVersion": 'v1alpha1',
                         'group_membership': {'state': 'pending'}}
@@ -258,7 +261,7 @@ def view_group_subgroups(group_name):
         display_name = '-'.join(group_name.split('.')[1:])
         subgroups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroups', params=query)
         subgroups = subgroups.json()['groups']
-        # print(subgroups)
+        print(subgroups)
         # Get User's Group Status
         user_status = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
@@ -268,6 +271,40 @@ def view_group_subgroups(group_name):
         return render_template('group_profile_subgroups.html',
                                 display_name=display_name, subgroups=subgroups,
                                 group_name=group_name, user_status=user_status)
+
+
+@app.route('/groups/<group_name>/subgroups/new', methods=['GET', 'POST'])
+@authenticated
+def create_subgroup(group_name):
+    token_query = {'token': session['access_token']}
+    if request.method == 'GET':
+        sciences = requests.get(ciconnect_api_endpoint + '/v1alpha1/fields_of_science')
+        sciences = sciences.json()['fields_of_science']
+        return render_template('groups_create.html', sciences=sciences)
+
+    elif request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        phone = request.form['phone']
+        field_of_science = request.form['field_of_science']
+        description = request.form['description']
+
+        put_query = {"apiVersion": 'v1alpha1',
+                        'metadata': {'name': name,
+                                    'field_of_science': field_of_science,
+                                    'email': email, 'phone': phone,
+                                    'description': description}}
+        r = requests.put(
+            ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name +
+            '/subgroups/' + name, params=token_query, json=put_query)
+
+        if r.status_code == requests.codes.ok:
+            flash("Successfully created group", 'success')
+            return redirect(url_for('groups'))
+        else:
+            err_message = r.json()['message']
+            flash('Failed to delete group: {}'.format(err_message), 'warning')
+            return redirect(url_for('view_group', group_name=group_name))
 
 
 @app.route('/signup', methods=['GET'])
@@ -398,7 +435,7 @@ def edit_profile(user_id):
         post_user = {"apiVersion": 'v1alpha1',
                     'metadata': {'name': name, 'email': email,
                                  'phone': phone, 'institution': institution,
-                                 'public_key': public_key}}
+                                 'public_key': public_key, 'superuser': superuser}}
         r = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' + user_id, params=query, json=post_user)
         print("Updated User: ", r)
         session['user_id'] = user_id
@@ -418,18 +455,20 @@ def profile():
     """User profile information. Assocated with a Globus Auth identity."""
     if request.method == 'GET':
         identity_id = session.get('primary_identity')
-        profile = None
         query = {'token': ciconnect_api_token,
                  'globus_id': identity_id}
 
-        user = requests.get(ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
-        user = user.json()
-        user_id = user['metadata']['id']
-        user_token = user['metadata']['access_token']
+        try:
+            user = requests.get(ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
+            user = user.json()
+            user_id = user['metadata']['id']
+            user_token = user['metadata']['access_token']
 
-        profile = requests.get(
-                    ciconnect_api_endpoint + '/v1alpha1/users/' + user_id, params=query)
-        profile = profile.json()
+            profile = requests.get(
+                        ciconnect_api_endpoint + '/v1alpha1/users/' + user_id, params=query)
+            profile = profile.json()
+        except:
+            profile = None
 
         if profile:
             profile = profile['metadata']
