@@ -128,6 +128,7 @@ def view_group(group_name):
                                 group_name=group_name, display_name=display_name,
                                 user_status=user_status, subgroups=subgroups)
     elif request.method == 'POST':
+        '''Request membership to join group'''
         put_query = {"apiVersion": 'v1alpha1',
                         'group_membership': {'state': 'pending'}}
         user_status = requests.put(
@@ -393,6 +394,16 @@ def create_profile():
         session['user_id'] = r['id']
         # print("Sesion: {}".format(session))
         # print("Created User: {}".format(r))
+
+        # Auto generate group membership into OSG - eventually change to
+        # dynamically choose connect site based on URL
+        put_query = {"apiVersion": 'v1alpha1',
+                        'group_membership': {'state': 'pending'}}
+        user_status = requests.put(
+                        ciconnect_api_endpoint +
+                        '/v1alpha1/groups/root.osg/members/' + r['id'],
+                        params=query, json=put_query)
+        # print("UPDATED MEMBERSHIP: {}".format(user_status))
 
         if 'next' in session:
             redirect_to = session['next']
