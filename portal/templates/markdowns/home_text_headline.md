@@ -1,1 +1,2 @@
-Cyberinfrastructure for accelerated research
+<!-- Cyberinfrastructure for accelerated research -->
+Distributed High Throughput Computing

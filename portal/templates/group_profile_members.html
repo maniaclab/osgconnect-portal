@@ -16,7 +16,7 @@
           {% if 'osg' in session['url_root'] %}
           <li class="breadcrumb-item"><a href="{{url_for('groups')}}">Projects</a></li>
           {% else %}
-          <li class="breadcrumb-item"><a href="{{url_for('groups')}}">Groups</a></li>
+          <li class="breadcrumb-item"><a href="{{url_for('groups')}}">Projects</a></li>
           {% endif %}
           <li class="breadcrumb-item"><a href="{{url_for('view_group', group_name=group_name)}}">{{display_name}}</a></li>
           <li class="breadcrumb-item active">Members</li>
@@ -91,7 +91,7 @@
                     {% if user_super %}
                     <td>
                       <div class="btn-group">
-                        {% if user_state == 'pending' %}
+                        {% if user_status == 'pending' %}
                         <form role="form" action="{{url_for('add_group_member', group_name=group_name, user_id=user_id)}}" method="POST" onsubmit="return confirm('Are you sure you want to confirm this member?');">
                           <button type="submit" name="add_group_member" class="btn btn-xs btn-success" data-submit="Adding Member..."><i class="fas fa-check-circle"></i> Accept</button>
                         </form>
@@ -99,9 +99,12 @@
                         <form role="form" action="{{url_for('remove_group_member', group_name=group_name, user_id=user_id)}}" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');">
                           <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Removing Member..."><i class="fas fa-times-circle"></i> Remove</button>
                         </form>
+                        {% if user_status == 'admin' %}
+                        {% else %}
                         <form role="form" action="{{url_for('admin_group_member', group_name=group_name, user_id=user_id)}}" method="POST" onsubmit="return confirm('Are you sure you want to make this member an admin?');">
                           <button type="submit" name="admin_group_member" class="btn btn-xs btn-warning" data-submit="Making Member Admin..."><i class="fas fa-user-shield"></i> Make Admin</button>
                         </form>
+                        {% endif %}
                         <!-- <button type="button" class="btn btn-sm btn-warning"><i class="fas fa-user-shield"></i> Make Admin</button> -->
                       </div>
                     </td>

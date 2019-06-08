@@ -19,7 +19,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
 
-    <title>{% if 'atlas' in session['url_root'] %}Atlas {% elif 'osg' in session['url_root'] %}OSG {% elif 'cms' in session['url_root'] %}CMS {% else %}CI {% endif %}Connect - {%block title%}{%endblock%}</title>
+    <title>{% if 'atlas' in session['url_root'] %}Atlas {% elif 'ci-connect' in session['url_root'] %}OSG {% elif 'cms' in session['url_root'] %}CMS {% else %}CI {% endif %}Connect - {%block title%}{%endblock%}</title>
 
     {# CSS files #}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
@@ -89,12 +89,12 @@
           <a class="navbar-brand" href="{{url_for('home')}}">
             {% if 'atlas' in session['url_root'] %}
             <img src="{{url_for('static', filename='img/atlas-connect-logo_trans.png')}}" id="connect-brand" width="180" height="40" class="d-inline-block align-top" alt="">
-            {% elif 'osg' in session['url_root'] %}
+            {% elif 'ci-connect' in session['url_root'] %}
             <img src="{{url_for('static', filename='img/OSGConnect_Logo.png')}}" id="connect-brand" width="180" height="40" class="d-inline-block align-top" alt="">
             {% elif 'cms' in session['url_root'] %}
             <img src="{{url_for('static', filename='img/CMSConnect_Logo.png')}}" id="connect-brand" width="180" height="40" class="d-inline-block align-top" alt="">
             {% else %}
-            <img src="{{url_for('static', filename='img/CIConnect_Logo.png')}}" id="connect-brand" width="120" height="40" class="d-inline-block align-top" alt="">
+            <img src="{{url_for('static', filename='img/OSGConnect_Logo.png')}}" id="connect-brand" width="180" height="40" class="d-inline-block align-top" alt="">
             {% endif %}
           </a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -113,31 +113,31 @@
               </li>
               {% if session.get('is_authenticated') %}
               <li class="nav-item dropdown">
-                {% if 'osg' in session['url_root'] %}
+                {% if 'ci-connect' in session['url_root'] %}
                 <a class="nav-link dropdown-toggle" href="#" id="connect-dropdown-menu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Projects
                 </a>
                 {% else %}
                 <a class="nav-link dropdown-toggle" href="#" id="connect-dropdown-menu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Connect
+                  Projects
                 </a>
                 {% endif %}
                 <div class="dropdown-menu" aria-labelledby="connect-dropdown-menu">
-                  {% if 'osg' in session['url_root'] %}
+                  {% if 'ci-connect' in session['url_root'] %}
                   <a class="dropdown-item" href="{{url_for('groups')}}">Join Projects</a>
-                  <a class="dropdown-item" href="{{url_for('create_group')}}">Create Project</a>
+                  <a class="dropdown-item" href="{{url_for('create_subgroup', group_name='root.OSG')}}">Create Project</a>
                   {% else %}
                   <a class="dropdown-item" href="{{url_for('groups')}}">Join Groups</a>
-                  <a class="dropdown-item" href="{{url_for('create_group')}}">Create Group</a>
+                  <a class="dropdown-item" href="{{url_for('create_subgroup', group_name='root.OSG')}}">Create Group</a>
                   {% endif %}
                 </div>
               </li>
               {% else %}
               <li class="nav-item">
-                {% if 'osg' in session['url_root'] %}
+                {% if 'ci-connect' in session['url_root'] %}
                 <a class="nav-link" href="{{url_for('groups')}}">Projects</a>
                 {% else %}
-                <a class="nav-link" href="{{url_for('groups')}}">Connect</a>
+                <a class="nav-link" href="{{url_for('groups')}}">Projects</a>
                 {% endif %}
               </li>
               {% endif %}

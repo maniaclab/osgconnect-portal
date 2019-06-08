@@ -14,14 +14,14 @@
     {%include 'messages.html'%}
     <div class="row">
       <div class="col-lg-8 mx-auto">
-        {% if 'osg' in session['url_root'] %}
+        {% if 'ci-connect' in session['url_root'] %}
         <h2>Request Project Creation</h2>
         {% else %}
         <h2>Request Group Creation</h2>
         {% endif %}
         <hr/>
-        <form role="form" action="{{url_for('create_group')}}" method="POST">
-          {% if 'osg' in session['url_root'] %}
+        <form role="form" action="{{url_for('create_subgroup', group_name='root.OSG')}}" method="POST">
+          {% if 'ci-connect' in session['url_root'] %}
           <div class="form-group">
             <label for="name">Project Name *</label>
             <input

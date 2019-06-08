@@ -13,7 +13,7 @@
         {%include 'messages.html' %}
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="#">Home</a></li>
-          {% if 'osg' in session['url_root'] %}
+          {% if 'local' in session['url_root'] %}
           <li class="breadcrumb-item"><a href="{{url_for('groups')}}">Projects</a></li>
           <li class="breadcrumb-item"><a href="{{url_for('view_group', group_name=group_name)}}">{{display_name}}</a></li>
           <li class="breadcrumb-item active">Subprojects</li>
@@ -44,7 +44,7 @@
             {% if 'osg' in session['url_root'] %}
             <button type="submit" name="delete_group" class="btn btn-danger btn-sm" data-submit="Deleting Project...">Delete Project</button>
             {% else %}
-            <button type="submit" name="delete_group" class="btn btn-danger btn-sm" data-submit="Deleting Group...">Delete Group</button>
+            <button type="submit" name="delete_group" class="btn btn-danger btn-sm" data-submit="Deleting Group...">Delete Project</button>
             {% endif %}
           </div>
           {% endif %}
@@ -60,7 +60,7 @@
             <a class="nav-link" href="{{url_for('view_group_members', group_name=group_name)}}"><i class="fas fa-user-friends"></i> Members</a>
           </li>
           <li class="nav-item">
-            {% if 'osg' in session['url_root'] %}
+            {% if 'local' in session['url_root'] %}
             <a class="nav-link active" href="#"><i class="fas fa-project-diagram"></i> Subprojects</a>
             {% else%}
             <a class="nav-link active" href="#"><i class="fas fa-project-diagram"></i> Subgroups</a>
@@ -72,7 +72,7 @@
         <div class="row">
           <div class="col-sm-12">
             <div class="table-responsive">
-              <h4>Subgroups of {{display_name}}</h4>
+              <h4>Subproject of {{display_name}}</h4>
               <table class="table" id="groups-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
                 <thead>
                   <tr>
