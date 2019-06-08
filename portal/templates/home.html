@@ -8,13 +8,13 @@
 
 <header class="text-white" style="height: 100%;" id="hero">
   <div class="container text-center">
-    {% if 'ci-connect' in session['url_root'] %}
+    {% if 'local' in session['url_root'] %}
     <img src="{{url_for('static', filename='img/CIConnect_Logo.png')}}" style="width:30%;">
     {% elif 'atlas' in session['url_root'] %}
     <img src="{{url_for('static', filename='img/atlas-connect-logo_trans.png')}}" style="width:30%;">
-    {% elif 'local' in session['url_root'] %}
+    {% elif 'ci-connect' in session['url_root'] %}
     <img src="{{url_for('static', filename='img/OSGConnect_Logo.png')}}" style="width:30%;">
-    {% elif 'cms' in session['url_root'] %}
+    {% elif 'osg' in session['url_root'] %}
     <img src="{{url_for('static', filename='img/CMSConnect_Logo.png')}}" style="width:30%;">
     {% else %}
     <img src="{{url_for('static', filename='img/OSGConnect_Logo.png')}}" style="width:30%;">
