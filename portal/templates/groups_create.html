@@ -17,10 +17,10 @@
         {% if 'ci-connect' in session['url_root'] %}
         <h2>Request Project Creation</h2>
         {% else %}
-        <h2>Request Group Creation</h2>
+        <h2>Request Project Creation</h2>
         {% endif %}
         <hr/>
-        <form role="form" action="{{url_for('create_subgroup', group_name='root.OSG')}}" method="POST">
+        <form role="form" action="{{url_for('create_subgroup', group_name=group_name)}}" method="POST">
           {% if 'ci-connect' in session['url_root'] %}
           <div class="form-group">
             <label for="name">Project Name *</label>
@@ -36,7 +36,7 @@
           </div>
           {% else %}
           <div class="form-group">
-            <label for="name">Group Name *</label>
+            <label for="name">Project Name *</label>
             <input
               type="text"
               class="form-control"

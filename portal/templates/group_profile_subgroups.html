@@ -38,14 +38,16 @@
           </div>
           {% elif user_status == 'admin' %}
           <div class="btn-group mr-2" role="group" aria-label="first group">
-            <a href="#" class="btn btn-secondary btn-sm">Edit Info</a>
+            <a href="{{url_for('create_subgroup', group_name=group_name)}}" class="btn btn-secondary btn-sm">Create Subproject</a>
           </div>
           <div class="btn-group mr-2" role="group", aria-label="second group">
-            {% if 'osg' in session['url_root'] %}
-            <button type="submit" name="delete_group" class="btn btn-danger btn-sm" data-submit="Deleting Project...">Delete Project</button>
-            {% else %}
-            <button type="submit" name="delete_group" class="btn btn-danger btn-sm" data-submit="Deleting Group...">Delete Project</button>
-            {% endif %}
+            <form role="form" action="{{url_for('delete_group', group_name=group_name)}}" method="POST" onsubmit="return confirm('Are you sure you want to delete this group?');">
+              {% if 'osg' in session['url_root'] %}
+              <button type="submit" name="delete_group" class="btn btn-danger btn-sm" data-submit="Deleting Project...">Delete Project</button>
+              {% else %}
+              <button type="submit" name="delete_group" class="btn btn-danger btn-sm" data-submit="Deleting Group...">Delete Project</button>
+              {% endif %}
+            </form>
           </div>
           {% endif %}
         </div>
@@ -77,20 +79,20 @@
                 <thead>
                   <tr>
                     <th data-field="name" data-sortable="true">Name</th>
-                    <th data-field="status" data-sortable="true">Admin</th>
                     <th data-field="email" data-sortable="true">Email</th>
                     <th data-field="phone" data-sortable="true">Phone</th>
                     <th data-field="field_of_science" data-sortable="true">Field of Science</th>
+                    <th data-field="description" data-sortable="true">Description</th>
                   </tr>
                 </thead>
                 <tbody data-link="row" class="rowlink" style="font-size:14px;">
                   {% for group in subgroups %}
                   <tr>
-                    <td>{{'.'.join(group['name'].split('.')[1:])}}</td>
-                    <td>{{group['admin']}}</td>
-                    <td>{{group['email']}}</td>
+                    <td>{{group['display_name']}}</td>
+                    <td><a href="mailto:{{group['email']}}?subject=Project Inquiry">{{group['email']}}</a></td>
                     <td>{{group['phone']}}</td>
                     <td>{{group['field_of_science']}}</td>
+                    <td>{{group['description']}}</td>
                   </tr>
                   {% endfor %}
                 </tbody>

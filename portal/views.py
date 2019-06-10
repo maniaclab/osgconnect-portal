@@ -122,7 +122,8 @@ def view_group(group_name):
         # print("USER STATUS: {}".format(user_status))
         subgroups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroups', params=query)
         subgroups = subgroups.json()['groups']
-        print(subgroups)
+        subgroups = sorted(subgroups, key=lambda k: k['name'])
+        # print(subgroups)
 
         return render_template('group_profile.html', group=group,
                                 group_name=group_name, display_name=display_name,
@@ -146,6 +147,7 @@ def delete_group(group_name):
 
         r = requests.delete(
             ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=token_query)
+        print(r)
 
         if r.status_code == requests.codes.ok:
             flash("Successfully deleted group", 'success')
@@ -180,10 +182,14 @@ def view_group_members(group_name):
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
                         group_name + '/members/' + session['user_id'], params=query)
         user_status = user_status.json()['membership']['state']
-
+        query = {'token': ciconnect_api_token}
         user_super = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/users/' + session['user_id'], params=query)
-        user_super = user_super.json()['metadata']['superuser']
+        # print("USER SUPER: {}".format(user_super.json()['metadata']['superuser']))
+        try:
+            user_super = user_super.json()['metadata']['superuser']
+        except:
+            user_super = False
 
         return render_template('group_profile_members.html',
                                 group_members=members, group_name=group_name,
@@ -205,11 +211,11 @@ def add_group_member(group_name, user_id):
 
         if user_status.status_code == requests.codes.ok:
             flash("Successfully added member to group", 'success')
-            return redirect(url_for('view_group', group_name=group_name))
+            return redirect(url_for('view_group_members', group_name=group_name))
         else:
             err_message = user_status.json()['message']
             flash('Failed to add member to group: {}'.format(err_message), 'warning')
-            return redirect(url_for('view_group', group_name=group_name))
+            return redirect(url_for('view_group_members', group_name=group_name))
 
 
 @app.route('/groups/<group_name>/delete_group_member/<user_id>', methods=['POST'])
@@ -224,11 +230,11 @@ def remove_group_member(group_name, user_id):
 
         if remove_user.status_code == requests.codes.ok:
             flash("Successfully removed member from group", 'success')
-            return redirect(url_for('view_group', group_name=group_name))
+            return redirect(url_for('view_group_members', group_name=group_name))
         else:
             err_message = remove_user.json()['message']
             flash('Failed to remove member from group: {}'.format(err_message), 'warning')
-            return redirect(url_for('view_group', group_name=group_name))
+            return redirect(url_for('view_group_members', group_name=group_name))
 
 
 @app.route('/groups/<group_name>/admin_group_member/<user_id>', methods=['POST'])
@@ -246,11 +252,11 @@ def admin_group_member(group_name, user_id):
 
         if user_status.status_code == requests.codes.ok:
             flash("Successfully updated member to admin", 'success')
-            return redirect(url_for('view_group', group_name=group_name))
+            return redirect(url_for('view_group_members', group_name=group_name))
         else:
             err_message = user_status.json()['message']
             flash('Failed make member an admin: {}'.format(err_message), 'warning')
-            return redirect(url_for('view_group', group_name=group_name))
+            return redirect(url_for('view_group_members', group_name=group_name))
 
 
 @app.route('/groups/<group_name>/subgroups', methods=['GET', 'POST'])
@@ -262,12 +268,14 @@ def view_group_subgroups(group_name):
         display_name = '-'.join(group_name.split('.')[1:])
         subgroups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroups', params=query)
         subgroups = subgroups.json()['groups']
-        print(subgroups)
         # Get User's Group Status
         user_status = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
                         group_name + '/members/' + session['user_id'], params=query)
         user_status = user_status.json()['membership']['state']
+
+        subgroup_requests = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroup_requests', params=query)
+        print(subgroup_requests.json())
 
         return render_template('group_profile_subgroups.html',
                                 display_name=display_name, subgroups=subgroups,
@@ -281,7 +289,7 @@ def create_subgroup(group_name):
     if request.method == 'GET':
         sciences = requests.get(ciconnect_api_endpoint + '/v1alpha1/fields_of_science')
         sciences = sciences.json()['fields_of_science']
-        return render_template('groups_create.html', sciences=sciences)
+        return render_template('groups_create.html', sciences=sciences, group_name=group_name)
 
     elif request.method == 'POST':
         name = request.form['name']
@@ -300,11 +308,11 @@ def create_subgroup(group_name):
             '/subgroups/' + name, params=token_query, json=put_query)
 
         if r.status_code == requests.codes.ok:
-            flash("Successfully created group", 'success')
+            flash("Successfully created project", 'success')
             return redirect(url_for('groups'))
         else:
             err_message = r.json()['message']
-            flash('Failed to delete group: {}'.format(err_message), 'warning')
+            flash('Failed to request project creation: {}'.format(err_message), 'warning')
             return redirect(url_for('view_group', group_name=group_name))
 
 
