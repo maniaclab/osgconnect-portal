@@ -20,7 +20,7 @@
           {% endif %}
           <li class="breadcrumb-item active">{{display_name}}</li>
         </ol>
-        <h2>{{display_name}}</h2>
+        <h2>{{group_name[5:]}}</h2>
         <br>
         <div class="btn-toolbar" role="toolbar">
           {% if user_status == 'nonmember' %}
@@ -78,7 +78,7 @@
                   <strong>Phone Number:</strong> {{group['phone']}}
                 </p>
                 <p class="">
-                  <strong>Field of Science:</strong> {{group['field_of_science']}}
+                  <strong>Field of Science:</strong> {{group['purpose']}}
                 </p>
                 <p class="">
                   <strong>Description:</strong> {{group['description']}}
@@ -93,11 +93,12 @@
                 Additional Info - Project Level
               </div>
               <div class="card-body">
+
                 <ul id="myUL">
                   {% set group_naming = group_name.split('.') %}
-                  <li><span class="caret">{{group_naming[1]}}</span>
+                  <li><span class="caret">{{group_naming[0]}}</span>
                     <ul class="nested">
-                      <li><span class="caret" style="color: green;">{{display_name}}</span>
+                      <li><span class="caret" style="color: green;">{{group_naming[-1]}}</span>
                         <ul class="nested">
                           {% for subgroup in subgroups %}
                           <li><a href="{{url_for('view_group', group_name=subgroup['name'])}}">{{subgroup['display_name']}}</a> - <span class='text-muted'>{{subgroup['field_of_science']}}</span></li>

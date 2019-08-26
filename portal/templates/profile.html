@@ -30,8 +30,11 @@
                   <li><strong>Email:</strong> {{profile['email']}}</li>
                   <li><strong>Phone:</strong> {{profile['phone']}}</li>
                   <li><strong>Institution:</strong> {{profile['institution']}}</li>
+                  <br>
+                  <li><strong>Joined:</strong> {{profile['join_date']}}</li>
+                  <li><strong>Last Active:</strong> {{profile['last_use_time']}}</li>
                 </ul>
-                <a href="{{url_for('edit_profile', user_id=profile['id'])}}" class="btn btn-primary btn-sm">Edit Profile</a>
+                <a href="{{url_for('edit_profile', unix_name=profile['unix_name'])}}" class="btn btn-primary btn-sm">Edit Profile</a>
               </div>
             </div>
           </div>

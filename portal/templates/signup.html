@@ -1,0 +1,40 @@
+{%extends "base.html"%}
+
+{%block title%}Signup{%endblock%}
+
+{%block body%}
+
+<!-- Page Header -->
+
+<header class="text-white" style="height: 100%;" id="hero">
+  <div class="container text-center">
+    <h1>{%include '/markdowns/signup.md' %}</h1>
+    <p class="leadl">{% include '/markdowns/signup_instructions.md' %}</p>
+  </div>
+</header>
+
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Acceptable Use Policy</h4>
+      </div>
+      <div class="modal-body">
+        <p>{% filter markdown %}{% include '/markdowns/signup_modal.md' %}{% endfilter %}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Agree</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(window).on('load',function(){
+        $('#myModal').modal('show');
+    });
+</script>
+
+{%endblock%}
