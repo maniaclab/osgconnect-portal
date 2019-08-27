@@ -272,7 +272,7 @@ def view_group_subgroups(group_name):
         user_status = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
                         group_name + '/members/' + session['unix_name'], params=query)
-        
+
         user_status = user_status.json()['membership']['state']
 
         subgroup_requests = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroup_requests', params=query)
@@ -397,12 +397,19 @@ def create_profile():
         superuser = False
         service_account = False
         # Schema and query for adding users to CI Connect DB
-        post_user = {"apiVersion": 'v1alpha1',
-                    'metadata': {'globusID': globus_id, 'name': name, 'email': email,
-                                 'phone': phone, 'institution': institution,
-                                 'public_key': public_key,
-                                 'unix_name': unix_name, 'superuser': superuser,
-                                 'service_account': service_account}}
+        if public_key:
+            post_user = {"apiVersion": 'v1alpha1',
+                        'metadata': {'globusID': globus_id, 'name': name, 'email': email,
+                                     'phone': phone, 'institution': institution,
+                                     'public_key': public_key,
+                                     'unix_name': unix_name, 'superuser': superuser,
+                                     'service_account': service_account}}
+        else:
+            post_user = {"apiVersion": 'v1alpha1',
+                        'metadata': {'globusID': globus_id, 'name': name, 'email': email,
+                                     'phone': phone, 'institution': institution,
+                                     'unix_name': unix_name, 'superuser': superuser,
+                                     'service_account': service_account}}
 
         print("POSTED: {}".format(post_user))
 
@@ -471,10 +478,17 @@ def edit_profile(unix_name):
         print("SUPERUSER: {}".format(superuser))
         service_account = False
         # Schema and query for adding users to CI Connect DB
-        post_user = {"apiVersion": 'v1alpha1',
-                    'metadata': {'name': name, 'email': email,
-                                 'phone': phone, 'institution': institution,
-                                 'public_key': public_key, 'superuser': superuser}}
+        if public_key:
+            post_user = {"apiVersion": 'v1alpha1',
+                        'metadata': {'name': name, 'email': email,
+                                     'phone': phone, 'institution': institution,
+                                     'public_key': public_key, 'superuser': superuser}}
+        else:
+            post_user = {"apiVersion": 'v1alpha1',
+                        'metadata': {'name': name, 'email': email,
+                                     'phone': phone, 'institution': institution,
+                                     'superuser': superuser}}
+                                     
         r = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name, params=query, json=post_user)
         print("Updated User: ", r)
         session['unix_name'] = unix_name
@@ -608,7 +622,7 @@ def authcallback():
 
         if profile:
             profile = profile['metadata']
-
+            print(profile)
             session['name'] = profile['name']
             session['email'] = profile['email']
             session['institution'] = profile['institution']
@@ -616,6 +630,7 @@ def authcallback():
             session['unix_name'] = profile['unix_name']
             session['url_root'] = request.url_root
         else:
+            print("NO PROFILE")
             session['url_root'] = request.url_root
             return redirect(url_for('create_profile',
                             next=url_for('profile')))
