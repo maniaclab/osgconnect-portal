@@ -24,6 +24,10 @@ p {
   /* color: #999; */
 }
 
+#base-p {
+  color: #999;
+}
+
 .nav-link {
   color: #155F83;
 }

@@ -83,26 +83,30 @@
                   </tr>
                 </thead>
                 <tbody data-link="row" class="rowlink" style="font-size:14px;">
-                  {% for member, user_id, user_state in group_members %}
+                  {% for member, info in group_members.items() %}
                   <tr>
-                    <td>{{member['name']}}</td>
-                    <td>{{member['email']}}</td>
-                    <td>{{member['phone']}}</td>
-                    <td>{{member['institution']}}</td>
-                    <td>{{user_state}}</td>
+                    <td>{{info['metadata']['name']}}</td>
+                    <td>{{info['metadata']['email']}}</td>
+                    <td>{{info['metadata']['phone']}}</td>
+                    <td>{{info['metadata']['institution']}}</td>
+                    {% for group_membership in info['metadata']['group_memberships'] %}
+                      {% if group_membership['name'] == group_name %}
+                    <td>{{group_membership['state']}}</td>
+                      {% endif %}
+                    {% endfor %}
                     {% if user_super or user_status == 'admin' %}
                     <td>
                       <div class="btn-group">
                         {% if user_state == 'pending' %}
-                        <form role="form" action="{{url_for('add_group_member', group_name=group_name, user_id=user_id)}}" method="POST" onsubmit="return confirm('Are you sure you want to confirm this member?');">
+                        <form role="form" action="{{url_for('add_group_member', group_name=group_name, unix_name='unix_name')}}" method="POST" onsubmit="return confirm('Are you sure you want to confirm this member?');">
                           <button type="submit" name="add_group_member" class="btn btn-xs btn-success" data-submit="Adding Member..."><i class="fas fa-check-circle"></i> Accept</button>
                         </form>
                         {% endif %}
-                        <form role="form" action="{{url_for('remove_group_member', group_name=group_name, user_id=user_id)}}" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');">
+                        <form role="form" action="{{url_for('remove_group_member', group_name=group_name, unix_name='unix_name')}}" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');">
                           <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Removing Member..."><i class="fas fa-times-circle"></i> Remove</button>
                         </form>
                         {% if user_state != 'admin' %}
-                        <form role="form" action="{{url_for('admin_group_member', group_name=group_name, user_id=user_id)}}" method="POST" onsubmit="return confirm('Are you sure you want to make this member an admin?');">
+                        <form role="form" action="{{url_for('admin_group_member', group_name=group_name, unix_name='unix_name')}}" method="POST" onsubmit="return confirm('Are you sure you want to make this member an admin?');">
                           <button type="submit" name="admin_group_member" class="btn btn-xs btn-warning" data-submit="Making Member Admin..."><i class="fas fa-user-shield"></i> Make Admin</button>
                         </form>
                         {% endif %}

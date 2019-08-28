@@ -97,6 +97,27 @@
               ></textarea>
           </div>
 
+          <div class="form-group input-fields-wrap">
+
+            <div class="form-row">
+              <div class="col">
+                <label for="meta-key">Key</label>
+                <input type="text" class="form-control" placeholder="ex: PI Name" id="meta-key" name="meta-key" tabindex="2">
+              </div>
+              <div class="col">
+                <label for="meta-value">Value</label>
+                <input type="text" class="form-control" placeholder="ex: John Smith" id="meta-value" name="meta-value" tabindex="3">
+              </div>
+              <div class="col">
+              </div>
+            </div>
+
+          </div>
+
+          <div class="form-group">
+            <button class="btn btn-secondary btn-sm add-field-button">Add Additional Info</button>
+          </div>
+
           <div class="form-group">
             <button type="submit" class="btn btn-primary">Submit</button>
           </div>
@@ -118,6 +139,38 @@ function setFormFields(email){
   document.getElementById('email').value = email;
   // document.getElementById('phone').value = phone;
 }
+
+$(document).ready(function() {
+	var max_fields = 10; //maximum input boxes allowed
+	var wrapper = $(".input-fields-wrap"); //Fields wrapper
+	var add_button = $(".add-field-button"); //Add button ID
+
+	var x = 1; //initlal text box count
+	$(add_button).click(function(e){ //on add input button click
+		e.preventDefault();
+		if(x < max_fields){ //max input box allowed
+			x++; //text box increment
+			$(wrapper).append(
+      "<div class='form-row'>"+
+        "<div class='col'>"+
+          "<label for='meta-key'>Key</label>"+
+          "<input type='text' class='form-control' placeholder='ex: Additional Contact' id='meta-key' name='meta-key' tabindex='2'>"+
+        "</div>"+
+        "<div class='col'>"+
+          "<label for='meta-value'>Value</label>"+
+          "<input type='text' class='form-control' placeholder='ex: 123-456-7890' id='meta-value' name='meta-value' tabindex='3'>"+
+        "</div>"+
+        "<div class='col' style='padding-top:35px;'>"+
+          "<button class='btn btn-danger btn-sm remove_field' name='remove-metadata' id='remove-metadata'>Remove Metadata</button>"+
+        "</div>"+
+      "</div>"); //add input box
+		}
+	});
+
+	$(wrapper).on("click",".remove_field", function(e){ //user click on remove text
+		e.preventDefault(); $(this).parent('div').parent('div').remove(); x--;
+	})
+});
 
 </script>
 {%endblock%}

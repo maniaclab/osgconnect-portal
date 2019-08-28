@@ -62,6 +62,7 @@ def groups():
         query = {'token': ciconnect_api_token}
         groups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups', params=query)
         groups = groups.json()['groups']
+        # print(groups.content)
         return render_template('groups.html', groups=groups)
 
 
@@ -168,23 +169,33 @@ def view_group_members(group_name):
         group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=query)
         # print(group_members.json())
         memberships = group_members.json()['memberships']
-        members = []
+        multiplexJson = {}
 
         for user in memberships:
             unix_name = user['user_name']
             user_state = user['state']
-            user_info = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name, params=query)
-            user_info = user_info.json()['metadata']
-            members.append((user_info, unix_name, user_state))
+            user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
+            multiplexJson[user_query] = {"method":"GET"}
+        # print("multiplexJson: {}".format(multiplexJson))
+
+        # POST request for multiplex return
+        multiplex = requests.post(
+            ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
+        multiplex = multiplex.json()
+        user_dict = {}
+        for user in multiplex:
+            user_name = user.split('/')[3].split('?')[0]
+            user_dict[user_name] = json.loads(multiplex[user]['body'])
+        # print("USER DICT: {}".format(user_dict))
 
         # Get User's Group Status
         user_status = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
-                        group_name + '/members/' + unix_name, params=query)
+                        group_name + '/members/' + session['unix_name'], params=query)
         user_status = user_status.json()['membership']['state']
         query = {'token': ciconnect_api_token}
         user_super = requests.get(
-                        ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name, params=query)
+                        ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'], params=query)
         # print("USER SUPER: {}".format(user_super.json()['metadata']['superuser']))
         try:
             user_super = user_super.json()['metadata']['superuser']
@@ -192,7 +203,7 @@ def view_group_members(group_name):
             user_super = False
 
         return render_template('group_profile_members.html',
-                                group_members=members, group_name=group_name,
+                                group_members=user_dict, group_name=group_name,
                                 display_name=display_name, user_status=user_status,
                                 user_super=user_super)
 
@@ -299,11 +310,25 @@ def create_subgroup(group_name):
         field_of_science = request.form['field_of_science']
         description = request.form['description']
 
-        put_query = {"apiVersion": 'v1alpha1',
-                        'metadata': {'name': name,
-                                    'field_of_science': field_of_science,
-                                    'email': email, 'phone': phone,
-                                    'description': description}}
+        additional_metadata = {}
+        # grab one or many location coordinates from dynamic form fields
+        for key, value in zip (request.form.getlist('meta-key'), request.form.getlist('meta-value')):
+            additional_metadata[str(key)] = str(value)
+        print(additional_metadata)
+
+        if additional_metadata:
+            put_query = {"apiVersion": 'v1alpha1',
+                            'metadata': {'name': name,
+                                        'purpose': field_of_science,
+                                        'email': email, 'phone': phone,
+                                        'description': description,
+                                        'additional_attributes': additional_metadata}}
+        else:
+            put_query = {"apiVersion": 'v1alpha1',
+                            'metadata': {'name': name,
+                                        'purpose': field_of_science,
+                                        'email': email, 'phone': phone,
+                                        'description': description}}
         # Request query to create group
         # r = requests.put(
         #     ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name +
@@ -311,7 +336,7 @@ def create_subgroup(group_name):
 
         r = requests.put(
             ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name +
-            '/subgroup_requests/' + group_name, params=token_query, json=put_query)
+            '/subgroup_requests/' + name, params=token_query, json=put_query)
 
         if r.status_code == requests.codes.ok:
             flash("Successfully requested project creation", 'success')
@@ -414,10 +439,10 @@ def create_profile():
         print("POSTED: {}".format(post_user))
 
         r = requests.post(ciconnect_api_endpoint + '/v1alpha1/users', params=query, json=post_user)
-        print(r.content)
+        # print(r.content)
         r = r.json()['metadata']
         session['access_token'] = r['access_token']
-        unix_name = r['unix_name']
+        session['unix_name'] = r['unix_name']
         flash(
             'Successfully created your account.', 'success')
 
@@ -460,7 +485,7 @@ def edit_profile(unix_name):
                     ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name, params=query)
         profile = profile.json()['metadata']
 
-        return render_template('profile_edit.html', profile=profile)
+        return render_template('profile_edit.html', profile=profile, unix_name=unix_name)
 
     elif request.method == 'POST':
         name = request.form['name']
@@ -478,7 +503,7 @@ def edit_profile(unix_name):
         print("SUPERUSER: {}".format(superuser))
         service_account = False
         # Schema and query for adding users to CI Connect DB
-        if public_key:
+        if public_key != ' ':
             post_user = {"apiVersion": 'v1alpha1',
                         'metadata': {'name': name, 'email': email,
                                      'phone': phone, 'institution': institution,
@@ -488,7 +513,7 @@ def edit_profile(unix_name):
                         'metadata': {'name': name, 'email': email,
                                      'phone': phone, 'institution': institution,
                                      'superuser': superuser}}
-                                     
+
         r = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name, params=query, json=post_user)
         print("Updated User: ", r)
         session['unix_name'] = unix_name
