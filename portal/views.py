@@ -21,8 +21,8 @@ try:
     g = open("/etc/ci-connect/secrets/ciconnect_api_endpoint.txt", "r")
 except:
     # Use these two lines below on local
-    f = open("/Users/JeremyVan/Documents/Programming/UChicago/CI_Connect/secrets/ciconnect_api_token.txt", "r")
-    g = open("/Users/JeremyVan/Documents/Programming/UChicago/CI_Connect/secrets/ciconnect_api_endpoint.txt", "r")
+    f = open("secrets/ciconnect_api_token.txt", "r")
+    g = open("secrets/ciconnect_api_endpoint.txt", "r")
 
 ciconnect_api_token = f.read().split()[0]
 ciconnect_api_endpoint = g.read().split()[0]
@@ -514,8 +514,14 @@ def approve_subgroup(group_name, subgroup_name):
 @app.route('/signup', methods=['GET'])
 def signup():
     """Send the user to Globus Auth with signup=1."""
+    f = open("portal/templates/markdowns/signup_modal.md", "r")
+    g = open("portal/templates/markdowns/signup_instructions.md", "r")
+    j = open("portal/templates/markdowns/signup.md", "r")
+    signup_modal_md = f.read()
+    signup_instructions_md = g.read()
+    signup_md = j.read()
     # return redirect(url_for('authcallback', signup=1))
-    return render_template('signup.html')
+    return render_template('signup.html', signup_modal_md=signup_modal_md, signup_instructions_md=signup_instructions_md, signup_md=signup_md)
 
 
 @app.route('/login', methods=['GET'])
