@@ -94,7 +94,13 @@
                     <td>{{info['metadata']['institution']}}</td>
                     {% for group_membership in info['metadata']['group_memberships'] %}
                       {% if group_membership['name'] == group_name %}
-                    <td>{{group_membership['state']}}</td>
+                        {% if group_membership['state'] == 'pending' %}
+                    <td><strong style='color: orange;'>{{group_membership['state']}}</strong></td>
+                        {% elif group_membership['state'] == 'admin' %}
+                    <td><strong style='color: blue;'>{{group_membership['state']}}</strong></td>
+                        {% else %}
+                    <td><strong style='color: green;'>{{group_membership['state']}}</strong></td>
+                        {% endif %}
                       {% endif %}
                     {% endfor %}
                     {% if user_super or user_status == 'admin' %}
@@ -141,7 +147,9 @@ function btnConfirm() {
     }
 }
 $(document).ready(function() {
-    $('#groups-table').DataTable();
+    $('#groups-table').DataTable({
+      order: [[4, 'desc'],[0, 'asc']]
+    });
 });
 
 $(document).ready(function() {
