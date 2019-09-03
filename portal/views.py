@@ -1,5 +1,5 @@
 from flask import (abort, flash, redirect, render_template, request,
-                   session, url_for, Markup)
+                   session, url_for, Markup, jsonify)
 import requests, traceback, json, time
 
 try:
@@ -111,10 +111,8 @@ def view_group(group_name):
     if request.method == 'GET':
         group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=query)
         group = group.json()['metadata']
-        group_name = group['name']
         # Remove 'root' and join group naming
-        display_name = group['name'].split('.')[1:]
-        display_name = '-'.join(display_name)
+        # display_name = group['display_name']
         # Get User's Group Status
         user_status = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
@@ -124,11 +122,9 @@ def view_group(group_name):
         subgroups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroups', params=query)
         subgroups = subgroups.json()['groups']
         subgroups = sorted(subgroups, key=lambda k: k['name'])
-        # print(subgroups)
-
         return render_template('group_profile.html', group=group,
-                                group_name=group_name, display_name=display_name,
-                                user_status=user_status, subgroups=subgroups)
+                                group_name=group_name, user_status=user_status,
+                                subgroups=subgroups)
     elif request.method == 'POST':
         '''Request membership to join group'''
         put_query = {"apiVersion": 'v1alpha1',
@@ -138,6 +134,40 @@ def view_group(group_name):
                         group_name + '/members/' + unix_name, params=query, json=put_query)
         # print("UPDATED MEMBERSHIP: {}".format(user_status))
         return redirect(url_for('view_group', group_name=group_name))
+
+
+@app.route('/groups-xhr/<group_name>', methods=['GET'])
+@authenticated
+def view_group_ajax(group_name):
+    group, user_status, subgroups = view_group_ajax_request(group_name)
+    # print(group, user_status, subgroups)
+    return jsonify(group, user_status, subgroups)
+
+def view_group_ajax_request(group_name):
+    query = {'token': ciconnect_api_token,
+             'globus_id': session['primary_identity']}
+
+    user = requests.get(ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
+    user = user.json()
+    unix_name = user['metadata']['unix_name']
+
+    group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=query)
+    group = group.json()['metadata']
+    group_name = group['name']
+    # Remove 'root' and join group naming
+    display_name = group['name'].split('.')[1:]
+    display_name = '-'.join(display_name)
+    # Get User's Group Status
+    user_status = requests.get(
+                    ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                    group_name + '/members/' + unix_name, params=query)
+    user_status = user_status.json()['membership']['state']
+    # print("USER STATUS: {}".format(user_status))
+    subgroups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroups', params=query)
+    subgroups = subgroups.json()['groups']
+    subgroups = sorted(subgroups, key=lambda k: k['name'])
+
+    return group, user_status, subgroups
 
 
 @app.route('/groups/<group_name>/delete', methods=['POST'])
@@ -170,12 +200,14 @@ def view_group_members(group_name):
         # print(group_members.json())
         memberships = group_members.json()['memberships']
         multiplexJson = {}
+        users_statuses = {}
 
         for user in memberships:
             unix_name = user['user_name']
             user_state = user['state']
             user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
             multiplexJson[user_query] = {"method":"GET"}
+            users_statuses[unix_name] = user_state
         # print("multiplexJson: {}".format(multiplexJson))
 
         # POST request for multiplex return
@@ -205,7 +237,64 @@ def view_group_members(group_name):
         return render_template('group_profile_members.html',
                                 group_members=user_dict, group_name=group_name,
                                 display_name=display_name, user_status=user_status,
-                                user_super=user_super)
+                                user_super=user_super, users_statuses=users_statuses)
+
+
+@app.route('/groups-xhr/<group_name>/members', methods=['GET'])
+@authenticated
+def view_group_members_ajax(group_name):
+    user_dict = view_group_members_ajax_request(group_name)
+    print(user_dict)
+    return jsonify(user_dict)
+
+def view_group_members_ajax_request(group_name):
+    """Detailed view of group's members"""
+    query = {'token': ciconnect_api_token}
+    if request.method == 'GET':
+        display_name = '-'.join(group_name.split('.')[1:])
+        group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=query)
+        # print(group_members.json())
+        memberships = group_members.json()['memberships']
+        multiplexJson = {}
+        users_statuses = {}
+
+        for user in memberships:
+            unix_name = user['user_name']
+            user_state = user['state']
+            user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
+            multiplexJson[user_query] = {"method":"GET"}
+            users_statuses[unix_name] = user_state
+        # print("multiplexJson: {}".format(multiplexJson))
+
+        # POST request for multiplex return
+        multiplex = requests.post(
+            ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
+        multiplex = multiplex.json()
+        user_dict = {}
+        for user in multiplex:
+            user_name = user.split('/')[3].split('?')[0]
+            user_dict[user_name] = json.loads(multiplex[user]['body'])
+        # print("USER DICT: {}".format(user_dict))
+
+        # Get User's Group Status
+        user_status = requests.get(
+                        ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                        group_name + '/members/' + session['unix_name'], params=query)
+        user_status = user_status.json()['membership']['state']
+        query = {'token': ciconnect_api_token}
+        user_super = requests.get(
+                        ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'], params=query)
+        # print("USER SUPER: {}".format(user_super.json()['metadata']['superuser']))
+        try:
+            user_super = user_super.json()['metadata']['superuser']
+        except:
+            user_super = False
+
+        # return render_template('group_profile_members.html',
+        #                         group_members=user_dict, group_name=group_name,
+        #                         display_name=display_name, user_status=user_status,
+        #                         user_super=user_super, users_statuses=users_statuses)
+        return user_dict
 
 @app.route('/groups/<group_name>/add_group_member/<unix_name>', methods=['POST'])
 @authenticated
@@ -294,6 +383,63 @@ def view_group_subgroups(group_name):
                                 group_name=group_name, user_status=user_status)
 
 
+@app.route('/groups/<group_name>/subgroups-requests', methods=['GET', 'POST'])
+@authenticated
+def view_group_subgroups_requests(group_name):
+    """List view of group's subgroups requests"""
+    query = {'token': ciconnect_api_token}
+    if request.method == 'GET':
+        display_name = '-'.join(group_name.split('.')[1:])
+        # subgroups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroups', params=query)
+        # subgroups = subgroups.json()['groups']
+        # Get User's Group Status
+        user_status = requests.get(
+                        ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                        group_name + '/members/' + session['unix_name'], params=query)
+
+        user_status = user_status.json()['membership']['state']
+
+        subgroup_requests = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroup_requests', params=query)
+        subgroup_requests = subgroup_requests.json()['groups']
+
+        print(user_status)
+
+        return render_template('group_profile_subgroups_requests.html',
+                                display_name=display_name, subgroup_requests=subgroup_requests,
+                                group_name=group_name, user_status=user_status)
+
+
+@app.route('/groups-xhr/<group_name>/subgroups-requests', methods=['GET', 'POST'])
+@authenticated
+def view_group_subgroups_ajax(group_name):
+    subgroup_requests = view_group_subgroups_ajax_requests(group_name)
+    subgroup_requests_count = len(subgroup_requests)
+    return jsonify(subgroup_requests, subgroup_requests_count)
+
+def view_group_subgroups_ajax_requests(group_name):
+    """List view of group's subgroups requests"""
+    query = {'token': ciconnect_api_token}
+    if request.method == 'GET':
+        # display_name = '-'.join(group_name.split('.')[1:])
+        # # subgroups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroups', params=query)
+        # # subgroups = subgroups.json()['groups']
+        # # Get User's Group Status
+        # user_status = requests.get(
+        #                 ciconnect_api_endpoint + '/v1alpha1/groups/' +
+        #                 group_name + '/members/' + session['unix_name'], params=query)
+        #
+        # user_status = user_status.json()['membership']['state']
+
+        subgroup_requests = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroup_requests', params=query)
+        subgroup_requests = subgroup_requests.json()['groups']
+
+        return subgroup_requests
+
+        # return render_template('group_profile_subgroups_requests.html',
+        #                         display_name=display_name, subgroup_requests=subgroup_requests,
+        #                         group_name=group_name, user_status=user_status)
+
+
 @app.route('/groups/<group_name>/subgroups/new', methods=['GET', 'POST'])
 @authenticated
 def create_subgroup(group_name):
@@ -314,7 +460,7 @@ def create_subgroup(group_name):
         # grab one or many location coordinates from dynamic form fields
         for key, value in zip (request.form.getlist('meta-key'), request.form.getlist('meta-value')):
             additional_metadata[str(key)] = str(value)
-        print(additional_metadata)
+        # print(additional_metadata)
 
         if additional_metadata:
             put_query = {"apiVersion": 'v1alpha1',
@@ -329,10 +475,6 @@ def create_subgroup(group_name):
                                         'purpose': field_of_science,
                                         'email': email, 'phone': phone,
                                         'description': description}}
-        # Request query to create group
-        # r = requests.put(
-        #     ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name +
-        #     '/subgroups/' + name, params=token_query, json=put_query)
 
         r = requests.put(
             ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name +
@@ -345,6 +487,28 @@ def create_subgroup(group_name):
             err_message = r.json()['message']
             flash('Failed to request project creation: {}'.format(err_message), 'warning')
             return redirect(url_for('view_group', group_name=group_name))
+
+
+@app.route('/groups/<group_name>/subgroups/<subgroup_name>/approve', methods=['GET', 'POST'])
+@authenticated
+def approve_subgroup(group_name, subgroup_name):
+    token_query = {'token': session['access_token']}
+    if request.method == 'GET':
+        print("GROUP NAME: {}".format(group_name))
+        print("SUBGROUP NAME: {}".format(subgroup_name))
+
+        r = requests.put(
+            ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name +
+            '/subgroup_requests/' + subgroup_name + '/approve', params=token_query)
+
+        if r.status_code == requests.codes.ok:
+            flash("Successfully approved project creation", 'success')
+            print(r.content)
+            return redirect(url_for('view_group_subgroups', group_name=group_name))
+        else:
+            err_message = r.json()['message']
+            flash('Failed to approve project creation: {}'.format(err_message), 'warning')
+            return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
 
 
 @app.route('/signup', methods=['GET'])

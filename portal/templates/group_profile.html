@@ -18,9 +18,9 @@
           {% else %}
           <li class="breadcrumb-item"><a href="{{url_for('groups')}}">Projects</a></li>
           {% endif %}
-          <li class="breadcrumb-item active">{{display_name}}</li>
+          <li class="breadcrumb-item active">{{group['display_name']}}</li>
         </ol>
-        <h2>{{group_name[5:]}}</h2>
+        <h2>{{group['display_name']}}</h2>
         <br>
         <div class="btn-toolbar" role="toolbar">
           {% if user_status == 'nonmember' %}
@@ -33,17 +33,17 @@
           <div class="btn-group mr-2" role="group", aria-label="first group">
             <button type="submit" name="pending_membership" class="btn btn-warning btn-sm disabled" data-submit="Pending Membership..."><i class="fas fa-spinner fa-spin"></i> Requested Membership</button>
           </div>
+          {% elif user_status == 'active' %}
+          <div class="btn-group mr-2" role="group" aria-label="first group">
+            <a href="{{url_for('create_subgroup', group_name=group_name)}}" class="btn btn-secondary btn-sm">Request Subproject</a>
+          </div>
           {% elif user_status == 'admin' %}
           <div class="btn-group mr-2" role="group" aria-label="first group">
             <a href="{{url_for('create_subgroup', group_name=group_name)}}" class="btn btn-secondary btn-sm">Create Subproject</a>
           </div>
           <div class="btn-group mr-2" role="group", aria-label="second group">
             <form role="form" action="{{url_for('delete_group', group_name=group_name)}}" method="POST" onsubmit="return confirm('Are you sure you want to delete this group?');">
-              {% if 'osg' in session['url_root'] %}
               <button type="submit" name="delete_group" class="btn btn-danger btn-sm" data-submit="Deleting Project...">Delete Project</button>
-              {% else %}
-              <button type="submit" name="delete_group" class="btn btn-danger btn-sm" data-submit="Deleting Group...">Delete Project</button>
-              {% endif %}
             </form>
           </div>
           {% endif %}
@@ -61,30 +61,33 @@
           <li class="nav-item">
             <a class="nav-link" href="{{url_for('view_group_subgroups', group_name=group_name)}}"><i class="fas fa-project-diagram"></i> Subprojects</a>
           </li>
+          <li class="nav-item" id='subprojects-request-tab'>
+            <a class="nav-link" href="{{url_for('view_group_subgroups_requests', group_name=group_name)}}"><span class="badge badge-warning">{[{subgroup_requests_count}]}</span> Subprojects Requests</a>
+          </li>
         </ul>
         <br>
 
-        <div class="row">
+        <div class="row" id='group-info'>
           <div class="col-sm-6">
             <div class="card h-100">
-              <div class="card-header">
+              <!-- <div class="card-header">
                 Information:
-              </div>
+              </div> -->
               <div class="card-body">
-                <p class="">
-                  <strong>Contact Email:</strong> <a href="mailto:#">{{group['email']}}</a>
+                <p>
+                  <strong>Contact Email:</strong> <a href="mailto:#">{[{group.email}]}</a>
                 </p>
-                <p class="">
-                  <strong>Phone Number:</strong> {{group['phone']}}
+                <p>
+                  <strong>Phone Number:</strong> {[{group.phone}]}
                 </p>
-                <p class="">
-                  <strong>Field of Science:</strong> {{group['purpose']}}
+                <p>
+                  <strong>Field of Science:</strong> {[{group.purpose}]}
                 </p>
-                <p class="">
-                  <strong>Description:</strong> {{group['description']}}
+                <p>
+                  <strong>Description:</strong> {[{group.description}]}
                 </p>
-                <p class="">
-                  <strong>Created:</strong> {{group['creation_date']}}
+                <p>
+                  <strong>Created:</strong> {[{group.creation_date}]}
                 </p>
               </div>
             </div>
@@ -104,7 +107,7 @@
                       <li><span class="caret" style="color: green;">{{group_naming[-1]}}</span>
                         <ul class="nested">
                           {% for subgroup in subgroups %}
-                          <li><a href="{{url_for('view_group', group_name=subgroup['name'])}}">{{subgroup['display_name']}}</a> - <span class='text-muted'>{{subgroup['field_of_science']}}</span></li>
+                          <li><a href="{{url_for('view_group', group_name=subgroup['name'])}}">{{subgroup['display_name']}}</a> - <span class='text-muted'>{{subgroup['purpose']}}</span></li>
                           {% endfor %}
                         </ul>
                       </li>
@@ -142,5 +145,49 @@ for (i = 0; i < toggler.length; i++) {
     this.classList.toggle("caret-down");
   });
 }
+
+$(document).ready(function() {
+  new Vue({
+	el: '#group-info',
+	data () {
+	    return {
+	      group: {},
+		user_status: '',
+    subgroups: {},
+		loading: true,
+		failed: false
+	    }
+	},
+	mounted() {
+            axios.get('/groups-xhr/{{group_name}}')
+	        .then(function (response) {
+		    this.group = response.data[0];
+		    this.user_status = response.data[1];
+        this.subgroups = response.data[2];
+				this.loading = false;
+		}.bind(this)) //must use bind(this) unless using arrow function
+		.catch(error => { this.failed = true; this.loading = false; })
+		}
+  });
+  new Vue({
+    el: '#subprojects-request-tab',
+    data () {
+      return {
+        subgroup_requests_count: {},
+        loading: true,
+        failed: false
+      }
+    },
+    mounted(){
+      axios.get('/groups-xhr/{{group_name}}/subgroups-requests')
+    .then(function (response) {
+      this.subgroup_requests_count = response.data[1];
+      this.loading = false;
+      console.log(this.subgroup_requests_count)
+    }.bind(this)) //must use bind(this) unless using arrow function
+    .catch(error => { this.failed = true; this.loading = false; })
+    }
+  })
+});
 </script>
 {%endblock%}

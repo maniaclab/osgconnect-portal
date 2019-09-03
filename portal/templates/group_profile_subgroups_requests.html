@@ -62,14 +62,10 @@
             <a class="nav-link" href="{{url_for('view_group_members', group_name=group_name)}}"><i class="fas fa-user-friends"></i> Members</a>
           </li>
           <li class="nav-item">
-            {% if 'local' in session['url_root'] %}
-            <a class="nav-link active" href="#"><i class="fas fa-project-diagram"></i> Subprojects</a>
-            {% else%}
-            <a class="nav-link active" href="#"><i class="fas fa-project-diagram"></i> Subgroups</a>
-            {% endif %}
+            <a class="nav-link" href="{{url_for('view_group_subgroups', group_name=group_name)}}"><i class="fas fa-project-diagram"></i> Subprojects</a>
           </li>
-          <li class="nav-item" id='subprojects-request-tab'>
-            <a class="nav-link" href="{{url_for('view_group_subgroups_requests', group_name=group_name)}}"><span class="badge badge-warning">{[{subgroup_requests_count}]}</span> Subprojects Requests</a>
+          <li class="nav-item">
+            <a class="nav-link active" href="#"><span class="badge badge-warning">{{subgroup_requests|length}}</span> Subprojects Requests</a>
           </li>
         </ul>
         <br>
@@ -77,25 +73,42 @@
         <div class="row">
           <div class="col-sm-12">
             <div class="table-responsive">
-              <h4>Subproject of {{display_name}}</h4>
+              <h4>Requested Subprojects</h4>
               <table class="table" id="groups-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
                 <thead>
                   <tr>
                     <th data-field="name" data-sortable="true">Name</th>
+                    <th data-field="requester" data-sortable="true">Requester</th>
                     <th data-field="email" data-sortable="true">Email</th>
                     <th data-field="phone" data-sortable="true">Phone</th>
                     <th data-field="field_of_science" data-sortable="true">Field of Science</th>
                     <th data-field="description" data-sortable="true">Description</th>
+                    {% if user_status == 'admin' %}
+                    <th data-field="action" data-sortable="true">Action</th>
+                    {% endif %}
                   </tr>
                 </thead>
                 <tbody data-link="row" class="rowlink" style="font-size:14px;">
-                  {% for group in subgroups %}
+                  {% for subgroup_request in subgroup_requests %}
                   <tr>
-                    <td>{{group['display_name']}}</td>
-                    <td><a href="mailto:{{group['email']}}?subject=Project Inquiry">{{group['email']}}</a></td>
-                    <td>{{group['phone']}}</td>
-                    <td>{{group['purpose']}}</td>
-                    <td>{{group['description']}}</td>
+                    <td>{{subgroup_request['display_name']}}</td>
+                    <td>{{subgroup_request['requester']}}</td>
+                    <td><a href="mailto:{{subgroup_request['email']}}?subject=Project Inquiry">{{subgroup_request['email']}}</a></td>
+                    <td>{{subgroup_request['phone']}}</td>
+                    <td>{{subgroup_request['purpose']}}</td>
+                    <td>{{subgroup_request['description']}}</td>
+                    {% if user_status == 'admin' %}
+                    <td>
+                      <div class="btn-group">
+                        <form role="form" action="{{url_for('approve_subgroup', group_name=group_name, subgroup_name=subgroup_request['name'])}}" method="GET" onsubmit="return confirm('Are you sure you want to approve this subproject?');">
+                          <button type="submit" name="add_group_member" class="btn btn-xs btn-success" data-submit="Approving Subproject Request..."><i class="fas fa-check-circle"></i> Approve</button>
+                        </form>
+                        <form role="form" action="#" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');">
+                          <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Denying Subproject Request..."><i class="fas fa-times-circle"></i> Deny</button>
+                        </form>
+                      </div>
+                    </td>
+                    {% endif %}
                   </tr>
                   {% endfor %}
                 </tbody>
@@ -122,28 +135,6 @@ function btnConfirm() {
 }
 $(document).ready(function() {
     $('#groups-table').DataTable();
-});
-
-$(document).ready(function() {
-  new Vue({
-    el: '#subprojects-request-tab',
-    data () {
-      return {
-        subgroup_requests_count: {},
-        loading: true,
-        failed: false
-      }
-    },
-    mounted(){
-      axios.get('/groups-xhr/{{group_name}}/subgroups-requests')
-    .then(function (response) {
-      this.subgroup_requests_count = response.data[1];
-      this.loading = false;
-      console.log(this.subgroup_requests_count)
-    }.bind(this)) //must use bind(this) unless using arrow function
-    .catch(error => { this.failed = true; this.loading = false; })
-    }
-  })
 });
 </script>
 {%endblock%}
