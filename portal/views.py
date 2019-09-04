@@ -451,30 +451,45 @@ def create_subgroup(group_name):
 
     elif request.method == 'POST':
         name = request.form['name']
+        display_name = request.form['display_name']
         email = request.form['email']
         phone = request.form['phone']
         field_of_science = request.form['field_of_science']
         description = request.form['description']
 
+        pi_name = request.form['pi-name']
+        pi_email = request.form['pi-email']
+        pi_organization = request.form['pi-org']
+
+        print("PI STUFF: ", pi_name, pi_email, pi_organization)
+
         additional_metadata = {}
+        if pi_name:
+            additional_metadata['OSG:PI_Name'] = pi_name
+        if pi_email:
+            additional_metadata['OSG:PI_Email'] = pi_name
+        if pi_organization:
+            additional_metadata['OSG:PI_Organization'] = pi_organization
         # grab one or many location coordinates from dynamic form fields
-        for key, value in zip (request.form.getlist('meta-key'), request.form.getlist('meta-value')):
-            additional_metadata[str(key)] = str(value)
+        # for key, value in zip (request.form.getlist('meta-key'), request.form.getlist('meta-value')):
+        #     additional_metadata[str(key)] = str(value)
         # print(additional_metadata)
 
-        if additional_metadata:
+        if len(additional_metadata) > 0:
             put_query = {"apiVersion": 'v1alpha1',
                             'metadata': {'name': name,
+                                        'display_name': display_name,
                                         'purpose': field_of_science,
                                         'email': email, 'phone': phone,
                                         'description': description,
                                         'additional_attributes': additional_metadata}}
         else:
             put_query = {"apiVersion": 'v1alpha1',
-                            'metadata': {'name': name,
+                            'metadata': {'name': name, 'display_name': display_name,
                                         'purpose': field_of_science,
                                         'email': email, 'phone': phone,
                                         'description': description}}
+        print(put_query)
 
         r = requests.put(
             ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name +
@@ -611,6 +626,10 @@ def create_profile():
         r = requests.post(ciconnect_api_endpoint + '/v1alpha1/users', params=query, json=post_user)
         # print(r.content)
         r = r.json()['metadata']
+        session['name'] = r['name']
+        session['email'] = r['email']
+        session['phone'] = r['phone']
+        session['institution'] = r['institution']
         session['access_token'] = r['access_token']
         session['unix_name'] = r['unix_name']
         flash(
@@ -686,7 +705,11 @@ def edit_profile(unix_name):
 
         r = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name, params=query, json=post_user)
         print("Updated User: ", r)
-        session['unix_name'] = unix_name
+
+        session['name'] = name
+        session['email'] = email
+        session['phone'] = phone
+        session['institution'] = institution
 
         if 'next' in session:
             redirect_to = session['next']
@@ -820,6 +843,7 @@ def authcallback():
             print(profile)
             session['name'] = profile['name']
             session['email'] = profile['email']
+            session['phone'] = profile['phone']
             session['institution'] = profile['institution']
             session['access_token'] = profile['access_token']
             session['unix_name'] = profile['unix_name']

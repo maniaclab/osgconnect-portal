@@ -21,33 +21,32 @@
         {% endif %}
         <hr/>
         <form role="form" action="{{url_for('create_subgroup', group_name=group_name)}}" method="POST">
-          {% if 'ci-connect' in session['url_root'] %}
           <div class="form-group">
-            <label for="name">Project Name *</label>
+            <label for="name">Project Name (unix convention)*</label>
             <input
               type="text"
               class="form-control"
               id="name"
               name="name"
-              placeholder="Name of Project"
+              placeholder="Unix Name of Project"
               required="required"
               tabindex="1"
+              onkeypress="return checkSpcialChar(event)"
             >
           </div>
-          {% else %}
+
           <div class="form-group">
-            <label for="name">Project Name *</label>
+            <label for="display-name">Display Name *</label>
             <input
               type="text"
               class="form-control"
-              id="name"
-              name="name"
-              placeholder="Name of Research Group"
+              id="display-name"
+              name="display-name"
+              placeholder="Display Name of Research Project"
               required="required"
-              tabindex="1"
+              tabindex="2"
             >
           </div>
-          {% endif %}
 
           <div class="form-group">
             <label for="email">Email *</label>
@@ -58,7 +57,7 @@
               class="form-control"
               placeholder="{{session['email']}}"
               required="required"
-              tabindex="2"
+              tabindex="3"
             >
           </div>
 
@@ -69,15 +68,15 @@
               id="phone"
               name="phone"
               class="form-control"
-              placeholder="888 888 8888"
+              placeholder="555 555 5555"
               required="required"
-              tabindex="3"
+              tabindex="4"
             >
           </div>
 
           <div class="form-group">
             <label for="field_of_science">Field of Science *</label>
-            <select class="form-control" id="field_of_science" name="field_of_science" required="required" tabindex="4" onmousedown="if(this.options.length>6){this.size=6;}"  onchange='this.size=0;' onblur="this.size=0;">
+            <select class="form-control" id="field_of_science" name="field_of_science" required="required" tabindex="5" onmousedown="if(this.options.length>6){this.size=6;}"  onchange='this.size=0;' onblur="this.size=0;">
               <option value="" selected disabled>Select Field of Science</option>
               {% for science in sciences %}
               <option value="{{science}}">{{science}}</option>
@@ -86,18 +85,54 @@
           </div>
 
           <div class="form-group">
+            <label for="pi-name">PI Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="pi-name"
+              name="pi-name"
+              placeholder="Name of Research Group"
+              tabindex="6"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="pi-email">PI Email</label>
+            <input
+              type="email"
+              id="pi-email"
+              name="pi-email"
+              class="form-control"
+              placeholder="johnsmith@email.com"
+              tabindex="7"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="pi-org">PI Organization</label>
+            <input
+              type="text"
+              class="form-control"
+              id="pi-org"
+              name="pi-org"
+              placeholder="Name of PI Organization"
+              tabindex="8"
+            >
+          </div>
+
+          <div class="form-group">
             <label for="description">Description <span id="asterik">*</span></label>
             <textarea
               placeholder="Brief description of your group"
               name="description"
               required
-              tabindex="5"
+              tabindex="9"
               style="background-color:white; color:black; border-radius:4px; border-color:lightgrey;"
               value=""
               ></textarea>
           </div>
 
-          <div class="form-group input-fields-wrap">
+          <!-- <div class="form-group input-fields-wrap">
 
             <div class="form-row">
               <div class="col">
@@ -116,7 +151,7 @@
 
           <div class="form-group">
             <button class="btn btn-secondary btn-sm add-field-button">Add Additional Info</button>
-          </div>
+          </div> -->
 
           <div class="form-group">
             <button type="submit" class="btn btn-primary">Submit</button>
@@ -131,46 +166,56 @@
 <script>
 var name = {{session['name']|tojson}};
 var email = {{session['email']|tojson}};
+var phone = {{session['phone']|tojson}};
 
 window.onload = setFormFields(email);
 
 function setFormFields(email){
   // document.getElementById('name').value = name;
   document.getElementById('email').value = email;
+  document.getElementById('phone').value = phone;
   // document.getElementById('phone').value = phone;
 }
 
-$(document).ready(function() {
-	var max_fields = 10; //maximum input boxes allowed
-	var wrapper = $(".input-fields-wrap"); //Fields wrapper
-	var add_button = $(".add-field-button"); //Add button ID
+function checkSpcialChar(event){
+  if(!((event.keyCode >= 65) && (event.keyCode <= 90) || (event.keyCode >= 97) && (event.keyCode <= 122) || (event.keyCode >= 48) && (event.keyCode <= 57))){
+    event.returnValue = false;
+    return;
+  }
+  event.returnValue = true;
+}
 
-	var x = 1; //initlal text box count
-	$(add_button).click(function(e){ //on add input button click
-		e.preventDefault();
-		if(x < max_fields){ //max input box allowed
-			x++; //text box increment
-			$(wrapper).append(
-      "<div class='form-row'>"+
-        "<div class='col'>"+
-          "<label for='meta-key'>Key</label>"+
-          "<input type='text' class='form-control' placeholder='ex: Additional Contact' id='meta-key' name='meta-key' tabindex='2'>"+
-        "</div>"+
-        "<div class='col'>"+
-          "<label for='meta-value'>Value</label>"+
-          "<input type='text' class='form-control' placeholder='ex: 123-456-7890' id='meta-value' name='meta-value' tabindex='3'>"+
-        "</div>"+
-        "<div class='col' style='padding-top:35px;'>"+
-          "<button class='btn btn-danger btn-sm remove_field' name='remove-metadata' id='remove-metadata'>Remove Metadata</button>"+
-        "</div>"+
-      "</div>"); //add input box
-		}
-	});
-
-	$(wrapper).on("click",".remove_field", function(e){ //user click on remove text
-		e.preventDefault(); $(this).parent('div').parent('div').remove(); x--;
-	})
-});
+// $(document).ready(function() {
+// 	var max_fields = 10; //maximum input boxes allowed
+// 	var wrapper = $(".input-fields-wrap"); //Fields wrapper
+// 	var add_button = $(".add-field-button"); //Add button ID
+//
+// 	var x = 1; //initlal text box count
+// 	$(add_button).click(function(e){ //on add input button click
+// 		e.preventDefault();
+// 		if(x < max_fields){ //max input box allowed
+// 			x++; //text box increment
+// 			$(wrapper).append(
+//       "<div class='form-row'>"+
+//         "<div class='col'>"+
+//           "<label for='meta-key'>Key</label>"+
+//           "<input type='text' class='form-control' placeholder='ex: Additional Contact' id='meta-key' name='meta-key' tabindex='2'>"+
+//         "</div>"+
+//         "<div class='col'>"+
+//           "<label for='meta-value'>Value</label>"+
+//           "<input type='text' class='form-control' placeholder='ex: 123-456-7890' id='meta-value' name='meta-value' tabindex='3'>"+
+//         "</div>"+
+//         "<div class='col' style='padding-top:35px;'>"+
+//           "<button class='btn btn-danger btn-sm remove_field' name='remove-metadata' id='remove-metadata'>Remove Metadata</button>"+
+//         "</div>"+
+//       "</div>"); //add input box
+// 		}
+// 	});
+//
+// 	$(wrapper).on("click",".remove_field", function(e){ //user click on remove text
+// 		e.preventDefault(); $(this).parent('div').parent('div').remove(); x--;
+// 	})
+// });
 
 </script>
 {%endblock%}
