@@ -451,7 +451,7 @@ def create_subgroup(group_name):
 
     elif request.method == 'POST':
         name = request.form['name']
-        display_name = request.form['display_name']
+        display_name = request.form['display-name']
         email = request.form['email']
         phone = request.form['phone']
         field_of_science = request.form['field_of_science']
