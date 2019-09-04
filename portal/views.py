@@ -457,13 +457,11 @@ def create_subgroup(group_name):
         field_of_science = request.form['field_of_science']
         description = request.form['description']
 
+        additional_metadata = {}
         pi_name = request.form['pi-name']
         pi_email = request.form['pi-email']
         pi_organization = request.form['pi-org']
 
-        print("PI STUFF: ", pi_name, pi_email, pi_organization)
-
-        additional_metadata = {}
         if pi_name:
             additional_metadata['OSG:PI_Name'] = pi_name
         if pi_email:
@@ -504,7 +502,7 @@ def create_subgroup(group_name):
             return redirect(url_for('view_group', group_name=group_name))
 
 
-@app.route('/groups/<group_name>/subgroups/<subgroup_name>/approve', methods=['GET', 'POST'])
+@app.route('/groups/<group_name>/subgroups/<subgroup_name>/approve', methods=['GET'])
 @authenticated
 def approve_subgroup(group_name, subgroup_name):
     token_query = {'token': session['access_token']}
@@ -519,10 +517,30 @@ def approve_subgroup(group_name, subgroup_name):
         if r.status_code == requests.codes.ok:
             flash("Successfully approved project creation", 'success')
             print(r.content)
-            return redirect(url_for('view_group_subgroups', group_name=group_name))
+            return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
         else:
             err_message = r.json()['message']
             flash('Failed to approve project creation: {}'.format(err_message), 'warning')
+            return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
+
+
+@app.route('/groups/<group_name>/subgroups/<subgroup_name>/deny', methods=['GET'])
+@authenticated
+def deny_subgroup(group_name, subgroup_name):
+    token_query = {'token': session['access_token']}
+    if request.method == 'GET':
+
+        r = requests.delete(
+            ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name +
+            '/subgroup_requests/' + subgroup_name, params=token_query)
+
+        if r.status_code == requests.codes.ok:
+            flash("Denied subproject creation", 'success')
+            print(r.content)
+            return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
+        else:
+            err_message = r.json()['message']
+            flash('Failed to deny subproject creation: {}'.format(err_message), 'warning')
             return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
 
 
