@@ -76,10 +76,8 @@
                 <thead>
                   <tr>
                     <th data-field="name" data-sortable="true">Name</th>
-                    {% if user_status == 'admin' %}
                     <th data-field="email" data-sortable="true">Email</th>
                     <th data-field="phone" data-sortable="true">Phone</th>
-                    {% endif %}
                     <th data-field="institution" data-sortable="true">Institution</th>
                     <th data-field="status" data-sortable="true">Status</th>
                     {% if user_super or user_status == 'admin' %}
@@ -94,6 +92,9 @@
                     {% if user_status == 'admin' %}
                     <td>{{info['metadata']['email']}}</td>
                     <td>{{info['metadata']['phone']}}</td>
+                    {% else %}
+                    <td>Admin View Only</td>
+                    <td>Admin View Only</td>
                     {% endif %}
                     <td>{{info['metadata']['institution']}}</td>
                     {% for group_membership in info['metadata']['group_memberships'] %}
