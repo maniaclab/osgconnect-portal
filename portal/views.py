@@ -60,12 +60,13 @@ def groups():
     """OSG Connect groups"""
     if request.method == 'GET':
         query = {'token': ciconnect_api_token}
-        groups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups', params=query)
-        groups = groups.json()['groups']
+        # groups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups', params=query)
+        # groups = groups.json()['groups']
 
         osg_groups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/root.osg/subgroups', params=query)
         osg_groups = osg_groups.json()['groups']
-        # print(groups.content)
+        osg_groups = [group for group in osg_groups if len(group['name'].split('.')) == 3]
+        # print(osg_groups)
         return render_template('groups.html', groups=osg_groups)
 
 
