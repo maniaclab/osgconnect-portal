@@ -85,23 +85,25 @@
           </div>
 
           <div class="form-group">
-            <label for="pi-name">PI Name</label>
+            <label for="pi-name">PI Name *</label>
             <input
               type="text"
               class="form-control"
               id="pi-name"
               name="pi-name"
-              placeholder="Name of Research Group"
+              required 
+              placeholder="Name of Principle Investigator"
               tabindex="6"
             >
           </div>
 
           <div class="form-group">
-            <label for="pi-email">PI Email</label>
+            <label for="pi-email">PI Email *</label>
             <input
               type="email"
               id="pi-email"
               name="pi-email"
+              required
               class="form-control"
               placeholder="johnsmith@email.com"
               tabindex="7"
@@ -109,12 +111,13 @@
           </div>
 
           <div class="form-group">
-            <label for="pi-org">PI Organization</label>
+            <label for="pi-org">PI Organization *</label>
             <input
               type="text"
               class="form-control"
               id="pi-org"
               name="pi-org"
+              required
               placeholder="Name of PI Organization"
               tabindex="8"
             >
