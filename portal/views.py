@@ -518,9 +518,10 @@ def create_subgroup(group_name):
         if pi_name:
             additional_metadata['OSG:PI_Name'] = pi_name
         if pi_email:
-            additional_metadata['OSG:PI_Email'] = pi_name
+            additional_metadata['OSG:PI_Email'] = pi_email
         if pi_organization:
             additional_metadata['OSG:PI_Organization'] = pi_organization
+
         # grab one or many location coordinates from dynamic form fields
         # for key, value in zip (request.form.getlist('meta-key'), request.form.getlist('meta-value')):
         #     additional_metadata[str(key)] = str(value)
