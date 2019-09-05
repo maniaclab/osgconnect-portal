@@ -62,8 +62,11 @@ def groups():
         query = {'token': ciconnect_api_token}
         groups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups', params=query)
         groups = groups.json()['groups']
+
+        osg_groups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/root.osg/subgroups', params=query)
+        osg_groups = osg_groups.json()['groups']
         # print(groups.content)
-        return render_template('groups.html', groups=groups)
+        return render_template('groups.html', groups=osg_groups)
 
 
 @app.route('/groups/new', methods=['GET', 'POST'])
