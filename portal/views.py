@@ -757,24 +757,17 @@ def edit_profile(unix_name):
         public_key = request.form['sshpubstring']
 
         globus_id = session['primary_identity']
-        try:
-            superuser = request.form['superuser']
-            superuser = True
-        except:
-            superuser = False
-        print("SUPERUSER: {}".format(superuser))
-        service_account = False
+
         # Schema and query for adding users to CI Connect DB
         if public_key != ' ':
             post_user = {"apiVersion": 'v1alpha1',
                         'metadata': {'name': name, 'email': email,
                                      'phone': phone, 'institution': institution,
-                                     'public_key': public_key, 'superuser': superuser}}
+                                     'public_key': public_key}}
         else:
             post_user = {"apiVersion": 'v1alpha1',
                         'metadata': {'name': name, 'email': email,
-                                     'phone': phone, 'institution': institution,
-                                     'superuser': superuser}}
+                                     'phone': phone, 'institution': institution}}
 
         r = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name, params=query, json=post_user)
         print("Updated User: ", r)
