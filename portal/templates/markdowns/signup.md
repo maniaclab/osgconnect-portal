@@ -1,1 +1,1 @@
-Sign Up for OSG
+Sign Up for OSG Connect
