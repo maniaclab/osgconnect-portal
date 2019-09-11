@@ -11,7 +11,7 @@ from portal import app
 from portal.decorators import authenticated
 from portal.utils import (load_portal_client, get_portal_tokens,
                           get_safe_redirect)
-
+from werkzeug.exceptions import HTTPException
 # Use these four lines on container
 import sys
 sys.path.insert(0, '/etc/ci-connect/secrets')
@@ -47,6 +47,15 @@ def errorpage():
 @app.errorhandler(404)
 def not_found(e):
   return render_template("404.html")
+
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # pass through HTTP errors
+    if isinstance(e, HTTPException):
+        return e
+    # now you're handling non-HTTP exceptions only
+    return render_template("500.html", e=e), 500
 
 
 @app.route('/', methods=['GET'])
