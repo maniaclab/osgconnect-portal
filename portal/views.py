@@ -551,7 +551,7 @@ def create_subgroup(group_name):
                                         'purpose': field_of_science,
                                         'email': email, 'phone': phone,
                                         'description': description}}
-        print(put_query)
+        # print(put_query)
 
         r = requests.put(
             ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name +
@@ -559,7 +559,7 @@ def create_subgroup(group_name):
 
         if r.status_code == requests.codes.ok:
             flash("Successfully requested project creation", 'success')
-            return redirect(url_for('groups'))
+            return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
         else:
             err_message = r.json()['message']
             flash('Failed to request project creation: {}'.format(err_message), 'warning')
