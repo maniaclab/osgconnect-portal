@@ -22,7 +22,7 @@
         <hr/>
         <form role="form" action="{{url_for('create_subgroup', group_name=group_name)}}" method="POST">
           <div class="form-group">
-            <label for="name">Project Name (unix convention)*</label>
+            <label for="name">Project Name <span class='text-muted'>(only alpha-numeric, dash and underscore allowed)</span>*</label>
             <input
               type="text"
               class="form-control"
@@ -31,6 +31,7 @@
               placeholder="Unix Name of Project"
               required="required"
               tabindex="1"
+              maxlength="32"
               onkeypress="return checkSpcialChar(event)"
             >
           </div>
@@ -91,7 +92,7 @@
               class="form-control"
               id="pi-name"
               name="pi-name"
-              required 
+              required
               placeholder="Name of Principle Investigator"
               tabindex="6"
             >
@@ -181,7 +182,8 @@ function setFormFields(email){
 }
 
 function checkSpcialChar(event){
-  if(!((event.keyCode >= 65) && (event.keyCode <= 90) || (event.keyCode >= 97) && (event.keyCode <= 122) || (event.keyCode >= 48) && (event.keyCode <= 57))){
+  console.log(event.keyCode);
+  if(!((event.keyCode >= 65) && (event.keyCode <= 90) || (event.keyCode >= 97) && (event.keyCode <= 122) || (event.keyCode >= 48) && (event.keyCode <= 57) || (event.keyCode == 45) || (event.keyCode == 95))){
     event.returnValue = false;
     return;
   }
