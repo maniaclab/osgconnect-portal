@@ -60,6 +60,9 @@
           <li class="nav-item">
             <a class="nav-link active" href="#"><i class="fas fa-user-friends"></i> Members</a>
           </li>
+          <li class="nav-item" id='members-request-tab'>
+            <a class="nav-link" href="{{url_for('view_group_members_requests', group_name=group_name)}}"><span class="badge badge-warning">{[{members_requests_count}]}</span> Members Pending</a>
+          </li>
           {% if group_name == 'root.osg' %}
           <li class="nav-item">
             <a class="nav-link" href="{{url_for('view_group_subgroups', group_name=group_name)}}"><i class="fas fa-project-diagram"></i> Projects</a>
@@ -186,7 +189,26 @@ $(document).ready(function() {
     }.bind(this)) //must use bind(this) unless using arrow function
     .catch(error => { this.failed = true; this.loading = false; })
     }
-  })
+  });
+  new Vue({
+    el: '#members-request-tab',
+    data () {
+      return {
+        members_requests_count: {},
+        loading: true,
+        failed: false
+      }
+    },
+    mounted(){
+      axios.get('/groups-xhr/{{group_name}}/members')
+    .then(function (response) {
+      this.members_requests_count = response.data[1];
+      this.loading = false;
+      // console.log(this.members_requests_count)
+    }.bind(this)) //must use bind(this) unless using arrow function
+    .catch(error => { this.failed = true; this.loading = false; })
+    }
+  });
 });
 </script>
 {%endblock%}

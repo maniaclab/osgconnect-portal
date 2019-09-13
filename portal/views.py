@@ -247,18 +247,17 @@ def view_group_members(group_name):
 
         display_name = '-'.join(group_name.split('.')[1:])
         group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=query)
-        # print(group_members.json())
         memberships = group_members.json()['memberships']
         multiplexJson = {}
         users_statuses = {}
 
         for user in memberships:
-            unix_name = user['user_name']
-            user_state = user['state']
-            user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
-            multiplexJson[user_query] = {"method":"GET"}
-            users_statuses[unix_name] = user_state
-        # print("multiplexJson: {}".format(multiplexJson))
+            if user['state'] != 'pending':
+                unix_name = user['user_name']
+                user_state = user['state']
+                user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
+                multiplexJson[user_query] = {"method":"GET"}
+                users_statuses[unix_name] = user_state
 
         # POST request for multiplex return
         multiplex = requests.post(
@@ -268,7 +267,6 @@ def view_group_members(group_name):
         for user in multiplex:
             user_name = user.split('/')[3].split('?')[0]
             user_dict[user_name] = json.loads(multiplex[user]['body'])
-        # print("USER DICT: {}".format(user_dict))
 
         # Get User's Group Status
         user_status = requests.get(
@@ -278,7 +276,6 @@ def view_group_members(group_name):
         query = {'token': ciconnect_api_token}
         user_super = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'], params=query)
-        # print("USER SUPER: {}".format(user_super.json()['metadata']['superuser']))
         try:
             user_super = user_super.json()['metadata']['superuser']
         except:
@@ -294,9 +291,8 @@ def view_group_members(group_name):
 @app.route('/groups-xhr/<group_name>/members', methods=['GET'])
 @authenticated
 def view_group_members_ajax(group_name):
-    user_dict = view_group_members_ajax_request(group_name)
-    print(user_dict)
-    return jsonify(user_dict)
+    user_dict, pending_user_count = view_group_members_ajax_request(group_name)
+    return jsonify(user_dict, pending_user_count)
 
 def view_group_members_ajax_request(group_name):
     """Detailed view of group's members"""
@@ -308,24 +304,26 @@ def view_group_members_ajax_request(group_name):
         memberships = group_members.json()['memberships']
         multiplexJson = {}
         users_statuses = {}
+        pending_user_count = 0
 
         for user in memberships:
             unix_name = user['user_name']
             user_state = user['state']
+            if user_state == 'pending':
+                pending_user_count += 1
             user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
             multiplexJson[user_query] = {"method":"GET"}
             users_statuses[unix_name] = user_state
-        # print("multiplexJson: {}".format(multiplexJson))
 
         # POST request for multiplex return
         multiplex = requests.post(
             ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
         multiplex = multiplex.json()
         user_dict = {}
+
         for user in multiplex:
             user_name = user.split('/')[3].split('?')[0]
             user_dict[user_name] = json.loads(multiplex[user]['body'])
-        # print("USER DICT: {}".format(user_dict))
 
         # Get User's Group Status
         user_status = requests.get(
@@ -335,7 +333,6 @@ def view_group_members_ajax_request(group_name):
         query = {'token': ciconnect_api_token}
         user_super = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'], params=query)
-        # print("USER SUPER: {}".format(user_super.json()['metadata']['superuser']))
         try:
             user_super = user_super.json()['metadata']['superuser']
         except:
@@ -345,7 +342,62 @@ def view_group_members_ajax_request(group_name):
         #                         group_members=user_dict, group_name=group_name,
         #                         display_name=display_name, user_status=user_status,
         #                         user_super=user_super, users_statuses=users_statuses)
-        return user_dict
+        return user_dict, pending_user_count
+
+
+@app.route('/groups/<group_name>/members-requests', methods=['GET', 'POST'])
+@authenticated
+def view_group_members_requests(group_name):
+    """Detailed view of group's pending members"""
+    query = {'token': ciconnect_api_token}
+    if request.method == 'GET':
+        # Get group information
+        group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
+                            + group_name, params=query)
+        group = group.json()['metadata']
+
+        display_name = '-'.join(group_name.split('.')[1:])
+        group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=query)
+        memberships = group_members.json()['memberships']
+        multiplexJson = {}
+        users_statuses = {}
+
+        for user in memberships:
+            unix_name = user['user_name']
+            if user['state'] == 'pending':
+                user_state = user['state']
+                user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
+                multiplexJson[user_query] = {"method":"GET"}
+                users_statuses[unix_name] = user_state
+
+        # POST request for multiplex return
+        multiplex = requests.post(
+            ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
+        multiplex = multiplex.json()
+        user_dict = {}
+        for user in multiplex:
+            user_name = user.split('/')[3].split('?')[0]
+            user_dict[user_name] = json.loads(multiplex[user]['body'])
+
+        # Get User's Group Status
+        user_status = requests.get(
+                        ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                        group_name + '/members/' + session['unix_name'], params=query)
+        user_status = user_status.json()['membership']['state']
+        query = {'token': ciconnect_api_token}
+        user_super = requests.get(
+                        ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'], params=query)
+        try:
+            user_super = user_super.json()['metadata']['superuser']
+        except:
+            user_super = False
+
+        return render_template('group_profile_members_requests.html',
+                                group_members=user_dict, group_name=group_name,
+                                display_name=display_name, user_status=user_status,
+                                user_super=user_super,
+                                users_statuses=users_statuses, group=group)
+
 
 @app.route('/groups/<group_name>/add_group_member/<unix_name>', methods=['POST'])
 @authenticated

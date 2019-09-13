@@ -112,17 +112,18 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('view_group', group_name='root.osg')}}">Home</a>
+              </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="support-dropdown-menu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Support
                 </a>
                 <div class="dropdown-menu" aria-labelledby="support-dropdown-menu">
                   <a class="dropdown-item" href="https://support.opensciencegrid.org/support/home" target="_blank">Helpdesk</a>
+                  <!-- Mail email mailgun form -->
                   <a class="dropdown-item" href="mailto:user-support@opensciencegrid.org">Email Us</a>
                 </div>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{{url_for('view_group', group_name='root.osg')}}">Open Science Grid</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="{{url_for('groups')}}">Projects</a>

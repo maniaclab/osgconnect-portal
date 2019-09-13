@@ -15,11 +15,11 @@
           <li class="breadcrumb-item"><a href="{{url_for('view_group', group_name='root.osg')}}">Home</a></li>
           {% if group_name == 'root.osg' %}
           <li class="breadcrumb-item"><a href="{{url_for('view_group', group_name=group_name)}}">{{group['display_name']}}</a></li>
-          <li class="breadcrumb-item active">Projects Requests</li>
+          <li class="breadcrumb-item active">Members Pending</li>
           {% else %}
           <li class="breadcrumb-item"><a href="{{url_for('groups')}}">Projects</a></li>
           <li class="breadcrumb-item"><a href="{{url_for('view_group', group_name=group_name)}}">{{group['display_name']}}</a></li>
-          <li class="breadcrumb-item active">Subprojects Requests</li>
+          <li class="breadcrumb-item active">Members Pending</li>
           {% endif %}
         </ol>
         <h2>{{group['display_name']}}</h2>
@@ -67,15 +67,15 @@
           <li class="nav-item">
             <a class="nav-link" href="{{url_for('view_group_subgroups', group_name=group_name)}}"><i class="fas fa-project-diagram"></i> Projects</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="#"><span class="badge badge-warning">{{subgroup_requests|length}}</span> Projects Requests</a>
+          <li class="nav-item" id='subprojects-request-tab'>
+            <a class="nav-link" href="{{url_for('view_group_subgroups_requests', group_name=group_name)}}"><span class="badge badge-warning">{[{subgroup_requests_count}]}</span> Projects Requests</a>
           </li>
           {% else %}
           <li class="nav-item">
             <a class="nav-link" href="{{url_for('view_group_subgroups', group_name=group_name)}}"><i class="fas fa-project-diagram"></i> Subprojects</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="#"><span class="badge badge-warning">{{subgroup_requests|length}}</span> Subprojects Requests</a>
+          <li class="nav-item" id='subprojects-request-tab'>
+            <a class="nav-link" href="{{url_for('view_group_subgroups_requests', group_name=group_name)}}"><span class="badge badge-warning">{[{subgroup_requests_count}]}</span> Subprojects Requests</a>
           </li>
           {% endif %}
         </ul>
@@ -84,39 +84,59 @@
         <div class="row">
           <div class="col-sm-12">
             <div class="table-responsive">
-              <h4>Requested Subprojects</h4>
-              <table class="table" id="groups-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
+              <!-- <h4>Members in Group</h4> -->
+              <table class="table" id="members-requests-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
                 <thead>
                   <tr>
                     <th data-field="name" data-sortable="true">Name</th>
-                    <th data-field="requester" data-sortable="true">Requester</th>
                     <th data-field="email" data-sortable="true">Email</th>
                     <th data-field="phone" data-sortable="true">Phone</th>
-                    <th data-field="field_of_science" data-sortable="true">Field of Science</th>
-                    <th data-field="description" data-sortable="true">Description</th>
-                    {% if user_status == 'admin' %}
+                    <th data-field="institution" data-sortable="true">Institution</th>
+                    <th data-field="status" data-sortable="true">Status</th>
+                    {% if user_super or user_status == 'admin' %}
                     <th data-field="action" data-sortable="true">Action</th>
                     {% endif %}
                   </tr>
                 </thead>
                 <tbody data-link="row" class="rowlink" style="font-size:14px;">
-                  {% for subgroup_request in subgroup_requests %}
+                  {% for member, info in group_members.items() %}
                   <tr>
-                    <td>{{subgroup_request['display_name']}}</td>
-                    <td>{{subgroup_request['requester']}}</td>
-                    <td><a href="mailto:{{subgroup_request['email']}}?subject=Project Inquiry">{{subgroup_request['email']}}</a></td>
-                    <td>{{subgroup_request['phone']}}</td>
-                    <td>{{subgroup_request['purpose']}}</td>
-                    <td>{{subgroup_request['description']}}</td>
+                    <td>{{info['metadata']['name']}}</td>
                     {% if user_status == 'admin' %}
+                    <td>{{info['metadata']['email']}}</td>
+                    <td>{{info['metadata']['phone']}}</td>
+                    {% else %}
+                    <td>Admin View Only</td>
+                    <td>Admin View Only</td>
+                    {% endif %}
+                    <td>{{info['metadata']['institution']}}</td>
+                    {% for group_membership in info['metadata']['group_memberships'] %}
+                      {% if group_membership['name'] == group_name %}
+                        {% if group_membership['state'] == 'pending' %}
+                    <td><strong style='color: orange;'>{{group_membership['state']}}</strong></td>
+                        {% elif group_membership['state'] == 'admin' %}
+                    <td><strong style='color: blue;'>{{group_membership['state']}}</strong></td>
+                        {% else %}
+                    <td><strong style='color: green;'>{{group_membership['state']}}</strong></td>
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+                    {% if user_super or user_status == 'admin' %}
                     <td>
                       <div class="btn-group">
-                        <form role="form" action="{{url_for('approve_subgroup', group_name=group_name, subgroup_name=subgroup_request['name'])}}" method="GET" onsubmit="return confirm('Are you sure you want to approve this subproject?');">
-                          <button type="submit" name="add_group_member" class="btn btn-xs btn-success" data-submit="Approving Subproject Request..."><i class="fas fa-check-circle"></i> Approve</button>
+                        {% if users_statuses[info['metadata']['unix_name']] == 'pending' %}
+                        <form role="form" action="{{url_for('add_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to confirm this member?');">
+                          <button type="submit" name="add_group_member" class="btn btn-xs btn-success" data-submit="Adding Member..."><i class="fas fa-check-circle"></i> Accept</button>
                         </form>
-                        <form role="form" action="{{url_for('deny_subgroup', group_name=group_name, subgroup_name=subgroup_request['name'])}}" method="GET" onsubmit="return confirm('Are you sure you want to deny this subproject request?');">
-                          <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Denying Subproject Request..."><i class="fas fa-times-circle"></i> Deny</button>
+                        {% endif %}
+                        <form role="form" action="{{url_for('remove_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');">
+                          <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Removing Member..."><i class="fas fa-times-circle"></i> Remove</button>
                         </form>
+                        {% if users_statuses[info['metadata']['unix_name']] != 'admin' %}
+                        <form role="form" action="{{url_for('admin_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to make this member an admin?');">
+                          <button type="submit" name="admin_group_member" class="btn btn-xs btn-warning" data-submit="Making Member Admin..."><i class="fas fa-user-shield"></i> Make Admin</button>
+                        </form>
+                        {% endif %}
                       </div>
                     </td>
                     {% endif %}
@@ -145,26 +165,50 @@ function btnConfirm() {
     }
 }
 $(document).ready(function() {
-    $('#groups-table').DataTable();
+    $('#members-requests-table').DataTable({
+      order: [[0, 'asc']]
+    });
 });
-new Vue({
-  el: '#members-request-tab',
-  data () {
-    return {
-      members_requests_count: {},
-      loading: true,
-      failed: false
+
+$(document).ready(function() {
+  new Vue({
+    el: '#subprojects-request-tab',
+    data () {
+      return {
+        subgroup_requests_count: {},
+        loading: true,
+        failed: false
+      }
+    },
+    mounted(){
+      axios.get('/groups-xhr/{{group_name}}/subgroups-requests')
+    .then(function (response) {
+      this.subgroup_requests_count = response.data[1];
+      this.loading = false;
+      console.log(this.subgroup_requests_count)
+    }.bind(this)) //must use bind(this) unless using arrow function
+    .catch(error => { this.failed = true; this.loading = false; })
     }
-  },
-  mounted(){
-    axios.get('/groups-xhr/{{group_name}}/members')
-  .then(function (response) {
-    this.members_requests_count = response.data[1];
-    this.loading = false;
-    // console.log(this.members_requests_count)
-  }.bind(this)) //must use bind(this) unless using arrow function
-  .catch(error => { this.failed = true; this.loading = false; })
-  }
+  });
+  new Vue({
+    el: '#members-request-tab',
+    data () {
+      return {
+        members_requests_count: {},
+        loading: true,
+        failed: false
+      }
+    },
+    mounted(){
+      axios.get('/groups-xhr/{{group_name}}/members')
+    .then(function (response) {
+      this.members_requests_count = response.data[1];
+      this.loading = false;
+      // console.log(this.members_requests_count)
+    }.bind(this)) //must use bind(this) unless using arrow function
+    .catch(error => { this.failed = true; this.loading = false; })
+    }
+  });
 });
 </script>
 {%endblock%}
