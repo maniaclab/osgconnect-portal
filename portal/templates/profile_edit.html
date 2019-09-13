@@ -186,15 +186,21 @@ var email = {{profile['email']|tojson}};
 var phone = {{profile['phone']|tojson}};
 var institution = {{profile['institution']|tojson}};
 var ssh_pubkey = {{profile['public_key']|tojson}};
+var email_pref = {{email_preference|tojson}};
 
-window.onload = setEditFields(name, email, phone, institution, ssh_pubkey);
+window.onload = setEditFields(name, email, phone, institution, ssh_pubkey, email_pref);
 
-function setEditFields(name, email, phone, institution, ssh_pubkey){
+function setEditFields(name, email, phone, institution, ssh_pubkey, email_pref){
   document.getElementById('name').value = name;
   document.getElementById('email').value = email;
   document.getElementById('phone-number').value = phone;
   document.getElementById('institution').value = institution;
   document.getElementById('sshpubstring').value = ssh_pubkey;
+  if(email_pref === 'on'){
+    document.getElementById('email_preference').checked = true;
+  } else {
+    document.getElementById('email_preference').checked = false;
+  }
 }
 
 </script>

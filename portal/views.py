@@ -767,20 +767,18 @@ def create_profile():
                                      'phone': phone, 'institution': institution,
                                      'public_key': public_key,
                                      'unix_name': unix_name, 'superuser': superuser,
-                                     'service_account': service_account,
-                                     'additional_attributes': additional_metadata}}
+                                     'service_account': service_account}}
         else:
             post_user = {"apiVersion": 'v1alpha1',
                         'metadata': {'globusID': globus_id, 'name': name, 'email': email,
                                      'phone': phone, 'institution': institution,
                                      'unix_name': unix_name, 'superuser': superuser,
-                                     'service_account': service_account,
-                                     'additional_attributes': additional_metadata}}
+                                     'service_account': service_account}}
 
-        print("POSTED: {}".format(post_user))
+        # print("POSTED: {}".format(post_user))
 
         r = requests.post(ciconnect_api_endpoint + '/v1alpha1/users', params=query, json=post_user)
-        # print(r.content)
+        print(r.content)
         r = r.json()['metadata']
         session['name'] = r['name']
         session['email'] = r['email']
@@ -793,6 +791,12 @@ def create_profile():
 
         # print("Sesion: {}".format(session))
         # print("Created User: {}".format(r))
+
+        # Additional PUT request to set additional attributes metadata
+        email_query = {"apiVersion": 'v1alpha1',
+                        "data": email_preference}
+        set_additional_attr = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' + r['unix_name'] + '/attributes/OSG:Email_Preference', params=query, json=email_query)
+        print("SET ADD ATTR: {}".format(set_additional_attr))
 
         # Auto generate group membership into OSG - eventually change to
         # dynamically choose connect site based on URL
@@ -833,11 +837,12 @@ def edit_profile(unix_name):
         try:
             additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/'
                                             + unix_name + '/attributes/OSG:Email_Preference', params=query)
-            email_preference = additional_attributes.json()
+            email_preference = additional_attributes.json()['data']
+            print(email_preference)
         except:
             email_preference = 'off'
 
-        return render_template('profile_edit.html', profile=profile, unix_name=unix_name)
+        return render_template('profile_edit.html', profile=profile, unix_name=unix_name, email_preference=email_preference)
 
     elif request.method == 'POST':
         name = request.form['name']
@@ -865,8 +870,13 @@ def edit_profile(unix_name):
                         'metadata': {'name': name, 'email': email,
                                      'phone': phone, 'institution': institution,
                                      'additional_attributes': additional_metadata}}
-
+        # PUT request to update user information
         r = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name, params=query, json=post_user)
+        # Additional PUT request to update user's additional attributes
+        email_query = {"apiVersion": 'v1alpha1',
+                        "data": email_preference}
+        set_additional_attr = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name + '/attributes/OSG:Email_Preference', params=query, json=email_query)
+        # print("SET ADD ATTR: {}".format(set_additional_attr))
         # print("Updated User: ", r)
 
         session['name'] = name
