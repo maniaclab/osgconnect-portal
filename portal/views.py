@@ -27,6 +27,13 @@ except:
 ciconnect_api_token = f.read().split()[0]
 ciconnect_api_endpoint = g.read().split()[0]
 
+try:
+    j = open("/etc/ci-connect/secrets/mailgun_api_token.txt", "r")
+except:
+    j = open("secrets/mailgun_api_token.txt", "r")
+
+mailgun_api_token = j.read().split()[0]
+
 # Create a custom error handler for Exceptions
 @app.errorhandler(Exception)
 def exception_occurred(e):
@@ -64,7 +71,7 @@ def home():
     return render_template('home.html')
 
 
-@app.route('/support', methods=['GET'])
+@app.route('/support', methods=['GET', 'POST'])
 def support():
     """
     Support page, utilize mailgun to send message
@@ -76,7 +83,21 @@ def support():
         email = request.form['email']
         description = request.form['description']
         # mailgun setup here
-        pass
+        r = requests.post("https://api.mailgun.net/v3/api.ci-connect.net/messages",
+                    auth=('api', mailgun_api_token),
+                    data={
+                        "from": "<"+email+">",
+                        "to": ["user-support@opensciencegrid.org"],
+                        "cc": "<{}>".format(email),
+                        "subject": "OSG Support Inquiry",
+                        "text": description
+                    })
+        if r.status_code == requests.codes.ok:
+            flash("Successfully sent message", 'success')
+            return redirect(url_for('support'))
+        else:
+            flash("Unable to send message", 'warning')
+            return redirect(url_for('support'))
 
 
 @app.route('/groups', methods=['GET'])
