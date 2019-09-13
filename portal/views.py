@@ -64,6 +64,21 @@ def home():
     return render_template('home.html')
 
 
+@app.route('/support', methods=['GET'])
+def support():
+    """
+    Support page, utilize mailgun to send message
+    mailto:user-support@opensciencegrid.org
+    """
+    if request.method == 'GET':
+        return render_template('support_email_form.html')
+    elif request.method == 'POST':
+        email = request.form['email']
+        description = request.form['description']
+        # mailgun setup here
+        pass
+
+
 @app.route('/groups', methods=['GET'])
 def groups():
     """OSG Connect groups"""

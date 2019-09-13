@@ -204,7 +204,6 @@ $(document).ready(function() {
     .then(function (response) {
       this.subgroup_requests_count = response.data[1];
       this.loading = false;
-      // console.log(this.subgroup_requests_count)
     }.bind(this)) //must use bind(this) unless using arrow function
     .catch(error => { this.failed = true; this.loading = false; })
     }
@@ -223,7 +222,6 @@ $(document).ready(function() {
     .then(function (response) {
       this.members_requests_count = response.data[1];
       this.loading = false;
-      // console.log(this.members_requests_count)
     }.bind(this)) //must use bind(this) unless using arrow function
     .catch(error => { this.failed = true; this.loading = false; })
     }
