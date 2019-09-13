@@ -749,12 +749,17 @@ def create_profile():
         email = request.form['email']
         phone = request.form['phone-number']
         institution = request.form['institution']
-        globus_id = session['primary_identity']
-
         public_key = request.form['sshpubstring']
-
+        try:
+            email_preference = request.form['email_preference']
+            email_preference = 'on'
+        except:
+            email_preference = 'off'
+        globus_id = session['primary_identity']
         superuser = False
         service_account = False
+
+        additional_metadata = {'OSG:Email_Preference': email_preference}
         # Schema and query for adding users to CI Connect DB
         if public_key:
             post_user = {"apiVersion": 'v1alpha1',
@@ -762,13 +767,15 @@ def create_profile():
                                      'phone': phone, 'institution': institution,
                                      'public_key': public_key,
                                      'unix_name': unix_name, 'superuser': superuser,
-                                     'service_account': service_account}}
+                                     'service_account': service_account,
+                                     'additional_attributes': additional_metadata}}
         else:
             post_user = {"apiVersion": 'v1alpha1',
                         'metadata': {'globusID': globus_id, 'name': name, 'email': email,
                                      'phone': phone, 'institution': institution,
                                      'unix_name': unix_name, 'superuser': superuser,
-                                     'service_account': service_account}}
+                                     'service_account': service_account,
+                                     'additional_attributes': additional_metadata}}
 
         print("POSTED: {}".format(post_user))
 
@@ -823,6 +830,13 @@ def edit_profile(unix_name):
                     ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name, params=query)
         profile = profile.json()['metadata']
 
+        try:
+            additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/'
+                                            + unix_name + '/attributes/OSG:Email_Preference', params=query)
+            email_preference = additional_attributes.json()
+        except:
+            email_preference = 'off'
+
         return render_template('profile_edit.html', profile=profile, unix_name=unix_name)
 
     elif request.method == 'POST':
@@ -831,22 +845,29 @@ def edit_profile(unix_name):
         phone = request.form['phone-number']
         institution = request.form['institution']
         public_key = request.form['sshpubstring']
+        try:
+            email_preference = request.form['email_preference']
+            email_preference = 'on'
+        except:
+            email_preference = 'off'
 
         globus_id = session['primary_identity']
-
+        additional_metadata = {'OSG:Email_Preference': email_preference}
         # Schema and query for adding users to CI Connect DB
         if public_key != ' ':
             post_user = {"apiVersion": 'v1alpha1',
                         'metadata': {'name': name, 'email': email,
                                      'phone': phone, 'institution': institution,
-                                     'public_key': public_key}}
+                                     'public_key': public_key,
+                                     'additional_attributes': additional_metadata}}
         else:
             post_user = {"apiVersion": 'v1alpha1',
                         'metadata': {'name': name, 'email': email,
-                                     'phone': phone, 'institution': institution}}
+                                     'phone': phone, 'institution': institution,
+                                     'additional_attributes': additional_metadata}}
 
         r = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name, params=query, json=post_user)
-        print("Updated User: ", r)
+        # print("Updated User: ", r)
 
         session['name'] = name
         session['email'] = email
