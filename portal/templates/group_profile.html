@@ -59,7 +59,11 @@
             <a class="nav-link" href="{{url_for('view_group_members', group_name=group_name)}}"><i class="fas fa-user-friends"></i> Members</a>
           </li>
           <li class="nav-item" id='members-request-tab'>
-            <a class="nav-link" href="{{url_for('view_group_members_requests', group_name=group_name)}}"><span class="badge badge-warning">{[{members_requests_count}]}</span> Members Pending</a>
+            <a class="nav-link" href="{{url_for('view_group_members_requests', group_name=group_name)}}">
+              <span class="badge badge-warning" v-if="loading"><i class="fas fa-sync fa-spin"></i></span>
+              <span class="badge badge-warning" v-else>{[{members_requests_count}]}</span>
+               Members Pending
+            </a>
           </li>
           {% if group_name == 'root.osg' %}
           <li class="nav-item">
@@ -222,6 +226,7 @@ $(document).ready(function() {
     .then(function (response) {
       this.members_requests_count = response.data[1];
       this.loading = false;
+      // console.log("3");
     }.bind(this)) //must use bind(this) unless using arrow function
     .catch(error => { this.failed = true; this.loading = false; })
     }

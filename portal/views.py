@@ -317,11 +317,9 @@ def view_group_members(group_name):
         except:
             user_super = False
 
-        return render_template('group_profile_members.html',
-                                group_members=user_dict, group_name=group_name,
+        return render_template('group_profile_members.html',group_name=group_name,
                                 display_name=display_name, user_status=user_status,
-                                user_super=user_super,
-                                users_statuses=users_statuses, group=group)
+                                user_super=user_super, group=group, group_members=user_dict)
 
 
 @app.route('/groups-xhr/<group_name>/members', methods=['GET'])
@@ -340,26 +338,31 @@ def view_group_members_ajax_request(group_name):
         memberships = group_members.json()['memberships']
         multiplexJson = {}
         users_statuses = {}
-        pending_user_count = 0
 
         for user in memberships:
             unix_name = user['user_name']
             user_state = user['state']
-            if user_state == 'pending':
-                pending_user_count += 1
             user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
             multiplexJson[user_query] = {"method":"GET"}
             users_statuses[unix_name] = user_state
+
+        pending_user_count = len(memberships) - len(users_statuses)
 
         # POST request for multiplex return
         multiplex = requests.post(
             ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
         multiplex = multiplex.json()
         user_dict = {}
+        group_user_dict = {}
 
         for user in multiplex:
             user_name = user.split('/')[3].split('?')[0]
             user_dict[user_name] = json.loads(multiplex[user]['body'])
+
+        for user, info in user_dict.items():
+            for group_membership in info['metadata']['group_memberships']:
+                if group_membership['name'] == group_name:
+                    group_user_dict[user] = info
 
         # Get User's Group Status
         user_status = requests.get(
