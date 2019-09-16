@@ -49,7 +49,7 @@
                 <ul class="list-unstyled">
                   {% for group in profile['group_memberships'] %}
                     {% if group['name'] != 'root'%}
-                  <li>{{'-'.join(group['name'].split('.')[1:])}} - {{group['state']}}</li>
+                  <li><a href="{{url_for('view_group', group_name=group['name'])}}">{{'-'.join(group['name'].split('.')[1:])}}</a>: {{group['state']}} member</li>
                     {% endif %}
                   {% endfor %}
                 </ul>
