@@ -946,7 +946,6 @@ def profile():
         identity_id = session.get('primary_identity')
         query = {'token': ciconnect_api_token,
                  'globus_id': identity_id}
-        print("THE QUERY: {}".format(query))
         try:
             user = requests.get(ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
             user = user.json()
@@ -1041,7 +1040,6 @@ def authcallback():
         access_token = session['tokens']['auth.globus.org']['access_token']
         token_introspect = client.oauth2_token_introspect(token=access_token ,include='identity_set')
         identity_set = token_introspect.data['identity_set']
-        print(identity_set)
         profile = None
 
         for identity in identity_set:
@@ -1050,7 +1048,6 @@ def authcallback():
             try:
                 r = requests.get(
                     ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
-                print("ID SET AUTH: {}".format(r.json()))
                 if r.status_code == requests.codes.ok:
                     user_info = r.json()
                     user_access_token = user_info['metadata']['access_token']
@@ -1058,12 +1055,12 @@ def authcallback():
                     profile = requests.get(
                                 ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name, params=query)
                     profile = profile.json()
+                    session['primary_identity'] = identity
             except:
-                print("NOTHING HERE")
+                print("NOTHING HERE: {}".format(identity))
 
         if profile:
             profile = profile['metadata']
-            # print(profile)
             session['name'] = profile['name']
             session['email'] = profile['email']
             session['phone'] = profile['phone']
