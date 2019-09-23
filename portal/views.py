@@ -601,7 +601,29 @@ def create_subgroup(group_name):
     if request.method == 'GET':
         sciences = requests.get(ciconnect_api_endpoint + '/v1alpha1/fields_of_science')
         sciences = sciences.json()['fields_of_science']
-        return render_template('groups_create.html', sciences=sciences, group_name=group_name)
+        group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=token_query)
+        group_members = group_members.json()['memberships']
+
+        group_admins = [member for member in group_members if member['state'] == 'admin']
+
+        # multiplexJson = {}
+        #
+        # for user in group_admins:
+        #     if user['name'] != 'root':
+        #         unix_name = user['user_name']
+        #         # user_state = user['state']
+        #         user_query = "/v1alpha1/users/" + unix_name + "?token=" + ciconnect_api_token
+        #         multiplexJson[user_query] = {"method":"GET"}
+        #         # users_statuses[unix_name] = user_state
+        #
+        # # POST request for multiplex return
+        # multiplex = requests.post(
+        #     ciconnect_api_endpoint + '/v1alpha1/multiplex', params=token_query, json=multiplexJson)
+        # multiplex = multiplex.json()
+        #
+        print(group_admins)
+
+        return render_template('groups_create.html', sciences=sciences, group_name=group_name, group_admins=group_admins)
 
     elif request.method == 'POST':
         name = request.form['name']
@@ -800,46 +822,45 @@ def create_profile():
                                      'service_account': service_account}}
 
         # print("POSTED: {}".format(post_user))
-
         r = requests.post(ciconnect_api_endpoint + '/v1alpha1/users', params=query, json=post_user)
         print(r.content)
-        r = r.json()['metadata']
-        session['name'] = r['name']
-        session['email'] = r['email']
-        session['phone'] = r['phone']
-        session['institution'] = r['institution']
-        session['access_token'] = r['access_token']
-        session['unix_name'] = r['unix_name']
-        flash(
-            'Successfully created your account.', 'success')
+        if r.status_code == requests.codes.ok:
+            r = r.json()['metadata']
+            session['name'] = r['name']
+            session['email'] = r['email']
+            session['phone'] = r['phone']
+            session['institution'] = r['institution']
+            session['access_token'] = r['access_token']
+            session['unix_name'] = r['unix_name']
 
-        # print("Sesion: {}".format(session))
-        # print("Created User: {}".format(r))
+            # Additional PUT request to set additional attributes metadata
+            email_query = {"apiVersion": 'v1alpha1',
+                            "data": email_preference}
+            set_additional_attr = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' + r['unix_name'] + '/attributes/OSG:Email_Preference', params=query, json=email_query)
+            print("SET ADD ATTR: {}".format(set_additional_attr))
 
-        # Additional PUT request to set additional attributes metadata
-        email_query = {"apiVersion": 'v1alpha1',
-                        "data": email_preference}
-        set_additional_attr = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' + r['unix_name'] + '/attributes/OSG:Email_Preference', params=query, json=email_query)
-        print("SET ADD ATTR: {}".format(set_additional_attr))
+            # Auto generate group membership into OSG - eventually change to
+            # dynamically choose connect site based on URL
+            put_query = {"apiVersion": 'v1alpha1',
+                            'group_membership': {'state': 'pending'}}
+            user_status = requests.put(
+                            ciconnect_api_endpoint +
+                            '/v1alpha1/groups/root.osg/members/' + unix_name,
+                            params=query, json=put_query)
 
-        # Auto generate group membership into OSG - eventually change to
-        # dynamically choose connect site based on URL
-        put_query = {"apiVersion": 'v1alpha1',
-                        'group_membership': {'state': 'pending'}}
-        user_status = requests.put(
-                        ciconnect_api_endpoint +
-                        '/v1alpha1/groups/root.osg/members/' + unix_name,
-                        params=query, json=put_query)
-
-        # print("UPDATED MEMBERSHIP: {}".format(user_status))
-
-        if 'next' in session:
-            redirect_to = session['next']
-            session.pop('next')
+            flash(
+                'Successfully created your account.', 'success')
+            if 'next' in session:
+                redirect_to = session['next']
+                session.pop('next')
+            else:
+                redirect_to = url_for('profile')
+            return redirect(url_for('profile'))
         else:
-            redirect_to = url_for('profile')
-
-        return redirect(url_for('profile'))
+            error_msg = r.json()['message']
+            flash(
+                'Failed to create your account: {}'.format(error_msg), 'warning')
+            return redirect(url_for('create_profile'))
 
 
 @app.route('/profile/edit/<unix_name>', methods=['GET', 'POST'])
@@ -925,7 +946,7 @@ def profile():
         identity_id = session.get('primary_identity')
         query = {'token': ciconnect_api_token,
                  'globus_id': identity_id}
-
+        print("THE QUERY: {}".format(query))
         try:
             user = requests.get(ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
             user = user.json()
@@ -1017,27 +1038,32 @@ def authcallback():
             primary_identity=id_token.get('sub'),
         )
 
-        # print("URL ROOT CAME FROM: {}".format(request.url_root))
-        globus_id = session['primary_identity']
-        query = {'token': ciconnect_api_token,
-                 'globus_id': globus_id}
-        try:
-            r = requests.get(
-                ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
-            print("AUTH: {}".format(r.json()))
-            user_info = r.json()
-            user_access_token = user_info['metadata']['access_token']
-            unix_name = user_info['metadata']['unix_name']
-            profile = requests.get(
-                        ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name, params=query)
-            profile = profile.json()
-            # print("PROFILE: {}".format(profile))
-        except:
-            profile = None
+        access_token = session['tokens']['auth.globus.org']['access_token']
+        token_introspect = client.oauth2_token_introspect(token=access_token ,include='identity_set')
+        identity_set = token_introspect.data['identity_set']
+        print(identity_set)
+        profile = None
+
+        for identity in identity_set:
+            query = {'token': ciconnect_api_token,
+                     'globus_id': identity}
+            try:
+                r = requests.get(
+                    ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
+                print("ID SET AUTH: {}".format(r.json()))
+                if r.status_code == requests.codes.ok:
+                    user_info = r.json()
+                    user_access_token = user_info['metadata']['access_token']
+                    unix_name = user_info['metadata']['unix_name']
+                    profile = requests.get(
+                                ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name, params=query)
+                    profile = profile.json()
+            except:
+                print("NOTHING HERE")
 
         if profile:
             profile = profile['metadata']
-            print(profile)
+            # print(profile)
             session['name'] = profile['name']
             session['email'] = profile['email']
             session['phone'] = profile['phone']
@@ -1046,9 +1072,7 @@ def authcallback():
             session['unix_name'] = profile['unix_name']
             session['url_root'] = request.url_root
         else:
-            print("NO PROFILE")
             session['url_root'] = request.url_root
             return redirect(url_for('create_profile',
                             next=url_for('profile')))
-
         return redirect(url_for('profile'))
