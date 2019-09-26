@@ -19,7 +19,7 @@
           {% else %}
           <li class="breadcrumb-item"><a href="{{url_for('groups')}}">Projects</a></li>
           <li class="breadcrumb-item"><a href="{{url_for('view_group', group_name=group_name)}}">{{group['display_name']}}</a></li>
-          <li class="breadcrumb-item active">Members</li>
+          <li class="breadcrumb-item active">Add Members</li>
           {% endif %}
         </ol>
         <h2>{{group['display_name']}}</h2>
@@ -58,7 +58,7 @@
             <a class="nav-link" href="{{url_for('view_group', group_name=group_name)}}"><i class="fas fa-cubes"></i> Overview</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" href="#"><i class="fas fa-user-friends"></i> Members</a>
+            <a class="nav-link" href="{{url_for('view_group_members', group_name=group_name)}}"><i class="fas fa-user-friends"></i> Members</a>
           </li>
           <li class="nav-item" id='members-request-tab'>
             <a class="nav-link" href="{{url_for('view_group_members_requests', group_name=group_name)}}">
@@ -84,7 +84,7 @@
           {% endif %}
           {% if user_status == 'admin' %}
           <li class="nav-item">
-            <a class="nav-link" href="{{url_for('view_group_add_members', group_name=group_name)}}"><i class="fas fa-user-plus"></i> Add Users</a>
+            <a class="nav-link active" href="#"><i class="fas fa-user-plus"></i> Add Users</a>
           </li>
           {% endif %}
         </ul>
@@ -101,7 +101,6 @@
                     <th data-field="email" data-sortable="true">Email</th>
                     <th data-field="phone" data-sortable="true">Phone</th>
                     <th data-field="institution" data-sortable="true">Institution</th>
-                    <th data-field="status" data-sortable="true">Status</th>
                     {% if user_super or user_status == 'admin' %}
                     <th data-field="action" data-sortable="true">Action</th>
                     {% endif %}
@@ -111,57 +110,16 @@
                   {% for member, info in group_members.items() %}
                   <tr>
                     <td>{{info['metadata']['name']}}</td>
-                    {% if user_status == 'admin' %}
                     <td>{{info['metadata']['email']}}</td>
                     <td>{{info['metadata']['phone']}}</td>
-                    {% else %}
-                    <td>Admin View Only</td>
-                    <td>Admin View Only</td>
-                    {% endif %}
                     <td>{{info['metadata']['institution']}}</td>
-                    {% for group_membership in info['metadata']['group_memberships'] %}
-                      {% if group_membership['name'] == group_name %}
-                        {% if group_membership['state'] == 'pending' %}
-                    <td><strong style='color: orange;'>{{group_membership['state']}}</strong></td>
-                          {% if user_super or user_status == 'admin' %}
+                    {% if user_super or user_status == 'admin' %}
                     <td>
-                      <div class="btn-group">
-                        <form role="form" action="{{url_for('add_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to confirm this member?');">
-                          <button type="submit" name="add_group_member" class="btn btn-xs btn-success" data-submit="Adding Member..."><i class="fas fa-check-circle"></i> Accept</button>
-                        </form>
-                        <form role="form" action="{{url_for('remove_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');">
-                          <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Removing Member..."><i class="fas fa-times-circle"></i> Remove</button>
-                        </form>
-                        <form role="form" action="{{url_for('admin_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to make this member an admin?');">
-                          <button type="submit" name="admin_group_member" class="btn btn-xs btn-warning" data-submit="Making Member Admin..."><i class="fas fa-user-shield"></i> Make Admin</button>
-                        </form>
-                      </div>
+                      <form role="form" action="{{url_for('add_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to add this member?');">
+                        <button type="submit" name="add_group_member" class="btn btn-xs btn-primary" data-submit="Adding Member..."><i class="fas fa-plus"></i> Add Member</button>
+                      </form>
                     </td>
-                          {% endif %}
-                        {% elif group_membership['state'] == 'admin' %}
-                    <td><strong style='color: blue;'>{{group_membership['state']}}</strong></td>
-                    <td>
-                      <div class="btn-group">
-                        <form role="form" action="{{url_for('remove_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');">
-                          <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Removing Member..."><i class="fas fa-times-circle"></i> Remove</button>
-                        </form>
-                      </div>
-                    </td>
-                        {% else %}
-                    <td><strong style='color: green;'>{{group_membership['state']}}</strong></td>
-                    <td>
-                      <div class="btn-group">
-                        <form role="form" action="{{url_for('remove_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');">
-                          <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Removing Member..."><i class="fas fa-times-circle"></i> Remove</button>
-                        </form>
-                        <form role="form" action="{{url_for('admin_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to make this member an admin?');">
-                          <button type="submit" name="admin_group_member" class="btn btn-xs btn-warning" data-submit="Making Member Admin..."><i class="fas fa-user-shield"></i> Make Admin</button>
-                        </form>
-                      </div>
-                    </td>
-                        {% endif %}
-                      {% endif %}
-                    {% endfor %}
+                    {% endif %}
                   </tr>
                   {% endfor %}
                 </tbody>
