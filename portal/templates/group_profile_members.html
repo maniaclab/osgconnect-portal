@@ -102,68 +102,70 @@
                     <th data-field="phone" data-sortable="true">Phone</th>
                     <th data-field="institution" data-sortable="true">Institution</th>
                     <th data-field="status" data-sortable="true">Status</th>
-                    {% if user_super or user_status == 'admin' %}
+                    {% if user_status == 'admin' %}
                     <th data-field="action" data-sortable="true">Action</th>
                     {% endif %}
                   </tr>
                 </thead>
-                <tbody data-link="row" class="rowlink" style="font-size:14px;">
-                  {% for member, info in group_members.items() %}
-                  <tr>
-                    <td>{{info['metadata']['name']}}</td>
-                    {% if user_status == 'admin' %}
-                    <td>{{info['metadata']['email']}}</td>
-                    <td>{{info['metadata']['phone']}}</td>
-                    {% else %}
-                    <td>Admin View Only</td>
-                    <td>Admin View Only</td>
-                    {% endif %}
-                    <td>{{info['metadata']['institution']}}</td>
-                    {% for group_membership in info['metadata']['group_memberships'] %}
-                      {% if group_membership['name'] == group_name %}
-                        {% if group_membership['state'] == 'pending' %}
-                    <td><strong style='color: orange;'>{{group_membership['state']}}</strong></td>
-                          {% if user_super or user_status == 'admin' %}
+                <tbody data-link="row" class="rowlink" style="font-size:14px;" id="members-table">
+
+                  <tr v-if="loading">
+              			<td>Loading Data <i class="fas fa-sync fa-spin"></i></td>
+              			<td><i class="fas fa-sync fa-spin"></i></td>
+              			<td><i class="fas fa-sync fa-spin"></i></td>
+              			<td><i class="fas fa-sync fa-spin"></i></td>
+                    <td><i class="fas fa-sync fa-spin"></i></td>
+              		</tr>
+              		<tr v-if="failed">
+              			<td>Failed to load the data, please refresh the page <i class="far fa-times-circle"></i></td>
+              			<td><i class="far fa-times-circle"></i></td>
+              			<td><i class="far fa-times-circle"></i></td>
+              			<td><i class="far fa-times-circle"></i></td>
+                    <td><i class="far fa-times-circle"></i></td>
+              		</tr>
+                  <tr v-for="(member, index) in members" v-cloak >
+              		  <td>{[{member.metadata.name}]}</td>
+              		  <td>{[{member.metadata.email}]}</td>
+              		  <td>{[{member.metadata.phone}]}</td>
+                    <td>{[{member.metadata.institution}]}</td>
                     <td>
-                      <div class="btn-group">
-                        <form role="form" action="{{url_for('add_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to confirm this member?');">
-                          <button type="submit" name="add_group_member" class="btn btn-xs btn-success" data-submit="Adding Member..."><i class="fas fa-check-circle"></i> Accept</button>
-                        </form>
-                        <form role="form" action="{{url_for('remove_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');">
-                          <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Removing Member..."><i class="fas fa-times-circle"></i> Remove</button>
-                        </form>
-                        <form role="form" action="{{url_for('admin_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to make this member an admin?');">
-                          <button type="submit" name="admin_group_member" class="btn btn-xs btn-warning" data-submit="Making Member Admin..."><i class="fas fa-user-shield"></i> Make Admin</button>
-                        </form>
+                      <div v-for="group in member.metadata.group_memberships">
+                        <div v-if="group.name == groupname && group.state !== 'pending'">{[{group.state}]}</div>
                       </div>
                     </td>
-                          {% endif %}
-                        {% elif group_membership['state'] == 'admin' %}
-                    <td><strong style='color: blue;'>{{group_membership['state']}}</strong></td>
-                    <td>
-                      <div class="btn-group">
-                        <form role="form" action="{{url_for('remove_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');">
-                          <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Removing Member..."><i class="fas fa-times-circle"></i> Remove</button>
-                        </form>
+                    <td v-if="admin == 'admin'">
+                      <div v-if="users_statuses[member.metadata.unix_name] == 'pending'">
+                        <div class="btn-group">
+                          <form role="form" :action="'/groups/' + groupname + '/add_group_member/' + member.metadata.unix_name" method="POST" onsubmit="return confirm('Are you sure you want to confirm this member?');">
+                            <button type="submit" name="add_group_member" class="btn btn-xs btn-success" data-submit="Adding Member..."><i class="fas fa-check-circle"></i> Accept</button>
+                          </form>
+                          <form role="form" :action="'/groups/' + groupname + '/delete_group_member/' + member.metadata.unix_name" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');">
+                            <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Removing Member..."><i class="fas fa-times-circle"></i> Remove</button>
+                          </form>
+                          <form role="form" :action="'/groups/' + groupname + '/admin_group_member/' + member.metadata.unix_name" method="POST" onsubmit="return confirm('Are you sure you want to make this member an admin?');">
+                            <button type="submit" name="admin_group_member" class="btn btn-xs btn-warning" data-submit="Making Member Admin..."><i class="fas fa-user-shield"></i> Make Admin</button>
+                          </form>
+                        </div>
+                      </div>
+                      <div v-else-if="users_statuses[member.metadata.unix_name] == 'active'">
+                        <div class="btn-group">
+                          <form role="form" :action="'/groups/' + groupname + '/delete_group_member/' + member.metadata.unix_name" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');">
+                            <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Removing Member..."><i class="fas fa-times-circle"></i> Remove</button>
+                          </form>
+                          <form role="form" :action="'/groups/' + groupname + '/admin_group_member/' + member.metadata.unix_name" method="POST" onsubmit="return confirm('Are you sure you want to make this member an admin?');">
+                            <button type="submit" name="admin_group_member" class="btn btn-xs btn-warning" data-submit="Making Member Admin..."><i class="fas fa-user-shield"></i> Make Admin</button>
+                          </form>
+                        </div>
+                      </div>
+                      <div v-else-if="users_statuses[member.metadata.unix_name] == 'admin'">
+                        <div class="btn-group">
+                          <form role="form" :action="'/groups/' + groupname + '/delete_group_member/' + member.metadata.unix_name" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');">
+                            <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Removing Member..."><i class="fas fa-times-circle"></i> Remove</button>
+                          </form>
+                        </div>
                       </div>
                     </td>
-                        {% else %}
-                    <td><strong style='color: green;'>{{group_membership['state']}}</strong></td>
-                    <td>
-                      <div class="btn-group">
-                        <form role="form" action="{{url_for('remove_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');">
-                          <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Removing Member..."><i class="fas fa-times-circle"></i> Remove</button>
-                        </form>
-                        <form role="form" action="{{url_for('admin_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to make this member an admin?');">
-                          <button type="submit" name="admin_group_member" class="btn btn-xs btn-warning" data-submit="Making Member Admin..."><i class="fas fa-user-shield"></i> Make Admin</button>
-                        </form>
-                      </div>
-                    </td>
-                        {% endif %}
-                      {% endif %}
-                    {% endfor %}
-                  </tr>
-                  {% endfor %}
+              		</tr>
                 </tbody>
 
               </table>
@@ -177,22 +179,30 @@
 </section>
 
 <script>
-
-function btnConfirm() {
-    var r = confirm("Are you sure you want to delete this secret?");
-    if(r == true){
-      window.location.href = "#";
-    } else {
-      return
+$(document).ready(function() {
+  new Vue({
+    el: '#members-table',
+    data () {
+      return {
+        members: {},
+        users_statuses: {},
+        groupname: {{ group_name|tojson|safe }},
+        admin: {{ user_status|tojson|safe }},
+        loading: true,
+        failed: false
+      }
+    },
+    mounted(){
+      axios.get('/groups-xhr/{{group_name}}/members')
+    .then(function (response) {
+      this.members = response.data[0];
+      this.users_statuses = response.data[2];
+      this.loading = false;
+      console.log(this.admin)
+    }.bind(this)) //must use bind(this) unless using arrow function
+    .catch(error => { this.failed = true; this.loading = false; })
     }
-}
-$(document).ready(function() {
-    $('#groups-table').DataTable({
-      order: [[4, 'desc'],[0, 'asc']]
-    });
-});
-
-$(document).ready(function() {
+  });
   new Vue({
     el: '#members-request-tab',
     data () {
@@ -202,12 +212,17 @@ $(document).ready(function() {
         failed: false
       }
     },
+    updated: function() {
+  	    //call DataTable after view is updated
+        $('#groups-table').DataTable({
+          order: [[4, 'desc'],[0, 'asc']]
+        });
+  	},
     mounted(){
       axios.get('/groups-xhr/{{group_name}}/members')
     .then(function (response) {
       this.members_requests_count = response.data[1];
       this.loading = false;
-      // console.log(this.members_requests_count)
     }.bind(this)) //must use bind(this) unless using arrow function
     .catch(error => { this.failed = true; this.loading = false; })
     }
@@ -226,7 +241,6 @@ $(document).ready(function() {
     .then(function (response) {
       this.subgroup_requests_count = response.data[1];
       this.loading = false;
-      console.log(this.subgroup_requests_count)
     }.bind(this)) //must use bind(this) unless using arrow function
     .catch(error => { this.failed = true; this.loading = false; })
     }

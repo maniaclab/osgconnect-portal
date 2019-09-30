@@ -325,8 +325,8 @@ def view_group_members(group_name):
 @app.route('/groups-xhr/<group_name>/members', methods=['GET'])
 @authenticated
 def view_group_members_ajax(group_name):
-    user_dict, pending_user_count = view_group_members_ajax_request(group_name)
-    return jsonify(user_dict, pending_user_count)
+    user_dict, pending_user_count, users_statuses = view_group_members_ajax_request(group_name)
+    return jsonify(user_dict, pending_user_count, users_statuses)
 
 def view_group_members_ajax_request(group_name):
     """Detailed view of group's members"""
@@ -381,7 +381,7 @@ def view_group_members_ajax_request(group_name):
         #                         group_members=user_dict, group_name=group_name,
         #                         display_name=display_name, user_status=user_status,
         #                         user_super=user_super, users_statuses=users_statuses)
-        return user_dict, pending_user_count
+        return user_dict, pending_user_count, users_statuses
 
 
 @app.route('/groups/<group_name>/members-requests', methods=['GET', 'POST'])
@@ -574,17 +574,12 @@ def view_group_subgroups(group_name):
         group = group.json()['metadata']
 
         display_name = '-'.join(group_name.split('.')[1:])
-        # subgroups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroups', params=query)
-        # subgroups = subgroups.json()['groups']
         # Get User's Group Status
         user_status = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
                         group_name + '/members/' + session['unix_name'], params=query)
 
         user_status = user_status.json()['membership']['state']
-
-        # subgroup_requests = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroup_requests', params=query)
-        # print(subgroup_requests.json())
 
         return render_template('group_profile_subgroups.html',
                                 display_name=display_name, group_name=group_name,
