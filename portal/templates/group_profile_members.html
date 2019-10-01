@@ -125,8 +125,10 @@
               		</tr>
                   <tr v-for="(member, index) in members" v-cloak >
               		  <td>{[{member.metadata.name}]}</td>
-              		  <td>{[{member.metadata.email}]}</td>
-              		  <td>{[{member.metadata.phone}]}</td>
+              		  <td v-if="admin == 'admin'">{[{member.metadata.email}]}</td>
+                    <td v-else>Admin View Only</td>
+              		  <td v-if="admin == 'admin'">{[{member.metadata.phone}]}</td>
+                    <td v-else>Admin View Only</td>
                     <td>{[{member.metadata.institution}]}</td>
                     <td>
                       <div v-for="group in member.metadata.group_memberships">
@@ -192,6 +194,12 @@ $(document).ready(function() {
         failed: false
       }
     },
+    updated: function() {
+  	    //call DataTable after view is updated
+        $('#groups-table').DataTable({
+          order: [[4, 'desc'],[0, 'asc']]
+        });
+  	},
     mounted(){
       axios.get('/groups-xhr/{{group_name}}/members')
     .then(function (response) {
@@ -212,16 +220,10 @@ $(document).ready(function() {
         failed: false
       }
     },
-    updated: function() {
-  	    //call DataTable after view is updated
-        $('#groups-table').DataTable({
-          order: [[4, 'desc'],[0, 'asc']]
-        });
-  	},
     mounted(){
-      axios.get('/groups-xhr/{{group_name}}/members')
+      axios.get('/groups-pending-members-count-xhr/{{group_name}}/members')
     .then(function (response) {
-      this.members_requests_count = response.data[1];
+      this.members_requests_count = response.data;
       this.loading = false;
     }.bind(this)) //must use bind(this) unless using arrow function
     .catch(error => { this.failed = true; this.loading = false; })

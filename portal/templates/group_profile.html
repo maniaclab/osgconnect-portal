@@ -120,21 +120,6 @@
                 Principle Investigator Info
               </div> -->
               <div class="card-body">
-
-                <!-- <ul id="myUL">
-                  {% set group_naming = group_name.split('.') %}
-                  <li><span class="caret">{{group_naming[0]}}</span>
-                    <ul class="nested">
-                      <li><span class="caret" style="color: green;">{{group_naming[-1]}}</span>
-                        <ul class="nested">
-                          {% for subgroup in subgroups %}
-                          <li><a href="{{url_for('view_group', group_name=subgroup['name'])}}">{{subgroup['display_name']}}</a> - <span class='text-muted'>{{subgroup['purpose']}}</span></li>
-                          {% endfor %}
-                        </ul>
-                      </li>
-                    </ul>
-                  </li>
-                </ul> -->
                 <p>
                   <strong>PI Name:</strong> {{pi_info['PI_Name']}}
                 </p>
@@ -144,7 +129,6 @@
                 <p>
                   <strong>PI Organization:</strong> {{pi_info['PI_Organization']}}
                 </p>
-
               </div>
             </div>
           </div>
@@ -157,25 +141,6 @@
 
 <script>
 
-function btnConfirm() {
-    var r = confirm("Are you sure you want to delete this secret?");
-    if(r == true){
-      window.location.href = "#";
-    } else {
-      return
-    }
-}
-// Subgroup Tree view
-var toggler = document.getElementsByClassName("caret");
-var i;
-
-for (i = 0; i < toggler.length; i++) {
-  toggler[i].addEventListener("click", function() {
-    this.parentElement.querySelector(".nested").classList.toggle("active");
-    this.classList.toggle("caret-down");
-  });
-}
-
 $(document).ready(function() {
   new Vue({
 	el: '#group-info',
@@ -183,7 +148,6 @@ $(document).ready(function() {
 	    return {
 	      group: {},
 		user_status: '',
-    subgroups: {},
 		loading: true,
 		failed: false
 	    }
@@ -193,7 +157,6 @@ $(document).ready(function() {
 	        .then(function (response) {
 		    this.group = response.data[0];
 		    this.user_status = response.data[1];
-        this.subgroups = response.data[2];
 				this.loading = false;
 		}.bind(this)) //must use bind(this) unless using arrow function
 		.catch(error => { this.failed = true; this.loading = false; })
@@ -227,9 +190,9 @@ $(document).ready(function() {
       }
     },
     mounted(){
-      axios.get('/groups-xhr/{{group_name}}/members')
+      axios.get('/groups-pending-members-count-xhr/{{group_name}}/members')
     .then(function (response) {
-      this.members_requests_count = response.data[1];
+      this.members_requests_count = response.data;
       this.loading = false;
       // console.log("3");
     }.bind(this)) //must use bind(this) unless using arrow function

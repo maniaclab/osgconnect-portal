@@ -161,18 +161,17 @@ def view_group(group_name):
         group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
                             + group_name, params=query)
         group = group.json()['metadata']
-        # Remove 'root' and join group naming
-        # display_name = group['display_name']
+
+        members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
+                            + group_name + '/members', params=query)
+        members = members.json()['memberships']
+
+        print(len(members))
         # Get User's Group Status
         user_status = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
                         group_name + '/members/' + unix_name, params=query)
         user_status = user_status.json()['membership']['state']
-        # print("USER STATUS: {}".format(user_status))
-        subgroups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
-                                + group_name + '/subgroups', params=query)
-        subgroups = subgroups.json()['groups']
-        subgroups = sorted(subgroups, key=lambda k: k['name'])
 
         pi_info = {}
 
@@ -204,8 +203,7 @@ def view_group(group_name):
             pi_info['PI_Organization'] = PI_Organization
 
         return render_template('group_profile.html', group=group,
-                                group_name=group_name, user_status=user_status,
-                                subgroups=subgroups, pi_info=pi_info)
+                                group_name=group_name, user_status=user_status, pi_info=pi_info)
     elif request.method == 'POST':
         '''Request membership to join group'''
         put_query = {"apiVersion": 'v1alpha1',
@@ -220,9 +218,8 @@ def view_group(group_name):
 @app.route('/groups-xhr/<group_name>', methods=['GET'])
 @authenticated
 def view_group_ajax(group_name):
-    group, user_status, subgroups = view_group_ajax_request(group_name)
-    # print(group, user_status, subgroups)
-    return jsonify(group, user_status, subgroups)
+    group, user_status = view_group_ajax_request(group_name)
+    return jsonify(group, user_status)
 
 def view_group_ajax_request(group_name):
     query = {'token': ciconnect_api_token,
@@ -235,20 +232,13 @@ def view_group_ajax_request(group_name):
     group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=query)
     group = group.json()['metadata']
     group_name = group['name']
-    # Remove 'root' and join group naming
-    display_name = group['name'].split('.')[1:]
-    display_name = '-'.join(display_name)
     # Get User's Group Status
     user_status = requests.get(
                     ciconnect_api_endpoint + '/v1alpha1/groups/' +
                     group_name + '/members/' + unix_name, params=query)
     user_status = user_status.json()['membership']['state']
-    # print("USER STATUS: {}".format(user_status))
-    subgroups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroups', params=query)
-    subgroups = subgroups.json()['groups']
-    subgroups = sorted(subgroups, key=lambda k: k['name'])
 
-    return group, user_status, subgroups
+    return group, user_status
 
 
 @app.route('/groups/<group_name>/delete', methods=['POST'])
@@ -281,45 +271,14 @@ def view_group_members(group_name):
                             + group_name, params=query)
         group = group.json()['metadata']
 
-        display_name = '-'.join(group_name.split('.')[1:])
-        group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=query)
-        memberships = group_members.json()['memberships']
-        multiplexJson = {}
-        users_statuses = {}
-
-        for user in memberships:
-            if user['state'] != 'pending':
-                unix_name = user['user_name']
-                user_state = user['state']
-                user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
-                multiplexJson[user_query] = {"method":"GET"}
-                users_statuses[unix_name] = user_state
-
-        # POST request for multiplex return
-        multiplex = requests.post(
-            ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
-        multiplex = multiplex.json()
-        user_dict = {}
-        for user in multiplex:
-            user_name = user.split('/')[3].split('?')[0]
-            user_dict[user_name] = json.loads(multiplex[user]['body'])
-
         # Get User's Group Status
         user_status = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
                         group_name + '/members/' + session['unix_name'], params=query)
         user_status = user_status.json()['membership']['state']
-        query = {'token': ciconnect_api_token}
-        user_super = requests.get(
-                        ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'], params=query)
-        try:
-            user_super = user_super.json()['metadata']['superuser']
-        except:
-            user_super = False
 
-        return render_template('group_profile_members.html',group_name=group_name,
-                                display_name=display_name, user_status=user_status,
-                                user_super=user_super, group=group, group_members=user_dict)
+        return render_template('group_profile_members.html', group_name=group_name,
+                                user_status=user_status, group=group)
 
 
 @app.route('/groups-xhr/<group_name>/members', methods=['GET'])
@@ -377,11 +336,30 @@ def view_group_members_ajax_request(group_name):
         except:
             user_super = False
 
-        # return render_template('group_profile_members.html',
-        #                         group_members=user_dict, group_name=group_name,
-        #                         display_name=display_name, user_status=user_status,
-        #                         user_super=user_super, users_statuses=users_statuses)
         return user_dict, pending_user_count, users_statuses
+
+
+@app.route('/groups-pending-members-count-xhr/<group_name>/members', methods=['GET'])
+@authenticated
+def group_pending_members_count_ajax(group_name):
+    pending_user_count = group_pending_members_count_request(group_name)
+    return jsonify(pending_user_count)
+
+def group_pending_members_count_request(group_name):
+    """Get a group's pending members count"""
+    query = {'token': ciconnect_api_token}
+    if request.method == 'GET':
+        group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=query)
+        # print(group_members.json())
+        memberships = group_members.json()['memberships']
+        pending_user_count = 0
+
+        for user in memberships:
+            if user['state'] == 'pending':
+                pending_user_count += 1
+
+        return pending_user_count
+
 
 
 @app.route('/groups/<group_name>/members-requests', methods=['GET', 'POST'])
@@ -855,7 +833,7 @@ def logout():
     ga_logout_url.append(app.config['GLOBUS_AUTH_LOGOUT_URI'])
     ga_logout_url.append('?client={}'.format(app.config['PORTAL_CLIENT_ID']))
     ga_logout_url.append('&redirect_uri={}'.format(redirect_uri))
-    ga_logout_url.append('&redirect_name=Globus Sample Data Portal')
+    ga_logout_url.append('&redirect_name=OSG Connect')
 
     # Redirect the user to the Globus Auth logout page
     return redirect(''.join(ga_logout_url))

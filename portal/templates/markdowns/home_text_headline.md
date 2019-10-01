@@ -1,2 +1,2 @@
 <!-- Cyberinfrastructure for accelerated research -->
-Distributed High Throughput Computing
+Front door to the Open Science Grid
