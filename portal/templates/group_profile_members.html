@@ -204,7 +204,7 @@ $(document).ready(function() {
       axios.get('/groups-xhr/{{group_name}}/members')
     .then(function (response) {
       this.members = response.data[0];
-      this.users_statuses = response.data[2];
+      this.users_statuses = response.data[1];
       this.loading = false;
       console.log(this.admin)
     }.bind(this)) //must use bind(this) unless using arrow function

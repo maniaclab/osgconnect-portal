@@ -194,7 +194,6 @@ $(document).ready(function() {
     .then(function (response) {
       this.members_requests_count = response.data;
       this.loading = false;
-      // console.log("3");
     }.bind(this)) //must use bind(this) unless using arrow function
     .catch(error => { this.failed = true; this.loading = false; })
     }

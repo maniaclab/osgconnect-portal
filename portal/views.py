@@ -162,11 +162,6 @@ def view_group(group_name):
                             + group_name, params=query)
         group = group.json()['metadata']
 
-        members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
-                            + group_name + '/members', params=query)
-        members = members.json()['memberships']
-
-        print(len(members))
         # Get User's Group Status
         user_status = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
@@ -284,14 +279,13 @@ def view_group_members(group_name):
 @app.route('/groups-xhr/<group_name>/members', methods=['GET'])
 @authenticated
 def view_group_members_ajax(group_name):
-    user_dict, pending_user_count, users_statuses = view_group_members_ajax_request(group_name)
-    return jsonify(user_dict, pending_user_count, users_statuses)
+    user_dict, users_statuses = view_group_members_ajax_request(group_name)
+    return jsonify(user_dict, users_statuses)
 
 def view_group_members_ajax_request(group_name):
     """Detailed view of group's members"""
     query = {'token': ciconnect_api_token}
     if request.method == 'GET':
-        display_name = '-'.join(group_name.split('.')[1:])
         group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=query)
         # print(group_members.json())
         memberships = group_members.json()['memberships']
@@ -304,8 +298,6 @@ def view_group_members_ajax_request(group_name):
             user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
             multiplexJson[user_query] = {"method":"GET"}
             users_statuses[unix_name] = user_state
-
-        pending_user_count = len(memberships) - len(users_statuses)
 
         # POST request for multiplex return
         multiplex = requests.post(
@@ -336,7 +328,7 @@ def view_group_members_ajax_request(group_name):
         except:
             user_super = False
 
-        return user_dict, pending_user_count, users_statuses
+        return user_dict, users_statuses
 
 
 @app.route('/groups-pending-members-count-xhr/<group_name>/members', methods=['GET'])
@@ -550,8 +542,6 @@ def view_group_subgroups(group_name):
         group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
                             + group_name, params=query)
         group = group.json()['metadata']
-
-        display_name = '-'.join(group_name.split('.')[1:])
         # Get User's Group Status
         user_status = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
@@ -559,8 +549,7 @@ def view_group_subgroups(group_name):
 
         user_status = user_status.json()['membership']['state']
 
-        return render_template('group_profile_subgroups.html',
-                                display_name=display_name, group_name=group_name,
+        return render_template('group_profile_subgroups.html', group_name=group_name,
                                 user_status=user_status, group=group)
 
 @app.route('/groups-xhr/<group_name>/subgroups', methods=['GET', 'POST'])
