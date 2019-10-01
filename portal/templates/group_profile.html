@@ -34,13 +34,25 @@
             <button type="submit" name="pending_membership" class="btn btn-warning btn-sm disabled" data-submit="Pending Membership..."><i class="fas fa-spinner fa-spin"></i> Requested Membership</button>
           </div>
           {% elif user_status == 'active' %}
+            {% if group_name == 'root.osg' %}
+          <div class="btn-group mr-2" role="group" aria-label="first group">
+            <a href="{{url_for('create_subgroup', group_name=group_name)}}" class="btn btn-secondary btn-sm">Request Project</a>
+          </div>
+            {% else %}
           <div class="btn-group mr-2" role="group" aria-label="first group">
             <a href="{{url_for('create_subgroup', group_name=group_name)}}" class="btn btn-secondary btn-sm">Request Subproject</a>
           </div>
+            {% endif %}
           {% elif user_status == 'admin' %}
+            {% if group_name == 'root.osg' %}
+          <div class="btn-group mr-2" role="group" aria-label="first group">
+            <a href="{{url_for('create_subgroup', group_name=group_name)}}" class="btn btn-secondary btn-sm">Create Project</a>
+          </div>
+            {% else %}
           <div class="btn-group mr-2" role="group" aria-label="first group">
             <a href="{{url_for('create_subgroup', group_name=group_name)}}" class="btn btn-secondary btn-sm">Create Subproject</a>
           </div>
+            {% endif %}
           <div class="btn-group mr-2" role="group", aria-label="second group">
             <form role="form" action="{{url_for('delete_group', group_name=group_name)}}" method="POST" onsubmit="return confirm('Are you sure you want to delete this group?');">
               <button type="submit" name="delete_group" class="btn btn-danger btn-sm" data-submit="Deleting Project...">Delete Project</button>
