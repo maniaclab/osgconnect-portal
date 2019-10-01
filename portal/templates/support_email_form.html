@@ -49,19 +49,4 @@
   </div>
 </section>
 
-<script>
-var name = {{session['name']|tojson}};
-var email = {{session['email']|tojson}};
-var phone = {{session['phone']|tojson}};
-
-window.onload = setFormFields(email);
-
-function setFormFields(email){
-  // document.getElementById('name').value = name;
-  document.getElementById('email').value = email;
-  document.getElementById('phone').value = phone;
-  // document.getElementById('phone').value = phone;
-}
-
-</script>
 {%endblock%}
