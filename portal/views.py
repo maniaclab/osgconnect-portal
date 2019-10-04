@@ -572,6 +572,7 @@ def view_group_subgroups_request(group_name):
         # Get group's subgroups information
         subgroups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroups', params=query)
         subgroups = subgroups.json()['groups']
+        subgroups = [subgroup for subgroup in subgroups if len(subgroup['name'].split('.')) == 3]
         # Get User's Group Status
         # user_status = requests.get(
         #                 ciconnect_api_endpoint + '/v1alpha1/groups/' +
@@ -942,6 +943,8 @@ def login_node_remove_user(group_name, unix_name):
         remove_user = requests.delete(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
                         group_name + '/members/' + unix_name, params=query)
+        # print(group_name, unix_name)
+        # print(remove_user)
 
         if remove_user.status_code == requests.codes.ok:
             flash("Successfully removed user from login node", 'success')
