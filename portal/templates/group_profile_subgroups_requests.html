@@ -108,10 +108,10 @@
                     {% endif %}
                   </tr>
                 </thead>
-                <tbody data-link="row" class="rowlink" style="font-size:14px;">
+                <tbody data-link="row" class="rowlink" style="font-size:14px;" id="subgroup-info">
                   {% for subgroup_request in subgroup_requests %}
                   <tr>
-                    <td>{{subgroup_request['display_name']}}</td>
+                    <td>{{subgroup_request['name']}}</td>
                     <td>{{subgroup_request['requester']}}</td>
                     <td><a href="mailto:{{subgroup_request['email']}}?subject=Project Inquiry">{{subgroup_request['email']}}</a></td>
                     <td>{{subgroup_request['phone']}}</td>
@@ -145,14 +145,6 @@
 
 <script>
 
-function btnConfirm() {
-    var r = confirm("Are you sure you want to delete this secret?");
-    if(r == true){
-      window.location.href = "#";
-    } else {
-      return
-    }
-}
 $(document).ready(function() {
     $('#groups-table').DataTable();
 });
@@ -166,9 +158,28 @@ new Vue({
     }
   },
   mounted(){
-    axios.get('/groups-xhr/{{group_name}}/members')
+    axios.get('/groups-pending-members-count-xhr/{{group_name}}/members')
   .then(function (response) {
-    this.members_requests_count = response.data[1];
+    this.members_requests_count = response.data;
+    this.loading = false;
+    // console.log(this.members_requests_count)
+  }.bind(this)) //must use bind(this) unless using arrow function
+  .catch(error => { this.failed = true; this.loading = false; })
+  }
+});
+new Vue({
+  el: '#subgroup-info',
+  data () {
+    return {
+      pi_info: {},
+      loading: true,
+      failed: false
+    }
+  },
+  mounted(){
+    axios.get('/pi-info-xhr/{{group_name}}')
+  .then(function (response) {
+    this.pi_info = response.data;
     this.loading = false;
     // console.log(this.members_requests_count)
   }.bind(this)) //must use bind(this) unless using arrow function
