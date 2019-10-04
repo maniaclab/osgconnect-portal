@@ -158,3 +158,13 @@ ul, #myUL {
 .asterik {
   color: red;
 }
+
+.form-control::-moz-placeholder {
+  opacity: 0.5;
+}
+.form-control:-ms-input-placeholder {
+  opacity: 0.5;
+}
+.form-control::-webkit-input-placeholder {
+  opacity: 0.5;
+}
