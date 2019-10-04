@@ -100,6 +100,38 @@ def support():
             return redirect(url_for('support'))
 
 
+@app.route('/users-groups', methods=['GET'])
+def users_groups():
+    """Groups that user's are specifically members of"""
+    if request.method == 'GET':
+        query = {'token': ciconnect_api_token,
+                 'globus_id': session['primary_identity']}
+
+        user = requests.get(ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
+        user = user.json()
+        unix_name = user['metadata']['unix_name']
+
+        users_group_memberships = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name + '/groups', params=query)
+        users_group_memberships = users_group_memberships.json()['group_memberships']
+
+        multiplexJson = {}
+
+        for group in users_group_memberships:
+            group_name = group['name']
+            group_query = "/v1alpha1/groups/" + group_name + "?token=" + query['token']
+            multiplexJson[group_query] = {"method":"GET"}
+        # POST request for multiplex return
+        multiplex = requests.post(
+            ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
+        multiplex = multiplex.json()
+
+        users_groups = []
+        for group in multiplex:
+            users_groups.append(json.loads(multiplex[group]['body']))
+        # users_groups = [group for group in users_groups if len(group['name'].split('.')) == 3]
+        return render_template('users_groups.html', groups=users_groups)
+
+
 @app.route('/groups', methods=['GET'])
 def groups():
     """OSG Connect groups"""
@@ -943,8 +975,6 @@ def login_node_remove_user(group_name, unix_name):
         remove_user = requests.delete(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
                         group_name + '/members/' + unix_name, params=query)
-        # print(group_name, unix_name)
-        # print(remove_user)
 
         if remove_user.status_code == requests.codes.ok:
             flash("Successfully removed user from login node", 'success')

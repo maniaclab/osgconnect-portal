@@ -138,6 +138,9 @@
 
               {% if session.get('is_authenticated') %}
               <li class="nav-item">
+                <a class="nav-link" href="{{url_for('users_groups')}}">My Projects</a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
               </li>
               <li class="nav-item">
