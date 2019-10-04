@@ -688,11 +688,6 @@ def create_subgroup(group_name):
         if pi_organization:
             additional_metadata['OSG:PI_Organization'] = pi_organization
 
-        # grab one or many location coordinates from dynamic form fields
-        # for key, value in zip (request.form.getlist('meta-key'), request.form.getlist('meta-value')):
-        #     additional_metadata[str(key)] = str(value)
-        # print(additional_metadata)
-
         if len(additional_metadata) > 0:
             put_query = {"apiVersion": 'v1alpha1',
                             'metadata': {'name': name,
@@ -763,9 +758,9 @@ def deny_subgroup(group_name, subgroup_name):
             flash('Failed to deny subproject creation: {}'.format(err_message), 'warning')
             return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
 
-##############################
-##### LOGIN-NODE ROUTES ######
-##############################
+################################################################################
+######################### LOGIN-NODE ROUTES ####################################
+################################################################################
 
 @app.route('/login-nodes', methods=['GET'])
 @authenticated
@@ -955,6 +950,38 @@ def login_node_remove_user(group_name, unix_name):
             err_message = remove_user.json()['message']
             flash('Failed to remove user from login node: {}'.format(err_message), 'warning')
             return redirect(url_for('view_login_node_users', group_name=group_name))
+
+
+@app.route('/login-nodes/<group_name>/new', methods=['GET', 'POST'])
+@authenticated
+def create_login_node(group_name):
+    token_query = {'token': session['access_token']}
+    if request.method == 'GET':
+        return render_template('login_nodes_create.html', group_name=group_name)
+
+    elif request.method == 'POST':
+        name = request.form['name']
+        display_name = request.form['display-name']
+        email = request.form['email']
+        description = request.form['description']
+
+        put_query = {"apiVersion": 'v1alpha1',
+                    'metadata': {'name': name, 'display_name': display_name,
+                                'purpose': 'None',
+                                'email': email, 'description': description}}
+
+        r = requests.put(
+            ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name +
+            '/subgroup_requests/' + name, params=token_query, json=put_query)
+
+        if r.status_code == requests.codes.ok:
+            flash("Successfully created login node", 'success')
+            return redirect(url_for('view_login_nodes'))
+        else:
+            err_message = r.json()['message']
+            flash('Failed to create login node: {}'.format(err_message), 'warning')
+            return redirect(url_for('view_login_nodes'))
+
 
 
 @app.route('/signup', methods=['GET'])
@@ -1164,6 +1191,8 @@ def edit_profile(unix_name):
         session['email'] = email
         session['phone'] = phone
         session['institution'] = institution
+
+        flash("Successfully updated profile information", 'success')
 
         if 'next' in session:
             redirect_to = session['next']
