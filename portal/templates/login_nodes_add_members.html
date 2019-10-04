@@ -1,0 +1,111 @@
+{%extends "base.html"%}
+
+{%block title%}
+  {{group['display_name']}}
+{%endblock%}
+
+{%block body%}
+<section id="cli-access" class="bg-light">
+  <div class="container col-lg-12 mx-auto">
+
+    <div class="row">
+      <div class="col-lg-12 mx-auto">
+        {%include 'messages.html' %}
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{url_for('view_group', group_name='root.osg')}}">Open Science Grid</a></li>
+          <li class="breadcrumb-item"><a href="{{url_for('view_login_nodes')}}">Login Nodes</a></li>
+          <li class="breadcrumb-item active">Add Users</li>
+        </ol>
+        <h2>{{group['display_name']}}</h2>
+        <br>
+        <div class="btn-toolbar" role="toolbar">
+          <div class="btn-group mr-2" role="group" aria-label="first group">
+            <a href="{{url_for('view_login_node_users', group_name=group_name)}}" class="btn btn-primary btn-sm">View Login Node Users</a>
+          </div>
+        </div>
+        <br>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="table-responsive">
+              <!-- <h4>Members in Group</h4> -->
+              <table class="table" id="groups-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
+                <thead>
+                  <tr>
+                    <th data-field="name" data-sortable="true">Name</th>
+                    <th data-field="email" data-sortable="true">Email</th>
+                    <th data-field="phone" data-sortable="true">Phone</th>
+                    <th data-field="institution" data-sortable="true">Institution</th>
+                    <th data-field="action" data-sortable="true">Action</th>
+                  </tr>
+                </thead>
+                <tbody data-link="row" class="rowlink" style="font-size:14px;" id="non-members-table">
+                  <tr v-if="loading">
+              			<td>Loading Data <i class="fas fa-sync fa-spin"></i></td>
+              			<td><i class="fas fa-sync fa-spin"></i></td>
+              			<td><i class="fas fa-sync fa-spin"></i></td>
+              			<td><i class="fas fa-sync fa-spin"></i></td>
+                    <td><i class="fas fa-sync fa-spin"></i></td>
+              		</tr>
+              		<tr v-if="failed">
+              			<td>Failed to load the data, please refresh the page <i class="far fa-times-circle"></i></td>
+              			<td><i class="far fa-times-circle"></i></td>
+              			<td><i class="far fa-times-circle"></i></td>
+              			<td><i class="far fa-times-circle"></i></td>
+                    <td><i class="far fa-times-circle"></i></td>
+              		</tr>
+                  <tr v-for="member in members">
+                    <td>{[{member.metadata.name}]}</td>
+                    <td>{[{member.metadata.email}]}</td>
+                    <td>{[{member.metadata.phone}]}</td>
+                    <td>{[{member.metadata.institution}]}</td>
+                    <td>
+                      <form role="form" :action="'/login-nodes/' + groupname + '/add_user/' + member.metadata.unix_name" method="POST" onsubmit="return confirm('Are you sure you want to add this member?');">
+                        <button type="submit" name="add_group_member" class="btn btn-xs btn-primary" data-submit="Adding Member..."><i class="fas fa-plus"></i> Add Member</button>
+                      </form>
+                    </td>
+                  </tr>
+                </tbody>
+
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+
+$(document).ready(function() {
+  new Vue({
+    el: '#non-members-table',
+    data () {
+      return {
+        members: {},
+        loading: true,
+        failed: false
+      }
+    },
+    updated: function() {
+  	    //call DataTable after view is updated
+        $('#groups-table').DataTable({
+          order: [[4, 'desc'],[0, 'asc']]
+        });
+  	},
+    mounted(){
+      axios.get('/login-nodes-xhr/{{group_name}}/members')
+    .then(function (response) {
+      this.members = response.data[0];
+      this.groupname = response.data[1];
+      this.loading = false;
+      // console.log(this.members_requests_count)
+    }.bind(this)) //must use bind(this) unless using arrow function
+    .catch(error => { this.failed = true; this.loading = false; })
+    }
+  });
+});
+</script>
+{%endblock%}

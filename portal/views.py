@@ -292,12 +292,16 @@ def view_group_members_ajax_request(group_name):
         multiplexJson = {}
         users_statuses = {}
 
+        # start = time.time()
+        # print("START")
+
         for user in memberships:
             unix_name = user['user_name']
             user_state = user['state']
-            user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
-            multiplexJson[user_query] = {"method":"GET"}
-            users_statuses[unix_name] = user_state
+            if user_state != 'nonmember':
+                user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
+                multiplexJson[user_query] = {"method":"GET"}
+                users_statuses[unix_name] = user_state
 
         # POST request for multiplex return
         multiplex = requests.post(
@@ -305,6 +309,9 @@ def view_group_members_ajax_request(group_name):
         multiplex = multiplex.json()
         user_dict = {}
         group_user_dict = {}
+
+        # end = time.time()
+        # print(end - start)
 
         for user in multiplex:
             user_name = user.split('/')[3].split('?')[0]
@@ -653,26 +660,11 @@ def create_subgroup(group_name):
         sciences = requests.get(ciconnect_api_endpoint + '/v1alpha1/fields_of_science')
         sciences = sciences.json()['fields_of_science']
         group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=token_query)
-        group_members = group_members.json()['memberships']
-
-        group_admins = [member for member in group_members if member['state'] == 'admin']
-
-        # multiplexJson = {}
-        #
-        # for user in group_admins:
-        #     if user['name'] != 'root':
-        #         unix_name = user['user_name']
-        #         # user_state = user['state']
-        #         user_query = "/v1alpha1/users/" + unix_name + "?token=" + ciconnect_api_token
-        #         multiplexJson[user_query] = {"method":"GET"}
-        #         # users_statuses[unix_name] = user_state
-        #
-        # # POST request for multiplex return
-        # multiplex = requests.post(
-        #     ciconnect_api_endpoint + '/v1alpha1/multiplex', params=token_query, json=multiplexJson)
-        # multiplex = multiplex.json()
-        #
-        print(group_admins)
+        try:
+            group_members = group_members.json()['memberships']
+            group_admins = [member for member in group_members if member['state'] == 'admin']
+        except:
+            group_admins = []
 
         return render_template('groups_create.html', sciences=sciences, group_name=group_name, group_admins=group_admins)
 
@@ -770,6 +762,199 @@ def deny_subgroup(group_name, subgroup_name):
             err_message = r.json()['message']
             flash('Failed to deny subproject creation: {}'.format(err_message), 'warning')
             return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
+
+##############################
+##### LOGIN-NODE ROUTES ######
+##############################
+
+@app.route('/login-nodes', methods=['GET'])
+@authenticated
+def view_login_nodes():
+    """Detailed view of Login Nodes specifically for OSG"""
+    query = {'token': ciconnect_api_token,
+             'globus_id': session['primary_identity']}
+
+    if request.method == 'GET':
+        # Check if user is Admin of OSG
+        user = requests.get(ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
+        user = user.json()
+        unix_name = user['metadata']['unix_name']
+
+        group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
+                            + 'root.osg.login-nodes', params=query)
+        group = group.json()['metadata']
+
+        return render_template('login_nodes.html', group=group)
+
+
+@app.route('/login-nodes-xhr/<group_name>', methods=['GET'])
+@authenticated
+def view_login_nodes_ajax(group_name):
+    group, user_status, login_nodes = view_login_nodes_ajax_request(group_name)
+    return jsonify(group, user_status, login_nodes)
+
+def view_login_nodes_ajax_request(group_name):
+    """
+    Get detailed information about OSG login nodes specifically
+    """
+    query = {'token': ciconnect_api_token,
+             'globus_id': session['primary_identity']}
+
+    user = requests.get(ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
+    user = user.json()
+    unix_name = user['metadata']['unix_name']
+
+    group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=query)
+    group = group.json()['metadata']
+    group_name = group['name']
+    # Get User's Group Status
+    user_status = requests.get(
+                    ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                    group_name + '/members/' + unix_name, params=query)
+    user_status = user_status.json()['membership']['state']
+
+    # Get all login nodes info
+    login_nodes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/root.osg.login-nodes/subgroups', params=query)
+    login_nodes = login_nodes.json()['groups']
+    # print(login_nodes)
+
+    return group, user_status, login_nodes
+
+
+@app.route('/login-nodes/<group_name>/users', methods=['GET'])
+@authenticated
+def view_login_node_users(group_name):
+    """Detailed view of Login Node's users"""
+    query = {'token': ciconnect_api_token,
+             'globus_id': session['primary_identity']}
+
+    if request.method == 'GET':
+        # Check if user is Admin of OSG
+        user = requests.get(ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
+        user = user.json()
+        unix_name = user['metadata']['unix_name']
+
+        group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
+                            + group_name, params=query)
+        group = group.json()['metadata']
+
+        return render_template('login_nodes_members.html', group=group, group_name=group_name)
+
+
+@app.route('/login-nodes/<group_name>/add_users', methods=['GET'])
+@authenticated
+def view_login_nodes_add_users(group_name):
+    """Detailed view of Login Node's non-members"""
+    query = {'token': ciconnect_api_token}
+    if request.method == 'GET':
+        # Get group information
+        group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
+                            + group_name, params=query)
+        group = group.json()['metadata']
+
+        # Get User's Group Status
+        user_status = requests.get(
+                        ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                        group_name + '/members/' + session['unix_name'], params=query)
+        user_status = user_status.json()['membership']['state']
+        query = {'token': ciconnect_api_token}
+        user_super = requests.get(
+                        ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'], params=query)
+        try:
+            user_super = user_super.json()['metadata']['superuser']
+        except:
+            user_super = False
+
+        return render_template('login_nodes_add_members.html', group_name=group_name,
+                                user_status=user_status, group=group,)
+
+
+@app.route('/login-nodes-xhr/<group_name>/members', methods=['GET'])
+@authenticated
+def view_login_node_members_ajax(group_name):
+    user_dict = view_login_node_members_ajax_request(group_name)
+    return jsonify(user_dict, group_name)
+
+def view_login_node_members_ajax_request(group_name):
+    """
+    Get detailed information about OSG login nodes specifically
+    """
+    query = {'token': ciconnect_api_token,
+             'globus_id': session['primary_identity']}
+    # Get root base group users, in this case, it would specifically be all OSG users
+    enclosing_group_name = '.'.join(group_name.split('.')[:-1])
+    enclosing_group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
+                        + 'root.osg' + '/members', params=query)
+    enclosing_group = enclosing_group.json()['memberships']
+    enclosing_group_members_names = [member['user_name'] for member in enclosing_group]
+
+    # Get login node's specific member's information
+    group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=query)
+    memberships = group_members.json()['memberships']
+    memberships_names = [member['user_name'] for member in memberships]
+    # Get non-member name
+    non_members = list(set(enclosing_group_members_names) - set(memberships_names))
+
+    # Set up multiplex to query all non member's information
+    multiplexJson = {}
+    for user in non_members:
+        unix_name = user
+        user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
+        multiplexJson[user_query] = {"method":"GET"}
+
+    # POST request for multiplex return
+    multiplex = requests.post(
+        ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
+    multiplex = multiplex.json()
+    user_dict = {}
+    for user in multiplex:
+        user_name = user.split('/')[3].split('?')[0]
+        user_dict[user_name] = json.loads(multiplex[user]['body'])
+
+    return user_dict
+
+
+@app.route('/login-nodes/<group_name>/add_user/<unix_name>', methods=['POST'])
+@authenticated
+def login_node_add_user(group_name, unix_name):
+    if request.method == 'POST':
+        query = {'token': session['access_token']}
+
+        put_query = {"apiVersion": 'v1alpha1',
+                        'group_membership': {'state': 'active'}}
+        # First add user to login nodes umbrella group
+        requests.put(ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                    'root.osg.login-nodes' + '/members/' + unix_name, params=query, json=put_query)
+        # Add user to actual login node group
+        user_status = requests.put(
+                        ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                        group_name + '/members/' + unix_name, params=query, json=put_query)
+
+        if user_status.status_code == requests.codes.ok:
+            flash("Successfully added member to login node", 'success')
+            return redirect(url_for('view_login_nodes_add_users', group_name=group_name))
+        else:
+            err_message = user_status.json()['message']
+            flash('Failed to add member to login node: {}'.format(err_message), 'warning')
+            return redirect(url_for('view_login_nodes_add_users', group_name=group_name))
+
+
+@app.route('/login-nodes/<group_name>/remove_user/<unix_name>', methods=['POST'])
+@authenticated
+def login_node_remove_user(group_name, unix_name):
+    if request.method == 'POST':
+        query = {'token': session['access_token']}
+        remove_user = requests.delete(
+                        ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                        group_name + '/members/' + unix_name, params=query)
+
+        if remove_user.status_code == requests.codes.ok:
+            flash("Successfully removed user from login node", 'success')
+            return redirect(url_for('view_login_node_users', group_name=group_name))
+        else:
+            err_message = remove_user.json()['message']
+            flash('Failed to remove user from login node: {}'.format(err_message), 'warning')
+            return redirect(url_for('view_login_node_users', group_name=group_name))
 
 
 @app.route('/signup', methods=['GET'])
@@ -1019,6 +1204,7 @@ def profile():
         else:
             flash(
                 'Please complete any missing profile fields and press Save.', 'warning')
+            return redirect(url_for('create_profile'))
 
         if request.args.get('next'):
             session['next'] = get_safe_redirect()
