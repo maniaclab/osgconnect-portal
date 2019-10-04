@@ -707,10 +707,10 @@ def create_subgroup(group_name):
         r = requests.put(
             ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name +
             '/subgroup_requests/' + name, params=token_query, json=put_query)
-
+        full_created_group_name = group_name + '.' + name
         if r.status_code == requests.codes.ok:
             flash("Successfully requested project creation", 'success')
-            return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
+            return redirect(url_for('view_group', group_name=full_created_group_name))
         else:
             err_message = r.json()['message']
             flash('Failed to request project creation: {}'.format(err_message), 'warning')
