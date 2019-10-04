@@ -18,7 +18,7 @@
         <hr/>
         <form role="form" action="{{url_for('edit_profile', unix_name=unix_name)}}" method="POST">
           <div class="form-group">
-            <label for="name">Name *</label>
+            <label for="name">Name <span class="asterik">*</span></label>
             <input
               type="text"
               class="form-control"
@@ -31,7 +31,7 @@
           </div>
 
           <div class="form-group">
-            <label for="phone-number">Phone *</label>
+            <label for="phone-number">Phone <span class="asterik">*</span></label>
             <input
               type="tel"
               id="phone-number"
@@ -44,7 +44,7 @@
           </div>
 
           <div class="form-group">
-            <label for="institution">Institution *</label>
+            <label for="institution">Institution <span class="asterik">*</span></label>
             <input
               type="text"
               id="institution"
@@ -57,7 +57,7 @@
           </div>
 
           <div class="form-group">
-            <label for="email">Email *</label>
+            <label for="email">Email <span class="asterik">*</span> (please use institutional email)</label>
             <input
               type="email"
               id="email"
@@ -80,7 +80,7 @@
           </div>
 
           <div class="form-group">
-            <label for="sshpubstring">SSH Public Key <span id="asterik">*</span></label>
+            <label for="sshpubstring">SSH Public Key</label>
             <textarea
               placeholder="Please enter your SSH public key here..."
               name="sshpubstring"

@@ -154,3 +154,7 @@ ul, #myUL {
 .active {
   display: block;
 }
+
+.asterik {
+  color: red;
+}
