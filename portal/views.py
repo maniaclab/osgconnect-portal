@@ -1367,8 +1367,22 @@ def authcallback():
             session['access_token'] = profile['access_token']
             session['unix_name'] = profile['unix_name']
             session['url_root'] = request.url_root
+            session['admin'] = admin_check(profile['unix_name'])
         else:
             session['url_root'] = request.url_root
             return redirect(url_for('create_profile',
                             next=url_for('profile')))
         return redirect(url_for('profile'))
+
+def admin_check(unix_name):
+    """
+    Check user status on login, and set return admin status
+    :param unix_name: unix name of user
+    :return: user's status in OSG specifically
+    """
+    query = {'token': ciconnect_api_token}
+    # Query to return user's membership status in a group, specifically OSG
+    r = requests.get(
+        ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name + '/groups/root.osg', params=query)
+    user_status = r.json()['membership']['state']
+    return user_status
