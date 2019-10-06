@@ -680,10 +680,6 @@ def view_group_subgroups_ajax_requests(group_name):
 
         return subgroup_requests
 
-        # return render_template('group_profile_subgroups_requests.html',
-        #                         display_name=display_name, subgroup_requests=subgroup_requests,
-        #                         group_name=group_name, user_status=user_status)
-
 
 @app.route('/groups/<group_name>/subgroups/new', methods=['GET', 'POST'])
 @authenticated
@@ -742,7 +738,7 @@ def create_subgroup(group_name):
             '/subgroup_requests/' + name, params=token_query, json=put_query)
         full_created_group_name = group_name + '.' + name
         if r.status_code == requests.codes.ok:
-            flash("Successfully requested project creation", 'success')
+            flash("The OSG support team has been notified of your requested project.", 'success')
             return redirect(url_for('view_group', group_name=full_created_group_name))
         else:
             err_message = r.json()['message']
@@ -1145,7 +1141,9 @@ def create_profile():
                             params=query, json=put_query)
 
             flash(
-                'Successfully created your account.', 'success')
+                'Successfully created your account, your request to join OSG has '
+                + 'been submitted. You will receive an email when an OSG admin '
+                + 'has acted on the request.', 'success')
             if 'next' in session:
                 redirect_to = session['next']
                 session.pop('next')

@@ -42,25 +42,43 @@
           <div class="col-sm-12 col-md-6">
             <div class="card h-100">
               <div class="card-header">
-                Projects <i class="fas fa-users float-right"></i>
+                <a href="{{url_for('users_groups')}}">My Projects</a> <i class="fas fa-users float-right"></i>
               </div>
               <div class="card-body">
-                <!-- <h5 class="card-title" style="text-align: center"><i class="fas fa-users fa-2x"></i></h5> -->
-                <ul class="list-unstyled">
-                  {% for group in profile['group_memberships'] %}
-                    {% if group['name'] != 'root'%}
-                  <li><a href="{{url_for('view_group', group_name=group['name'])}}">{{'-'.join(group['name'].split('.')[1:])}}</a>: {{group['state']}} status</li>
-                    {% endif %}
-                  {% endfor %}
-                </ul>
-                <a href="{{url_for('users_groups')}}" class="btn btn-primary btn-sm">My Projects</a>
+                <div class="table-responsive">
+                  <table class="table" id="groups-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
+                    <thead>
+                      <tr>
+                        <th data-field="name" data-sortable="true">Name</th>
+                        <th data-field="status" data-sortable="true">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody data-link="row" class="rowlink" style="font-size:14px;">
+                      {% for group in profile['group_memberships'] %}
+                        {% if group['name'] != 'root'%}
+                      <tr>
+                        <td><a href="{{url_for('view_group', group_name=group['name'])}}">{{'-'.join(group['name'].split('.')[1:])}}</a></td>
+                        <td>{{group['state']}}</td>
+                      </tr>
+                        {% endif %}
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div> <!-- row -->
-
   </div>
 </section>
+
+<script>
+$(document).ready(function() {
+  $('#groups-table').dataTable({
+  "pageLength": 1;
+});
+</script>
 {%endblock%}
