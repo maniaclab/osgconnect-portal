@@ -115,11 +115,11 @@ def users_groups():
         users_group_memberships = users_group_memberships.json()['group_memberships']
 
         multiplexJson = {}
-
         for group in users_group_memberships:
-            group_name = group['name']
-            group_query = "/v1alpha1/groups/" + group_name + "?token=" + query['token']
-            multiplexJson[group_query] = {"method":"GET"}
+            if group['state'] != 'nonmember':
+                group_name = group['name']
+                group_query = "/v1alpha1/groups/" + group_name + "?token=" + query['token']
+                multiplexJson[group_query] = {"method":"GET"}
         # POST request for multiplex return
         multiplex = requests.post(
             ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
@@ -128,6 +128,7 @@ def users_groups():
         users_groups = []
         for group in multiplex:
             users_groups.append(json.loads(multiplex[group]['body']))
+        # print(users_groups)
         # users_groups = [group for group in users_groups if len(group['name'].split('.')) == 3]
         return render_template('users_groups.html', groups=users_groups)
 
@@ -741,7 +742,7 @@ def create_subgroup(group_name):
         full_created_group_name = group_name + '.' + name
         if r.status_code == requests.codes.ok:
             flash("The OSG support team has been notified of your requested project.", 'success')
-            return redirect(url_for('view_group', group_name=full_created_group_name))
+            return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
         else:
             err_message = r.json()['message']
             flash('Failed to request project creation: {}'.format(err_message), 'warning')
@@ -770,23 +771,25 @@ def approve_subgroup(group_name, subgroup_name):
             return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
 
 
-@app.route('/groups/<group_name>/subgroups/<subgroup_name>/deny', methods=['GET'])
+@app.route('/groups/<group_name>/subgroups/<subgroup_name>/deny', methods=['POST'])
 @authenticated
 def deny_subgroup(group_name, subgroup_name):
     token_query = {'token': session['access_token']}
-    if request.method == 'GET':
+    if request.method == 'POST':
+        message = request.form['denial-message']
+        denial_message = {'message': message}
 
         r = requests.delete(
             ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name +
-            '/subgroup_requests/' + subgroup_name, params=token_query)
+            '/subgroup_requests/' + subgroup_name, params=token_query, json=denial_message)
 
         if r.status_code == requests.codes.ok:
-            flash("Denied subproject creation", 'success')
+            flash("Denied Project Request", 'success')
             print(r.content)
             return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
         else:
             err_message = r.json()['message']
-            flash('Failed to deny subproject creation: {}'.format(err_message), 'warning')
+            flash('Failed to deny project request: {}'.format(err_message), 'warning')
             return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
 
 ################################################################################
