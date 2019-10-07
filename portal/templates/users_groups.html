@@ -12,7 +12,7 @@
         {%include 'messages.html' %}
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{url_for('view_group', group_name='root.osg')}}">Home</a></li>
-          <li class="breadcrumb-item">Projects</li>
+          <li class="breadcrumb-item">My Projects</li>
         </ol>
 
         <div class="table-responsive">
@@ -20,21 +20,25 @@
             <thead>
               <tr>
                 <th data-field="name" data-sortable="true">Name</th>
+                <th data-field="unix-name" data-sortable="true">Unix Name</th>
                 <th data-field="email" data-sortable="true">Email</th>
-                <th data-field="phone" data-sortable="true">Phone</th>
+                <!-- <th data-field="phone" data-sortable="true">Phone</th> -->
                 <th data-field="field-of-science" data-sortable="true">Field of Science</th>
-                <th data-field="description" data-sortable="true">Description</th>
+                <!-- <th data-field="description" data-sortable="true">Description</th> -->
               </tr>
             </thead>
             <tbody data-link="row" class="rowlink" style="font-size:14px;">
               {% for group in groups %}
-                {% if group['metadata']['name'] != 'root' %}
+                {% if group['metadata']['name'] not in ['root', 'root.osg', 'root.osg.login-nodes'] %}
               <tr>
                 <td><a href="{{url_for('view_group', group_name=group['metadata']['name'])}}">{{group['metadata']['display_name']}}</a></td>
+                {% if group['metadata']['pending'] %}
+                <td>Pending</td>
+                {% else %}
+                <td>{{ '.'.join(group['metadata']['name'].split('.')[1:]) }}</td>
+                {% endif %}
                 <td>{{group['metadata']['email']}}</td>
-                <td>{{group['metadata']['phone']}}</td>
                 <td>{{group['metadata']['purpose']}}</td>
-                <td>{{group['metadata']['description']}}</td>
               </tr>
                 {% endif %}
               {% endfor %}
