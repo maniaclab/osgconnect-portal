@@ -137,9 +137,44 @@
                           <button type="submit" name="add_group_member" class="btn btn-xs btn-success" data-submit="Adding Member..."><i class="fas fa-check-circle"></i> Accept</button>
                         </form>
                         {% endif %}
-                        <form role="form" action="{{url_for('remove_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to remove this member?');">
-                          <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Removing Member..."><i class="fas fa-times-circle"></i> Remove</button>
-                        </form>
+                        <button type="button" class="btn btn-xs btn-danger" data-toggle="modal" data-target="#exampleModalCenter"><i class="fas fa-times-circle"></i> Deny</button>
+                        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLongTitle">Confirm denying user</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+
+                                <form role="form" action="{{url_for('remove_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST">
+
+                                  <div class="form-group">
+                                    <label for="description">Reason for denial <span id="asterik">*</span></label>
+                                    <textarea
+                                      placeholder="Brief reason for denying user"
+                                      name="denial-message"
+                                      required
+                                      tabindex="1"
+                                      style="background-color:white; color:black; border-radius:4px; border-color:lightgrey;"
+                                      value=""
+                                      ></textarea>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <div class="form-group">
+                                      <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+                                      <button type="submit" name="remove_group_member" class="btn btn-sm btn-primary" data-submit="Removing Member..."> Confirm</button>
+                                    </div>
+                                  </div>
+                                </form>
+
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
                         {% if users_statuses[info['metadata']['unix_name']] != 'admin' %}
                         <form role="form" action="{{url_for('admin_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to make this member an admin?');">
                           <button type="submit" name="admin_group_member" class="btn btn-xs btn-warning" data-submit="Making Member Admin..."><i class="fas fa-user-shield"></i> Make Admin</button>

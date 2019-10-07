@@ -535,10 +535,12 @@ def add_group_member(group_name, unix_name):
 def remove_group_member(group_name, unix_name):
     if request.method == 'POST':
         query = {'token': session['access_token']}
+        message = request.form['denial-message']
+        denial_message = {'message': message}
         remove_user = requests.delete(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
-                        group_name + '/members/' + unix_name, params=query)
-        print("UPDATED remove_user: {}".format(remove_user))
+                        group_name + '/members/' + unix_name, params=query, json=denial_message)
+        # print("UPDATED remove_user: {}".format(remove_user))
 
         if remove_user.status_code == requests.codes.ok:
             flash("Successfully removed member from group", 'success')
@@ -840,7 +842,6 @@ def view_login_nodes_ajax_request(group_name):
     # Get all login nodes info
     login_nodes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/root.osg.login-nodes/subgroups', params=query)
     login_nodes = login_nodes.json()['groups']
-    # print(login_nodes)
 
     return group, user_status, login_nodes
 
