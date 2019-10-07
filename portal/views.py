@@ -83,11 +83,12 @@ def support():
         email = request.form['email']
         description = request.form['description']
         # mailgun setup here
+        # user-support@opensciencegrid.org
         r = requests.post("https://api.mailgun.net/v3/api.ci-connect.net/messages",
                     auth=('api', mailgun_api_token),
                     data={
                         "from": "<"+email+">",
-                        "to": ["user-support@opensciencegrid.org"],
+                        "to": ["fijalawa@inappmail.com"],
                         "cc": "<{}>".format(email),
                         "subject": "OSG Support Inquiry",
                         "text": description
