@@ -537,11 +537,16 @@ def add_group_member(group_name, unix_name):
 def remove_group_member(group_name, unix_name):
     if request.method == 'POST':
         query = {'token': session['access_token']}
-        message = request.form['denial-message']
-        denial_message = {'message': message}
-        remove_user = requests.delete(
-                        ciconnect_api_endpoint + '/v1alpha1/groups/' +
-                        group_name + '/members/' + unix_name, params=query, json=denial_message)
+        try:
+            message = request.form['denial-message']
+            denial_message = {'message': message}
+            remove_user = requests.delete(
+                            ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                            group_name + '/members/' + unix_name, params=query, json=denial_message)
+        except:
+            remove_user = requests.delete(
+                            ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                            group_name + '/members/' + unix_name, params=query)
         # print("UPDATED remove_user: {}".format(remove_user))
 
         if remove_user.status_code == requests.codes.ok:
