@@ -93,7 +93,11 @@
         <div class="row">
           <div class="col-sm-12">
             <div class="table-responsive">
-              <h4>Subproject of {{display_name}}</h4>
+              {% if group_name == 'root.osg' %}
+              <h4>Projects of {{group['display_name']}}</h4>
+              {% else %}
+              <h4>Subprojects of {{group['display_name']}}</h4>
+              {% endif %}
               <table class="table" id="groups-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
                 <thead>
                   <tr>
@@ -142,6 +146,28 @@
 
 $(document).ready(function() {
   new Vue({
+    el: '#subgroups-table',
+    data () {
+      return {
+        subgroups: {},
+        loading: true,
+        failed: false
+      }
+    },
+    updated: function() {
+  	    //call DataTable after view is updated
+        $('#groups-table').DataTable();
+  	},
+    mounted(){
+      axios.get('/groups-xhr/{{group_name}}/subgroups')
+    .then(function (response) {
+      this.subgroups = response.data;
+      this.loading = false;
+    }.bind(this)) //must use bind(this) unless using arrow function
+    .catch(error => { this.failed = true; this.loading = false; })
+    }
+  });
+  new Vue({
     el: '#subprojects-request-tab',
     data () {
       return {
@@ -175,28 +201,6 @@ $(document).ready(function() {
       this.members_requests_count = response.data;
       this.loading = false;
       // console.log(this.members_requests_count)
-    }.bind(this)) //must use bind(this) unless using arrow function
-    .catch(error => { this.failed = true; this.loading = false; })
-    }
-  });
-  new Vue({
-    el: '#subgroups-table',
-    data () {
-      return {
-        subgroups: {},
-        loading: true,
-        failed: false
-      }
-    },
-    updated: function() {
-  	    //call DataTable after view is updated
-        $('#groups-table').DataTable();
-  	},
-    mounted(){
-      axios.get('/groups-xhr/{{group_name}}/subgroups')
-    .then(function (response) {
-      this.subgroups = response.data;
-      this.loading = false;
     }.bind(this)) //must use bind(this) unless using arrow function
     .catch(error => { this.failed = true; this.loading = false; })
     }
