@@ -26,6 +26,7 @@
               id="name"
               name="name"
               placeholder="{{session['name']}}"
+              value="{{session['name']}}"
               required="required"
               tabindex="1"
             >
@@ -39,6 +40,7 @@
               id="unix_name"
               name="unix_name"
               placeholder="UNIX alpha-numeric and underscore"
+              value="{{unix_name}}"
               required="required"
               tabindex="2"
             >
@@ -52,6 +54,7 @@
               name="phone-number"
               class="form-control"
               placeholder="111 111 1111"
+              value="{{phone}}"
               required="required"
               tabindex="3"
             >
@@ -65,6 +68,7 @@
               name="institution"
               class="form-control"
               placeholder="Institution Name"
+              value="{{session['institution']}}"
               required="required"
               tabindex="4"
             >
@@ -78,6 +82,7 @@
               name="email"
               class="form-control"
               placeholder="{{session['email']}}"
+              value="{{session['email']}}"
               required="required"
               tabindex="5"
             >
@@ -101,8 +106,7 @@
               id="sshpubstring"
               tabindex="7"
               style="background-color:white; color:black; border-radius:4px; border-color:lightgrey;"
-              value=""
-              ></textarea>
+              >{{public_key}}</textarea>
           </div>
 
           <div class="form-group">
@@ -193,13 +197,19 @@
 var name = {{session['name']|tojson}};
 var email = {{session['email']|tojson}};
 var institution = {{session['institution']|tojson}};
+var email_pref = {{session['email_pref']|tojson}};
 
-window.onload = setEditFields(name, email, institution);
+window.onload = setEditFields(name, email, institution, email_pref);
 
-function setEditFields(name, email, institution){
+function setEditFields(name, email, institution, email_pref){
   document.getElementById('name').value = name;
   document.getElementById('email').value = email;
   document.getElementById('institution').value = institution;
+  if(email_pref === 'on'){
+    document.getElementById('email_preference').checked = true;
+  } else {
+    document.getElementById('email_preference').checked = false;
+  }
 }
 
 </script>

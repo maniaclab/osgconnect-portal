@@ -1084,7 +1084,10 @@ def create_profile():
              'globus_id': globus_id}
 
     if request.method == 'GET':
-        return render_template('profile_create.html')
+        unix_name = ''
+        phone = ''
+        public_key = ''
+        return render_template('profile_create.html', unix_name=unix_name, phone=phone, public_key=public_key)
 
     elif request.method == 'POST':
         name = request.form['name']
@@ -1120,7 +1123,6 @@ def create_profile():
 
         # print("POSTED: {}".format(post_user))
         r = requests.post(ciconnect_api_endpoint + '/v1alpha1/users', params=query, json=post_user)
-        print(r.content)
         if r.status_code == requests.codes.ok:
             r = r.json()['metadata']
             session['name'] = r['name']
@@ -1134,7 +1136,7 @@ def create_profile():
             email_query = {"apiVersion": 'v1alpha1',
                             "data": email_preference}
             set_additional_attr = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' + r['unix_name'] + '/attributes/OSG:Email_Preference', params=query, json=email_query)
-            print("SET ADD ATTR: {}".format(set_additional_attr))
+            # print("SET ADD ATTR: {}".format(set_additional_attr))
 
             # Auto generate group membership into OSG - eventually change to
             # dynamically choose connect site based on URL
@@ -1146,9 +1148,9 @@ def create_profile():
                             params=query, json=put_query)
 
             flash(
-                'Successfully created your account, your request to join OSG has '
-                + 'been submitted. You will receive an email when an OSG admin '
-                + 'has acted on the request.', 'success')
+                'Account registration successful. A request for Unix account '
+                + 'activation on the OSG Connect job submission server has been '
+                + 'forwarded to OSG staff.', 'success')
             if 'next' in session:
                 redirect_to = session['next']
                 session.pop('next')
@@ -1157,9 +1159,13 @@ def create_profile():
             return redirect(url_for('profile'))
         else:
             error_msg = r.json()['message']
+            session['email_pref'] = email_preference
+            print(name, unix_name, email, phone, institution, public_key, email_preference)
             flash(
                 'Failed to create your account: {}'.format(error_msg), 'warning')
-            return redirect(url_for('create_profile'))
+            return render_template('profile_create.html', name=name, unix_name=unix_name,
+                                    email=email, phone=phone, institution=institution,
+                                    public_key=public_key, email_preference=email_preference)
 
 
 @app.route('/profile/edit/<unix_name>', methods=['GET', 'POST'])
@@ -1373,6 +1379,7 @@ def authcallback():
             session['admin'] = admin_check(profile['unix_name'])
         else:
             session['url_root'] = request.url_root
+            session['email_pref'] = 'off'
             return redirect(url_for('create_profile',
                             next=url_for('profile')))
         return redirect(url_for('profile'))
