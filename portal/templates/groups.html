@@ -11,7 +11,6 @@
       <div class="col-lg-12 mx-auto">
         {%include 'messages.html' %}
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{url_for('view_group', group_name='root.osg')}}">Open Science Grid</a></li>
           <li class="breadcrumb-item">OSG Projects</li>
         </ol>
         {% if session['admin'] == 'active' %}
@@ -35,7 +34,7 @@
             </thead>
             <tbody data-link="row" class="rowlink" style="font-size:14px;">
               {% for group in groups %}
-                {% if group['name'] != 'root' %}
+                {% if group['name'] != 'root' and not group['pending'] %}
               <tr>
                 <td><a href="{{url_for('view_group', group_name=group['name'])}}">{{group['display_name']}}</a></td>
                 <td>{{group['email']}}</td>
@@ -47,6 +46,16 @@
                 {% endif %}
               {% endfor %}
             </tbody>
+            <tfoot>
+              <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  {% if session['admin'] == 'admin' %}
+                  <th data-field="phone" data-sortable="true">Phone</th>
+                  {% endif %}
+                  <th>Field of Science</th>
+              </tr>
+            </tfoot>
 
           </table>
         </div>
@@ -58,8 +67,26 @@
 </section>
 
 <script>
+
 $(document).ready(function() {
-    $('#groups-table').DataTable();
+  // Setup - add a text input to each footer cell
+  $('#groups-table tfoot th').each( function () {
+    var title = $(this).text();
+    $(this).html('<input type="text" placeholder="Search '+title+'" />');
+  });
+  // DataTable
+  var table = $('#groups-table').DataTable();
+  // Apply the search
+  table.columns().every(function(){
+    var that = this;
+    $('input', this.footer()).on('keyup change clear', function (){
+      if(that.search() !== this.value){
+        that
+        .search(this.value)
+        .draw();
+      }
+    });
+  });
 });
 </script>
 {%endblock%}

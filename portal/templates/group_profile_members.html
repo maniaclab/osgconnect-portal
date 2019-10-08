@@ -98,7 +98,7 @@
                 <thead>
                   <tr>
                     <th data-field="name" data-sortable="true">Name</th>
-                    <th data-field="email" data-sortable="true">Email</th>
+                    <th data-field="email" data-sortable="true" class="email-th">Email</th>
                     <th data-field="phone" data-sortable="true">Phone</th>
                     <th data-field="institution" data-sortable="true">Institution</th>
                     <th data-field="status" data-sortable="true">Status</th>
@@ -125,8 +125,8 @@
               		</tr>
                   <tr v-for="(member, index) in members" v-cloak >
               		  <td>{[{member.metadata.name}]}</td>
-              		  <td v-if="admin == 'admin'">{[{member.metadata.email}]}</td>
-                    <td v-else>Admin View Only</td>
+              		  <td v-if="admin == 'admin'" class="email-th">{[{member.metadata.email}]}</td>
+                    <td v-else class="email-th">Admin View Only</td>
               		  <td v-if="admin == 'admin'">{[{member.metadata.phone}]}</td>
                     <td v-else>Admin View Only</td>
                     <td>{[{member.metadata.institution}]}</td>
@@ -145,7 +145,7 @@
                             <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Removing Member..."><i class="fas fa-times-circle"></i> Remove</button>
                           </form>
                           <form role="form" :action="'/groups/' + groupname + '/admin_group_member/' + member.metadata.unix_name" method="POST" onsubmit="return confirm('Are you sure you want to make this member an admin?');">
-                            <button type="submit" name="admin_group_member" class="btn btn-xs btn-warning" data-submit="Making Member Admin..."><i class="fas fa-user-shield"></i> Make Admin</button>
+                            <button type="submit" name="admin_group_member" class="btn btn-xs btn-warning" data-submit="Making Member Admin..."><i class="fas fa-user-shield"></i> Admin</button>
                           </form>
                         </div>
                       </div>
@@ -155,7 +155,7 @@
                             <button type="submit" name="remove_group_member" class="btn btn-xs btn-danger" data-submit="Removing Member..."><i class="fas fa-times-circle"></i> Remove</button>
                           </form>
                           <form role="form" :action="'/groups/' + groupname + '/admin_group_member/' + member.metadata.unix_name" method="POST" onsubmit="return confirm('Are you sure you want to make this member an admin?');">
-                            <button type="submit" name="admin_group_member" class="btn btn-xs btn-warning" data-submit="Making Member Admin..."><i class="fas fa-user-shield"></i> Make Admin</button>
+                            <button type="submit" name="admin_group_member" class="btn btn-xs btn-warning" data-submit="Making Member Admin..."><i class="fas fa-user-shield"></i> Admin</button>
                           </form>
                         </div>
                       </div>
@@ -197,6 +197,7 @@ $(document).ready(function() {
     updated: function() {
   	    //call DataTable after view is updated
         $('#groups-table').DataTable({
+          "columnDefs": [{"width": "15%", "targets": 5}],
           order: [[4, 'desc'],[0, 'asc']]
         });
   	},
@@ -206,7 +207,6 @@ $(document).ready(function() {
       this.members = response.data[0];
       this.users_statuses = response.data[1];
       this.loading = false;
-      console.log(this.admin)
     }.bind(this)) //must use bind(this) unless using arrow function
     .catch(error => { this.failed = true; this.loading = false; })
     }
