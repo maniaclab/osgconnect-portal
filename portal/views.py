@@ -750,6 +750,190 @@ def create_subgroup(group_name):
             return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
 
 
+@app.route('/groups/<group_name>/requests/edit', methods=['GET', 'POST'])
+@authenticated
+def edit_subgroup_requests(group_name):
+    token_query = {'token': session['access_token']}
+    if request.method == 'GET':
+        sciences = requests.get(ciconnect_api_endpoint + '/v1alpha1/fields_of_science')
+        sciences = sciences.json()['fields_of_science']
+        group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=token_query)
+        group = group.json()['metadata']
+
+        pi_info = {}
+
+        try:
+            additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
+                                            + group_name + '/attributes/OSG:PI_Name', params=query)
+            PI_Name = additional_attributes.json()['data']
+            pi_info['PI_Name'] = PI_Name
+        except:
+            PI_Name = None
+            pi_info['PI_Name'] = PI_Name
+
+        try:
+            additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
+                                            + group_name + '/attributes/OSG:PI_Email', params=query)
+            PI_Email = additional_attributes.json()['data']
+            pi_info['PI_Email'] = PI_Email
+        except:
+            PI_Email = None
+            pi_info['PI_Email'] = PI_Email
+
+        try:
+            additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
+                                            + group_name + '/attributes/OSG:PI_Organization', params=query)
+            PI_Organization = additional_attributes.json()['data']
+            pi_info['PI_Organization'] = PI_Organization
+        except:
+            PI_Organization = None
+            pi_info['PI_Organization'] = PI_Organization
+
+        print(pi_info)
+
+        return render_template('groups_requests_edit.html', sciences=sciences, group_name=group_name, group=group)
+
+    elif request.method == 'POST':
+        name = request.form['name']
+        display_name = request.form['display-name']
+        email = request.form['email']
+        phone = request.form['phone']
+        field_of_science = request.form['field_of_science']
+        description = request.form['description']
+
+        additional_metadata = {}
+        pi_name = request.form['pi-name']
+        pi_email = request.form['pi-email']
+        pi_organization = request.form['pi-org']
+
+        if pi_name:
+            additional_metadata['OSG:PI_Name'] = pi_name
+        if pi_email:
+            additional_metadata['OSG:PI_Email'] = pi_email
+        if pi_organization:
+            additional_metadata['OSG:PI_Organization'] = pi_organization
+
+        if len(additional_metadata) > 0:
+            put_query = {"apiVersion": 'v1alpha1',
+                            'metadata': {'name': name,
+                                        'display_name': display_name,
+                                        'purpose': field_of_science,
+                                        'email': email, 'phone': phone,
+                                        'description': description,
+                                        'additional_attributes': additional_metadata}}
+        else:
+            put_query = {"apiVersion": 'v1alpha1',
+                            'metadata': {'name': name, 'display_name': display_name,
+                                        'purpose': field_of_science,
+                                        'email': email, 'phone': phone,
+                                        'description': description}}
+        # print(put_query)
+
+        r = requests.put(
+            ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=token_query, json=put_query)
+
+        enclosing_group_name = '.'.join(group_name.split('.')[:-1])
+        print(enclosing_group_name)
+        if r.status_code == requests.codes.ok:
+            flash("The OSG support team has been notified of your updated project request.", 'success')
+            return redirect(url_for('view_group_subgroups_requests', group_name=enclosing_group_name))
+        else:
+            err_message = r.json()['message']
+            flash('Failed to edit project request: {}'.format(err_message), 'warning')
+            return redirect(url_for('view_group_subgroups_requests', group_name=enclosing_group_name))
+
+
+@app.route('/groups/<group_name>/edit', methods=['GET', 'POST'])
+@authenticated
+def edit_subgroup(group_name):
+    token_query = {'token': session['access_token']}
+    if request.method == 'GET':
+        sciences = requests.get(ciconnect_api_endpoint + '/v1alpha1/fields_of_science')
+        sciences = sciences.json()['fields_of_science']
+        group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=token_query)
+        group = group.json()['metadata']
+
+        pi_info = {}
+
+        try:
+            additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
+                                            + group_name + '/attributes/OSG:PI_Name', params=query)
+            PI_Name = additional_attributes.json()['data']
+            pi_info['PI_Name'] = PI_Name
+        except:
+            PI_Name = None
+            pi_info['PI_Name'] = PI_Name
+
+        try:
+            additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
+                                            + group_name + '/attributes/OSG:PI_Email', params=query)
+            PI_Email = additional_attributes.json()['data']
+            pi_info['PI_Email'] = PI_Email
+        except:
+            PI_Email = None
+            pi_info['PI_Email'] = PI_Email
+
+        try:
+            additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
+                                            + group_name + '/attributes/OSG:PI_Organization', params=query)
+            PI_Organization = additional_attributes.json()['data']
+            pi_info['PI_Organization'] = PI_Organization
+        except:
+            PI_Organization = None
+            pi_info['PI_Organization'] = PI_Organization
+
+        print(pi_info)
+
+        return render_template('groups_edit.html', sciences=sciences, group_name=group_name, group=group)
+
+    elif request.method == 'POST':
+        display_name = request.form['display-name']
+        email = request.form['email']
+        phone = request.form['phone']
+        field_of_science = request.form['field_of_science']
+        description = request.form['description']
+
+        additional_metadata = {}
+        pi_name = request.form['pi-name']
+        pi_email = request.form['pi-email']
+        pi_organization = request.form['pi-org']
+
+        if pi_name:
+            additional_metadata['OSG:PI_Name'] = pi_name
+        if pi_email:
+            additional_metadata['OSG:PI_Email'] = pi_email
+        if pi_organization:
+            additional_metadata['OSG:PI_Organization'] = pi_organization
+
+        if len(additional_metadata) > 0:
+            put_query = {"apiVersion": 'v1alpha1',
+                            'metadata': {'display_name': display_name,
+                                        'purpose': field_of_science,
+                                        'email': email, 'phone': phone,
+                                        'description': description,
+                                        'additional_attributes': additional_metadata}}
+        else:
+            put_query = {"apiVersion": 'v1alpha1',
+                            'metadata': {'display_name': display_name,
+                                        'purpose': field_of_science,
+                                        'email': email, 'phone': phone,
+                                        'description': description}}
+        # print(put_query)
+
+        r = requests.put(
+            ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=token_query, json=put_query)
+
+        enclosing_group_name = '.'.join(group_name.split('.')[:-1])
+        print(enclosing_group_name)
+        if r.status_code == requests.codes.ok:
+            flash("Successfully updated project information.", 'success')
+            return redirect(url_for('view_group', group_name=group_name))
+        else:
+            err_message = r.json()['message']
+            flash('Failed to update project information: {}'.format(err_message), 'warning')
+            return redirect(url_for('edit_subgroup', group_name=group_name))
+
+
 @app.route('/groups/<group_name>/subgroups/<subgroup_name>/approve', methods=['GET'])
 @authenticated
 def approve_subgroup(group_name, subgroup_name):
