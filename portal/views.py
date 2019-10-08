@@ -105,7 +105,7 @@ def support():
 def users_groups():
     """Groups that user's are specifically members of"""
     if request.method == 'GET':
-        query = {'token': session['access_token'],
+        query = {'token': ciconnect_api_token,
                  'globus_id': session['primary_identity']}
 
         user = requests.get(ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
