@@ -115,7 +115,7 @@
                 <tbody data-link="row" class="rowlink" style="font-size:14px;" id="subgroup-info">
                   {% for subgroup_request in subgroup_requests %}
                   <tr>
-                    <td><a href="{{url_for('edit_subgroup', group_name=subgroup_request['name'])}}">{{subgroup_request['name']}}</a></td>
+                    <td><a href="{{url_for('edit_subgroup_requests', group_name=subgroup_request['name'])}}">{{subgroup_request['name']}}</a></td>
                     <td>{{subgroup_request['requester']}}</td>
                     <td><a href="mailto:{{subgroup_request['email']}}?subject=Project Inquiry">{{subgroup_request['email']}}</a></td>
                     <td>{{subgroup_request['phone']}}</td>
