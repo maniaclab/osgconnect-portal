@@ -105,7 +105,7 @@ def support():
 def users_groups():
     """Groups that user's are specifically members of"""
     if request.method == 'GET':
-        query = {'token': ciconnect_api_token,
+        query = {'token': session['access_token'],
                  'globus_id': session['primary_identity']}
 
         user = requests.get(ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
@@ -138,7 +138,7 @@ def users_groups():
 def groups():
     """OSG Connect groups"""
     if request.method == 'GET':
-        query = {'token': ciconnect_api_token}
+        query = {'token': session['access_token']}
         # groups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups', params=query)
         # groups = groups.json()['groups']
 
@@ -184,7 +184,7 @@ def create_group():
 @authenticated
 def view_group(group_name):
     """Detailed view of specific groups"""
-    query = {'token': ciconnect_api_token,
+    query = {'token': session['access_token'],
              'globus_id': session['primary_identity']}
 
     user = requests.get(ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
