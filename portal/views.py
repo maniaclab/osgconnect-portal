@@ -184,7 +184,7 @@ def create_group():
 @authenticated
 def view_group(group_name):
     """Detailed view of specific groups"""
-    query = {'token': session['access_token'],
+    query = {'token': ciconnect_api_token,
              'globus_id': session['primary_identity']}
 
     user = requests.get(ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
