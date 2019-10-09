@@ -129,7 +129,6 @@ def users_groups():
         users_groups = []
         for group in multiplex:
             users_groups.append(json.loads(multiplex[group]['body']))
-        # print(users_groups)
         # users_groups = [group for group in users_groups if len(group['name'].split('.')) == 3]
         return render_template('users_groups.html', groups=users_groups)
 
@@ -613,21 +612,8 @@ def view_group_subgroups_request(group_name):
         # Get group's subgroups information
         subgroups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroups', params=query)
         subgroups = subgroups.json()['groups']
-        subgroups = [subgroup for subgroup in subgroups if len(subgroup['name'].split('.')) == 3]
-        # Get User's Group Status
-        # user_status = requests.get(
-        #                 ciconnect_api_endpoint + '/v1alpha1/groups/' +
-        #                 group_name + '/members/' + session['unix_name'], params=query)
-        #
-        # user_status = user_status.json()['membership']['state']
-        #
-        # subgroup_requests = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroup_requests', params=query)
-        # print(subgroup_requests.json())
+        subgroups = [subgroup for subgroup in subgroups if (len(subgroup['name'].split('.')) == 3 and not subgroup['pending'])]
 
-        # return render_template('group_profile_subgroups.html',
-        #                         display_name=display_name, subgroups=subgroups,
-        #                         group_name=group_name, user_status=user_status,
-        #                         group=group)
         return subgroups
 
 
@@ -654,8 +640,6 @@ def view_group_subgroups_requests(group_name):
 
         subgroup_requests = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/subgroup_requests', params=query)
         subgroup_requests = subgroup_requests.json()['groups']
-
-        print(user_status)
 
         return render_template('group_profile_subgroups_requests.html',
                                 display_name=display_name, subgroup_requests=subgroup_requests,
@@ -759,44 +743,24 @@ def create_subgroup(group_name):
 @authenticated
 def edit_subgroup_requests(group_name):
     token_query = {'token': session['access_token']}
+    enclosing_group_name = '.'.join(group_name.split('.')[:-1])
     if request.method == 'GET':
         sciences = requests.get(ciconnect_api_endpoint + '/v1alpha1/fields_of_science')
         sciences = sciences.json()['fields_of_science']
         group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=token_query)
         group = group.json()['metadata']
 
+        subgroup_requests = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + enclosing_group_name + '/subgroup_requests', params=token_query)
+        subgroup_requests = subgroup_requests.json()['groups']
         pi_info = {}
 
-        try:
-            additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
-                                            + group_name + '/attributes/OSG:PI_Name', params=query)
-            PI_Name = additional_attributes.json()['data']
-            pi_info['PI_Name'] = PI_Name
-        except:
-            PI_Name = None
-            pi_info['PI_Name'] = PI_Name
+        for subgroup_request in subgroup_requests:
+            if subgroup_request['name'] == group_name:
+                pi_info['PI_Name'] = subgroup_request['additional_attributes']['OSG:PI_Name']
+                pi_info['PI_Email'] = subgroup_request['additional_attributes']['OSG:PI_Email']
+                pi_info['PI_Organization'] = subgroup_request['additional_attributes']['OSG:PI_Organization']
 
-        try:
-            additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
-                                            + group_name + '/attributes/OSG:PI_Email', params=query)
-            PI_Email = additional_attributes.json()['data']
-            pi_info['PI_Email'] = PI_Email
-        except:
-            PI_Email = None
-            pi_info['PI_Email'] = PI_Email
-
-        try:
-            additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
-                                            + group_name + '/attributes/OSG:PI_Organization', params=query)
-            PI_Organization = additional_attributes.json()['data']
-            pi_info['PI_Organization'] = PI_Organization
-        except:
-            PI_Organization = None
-            pi_info['PI_Organization'] = PI_Organization
-
-        print(pi_info)
-
-        return render_template('groups_requests_edit.html', sciences=sciences, group_name=group_name, group=group)
+        return render_template('groups_requests_edit.html', sciences=sciences, group_name=group_name, group=group, pi_info=pi_info)
 
     elif request.method == 'POST':
         name = request.form['name']
@@ -818,7 +782,16 @@ def edit_subgroup_requests(group_name):
         if pi_organization:
             additional_metadata['OSG:PI_Organization'] = pi_organization
 
-        if len(additional_metadata) > 0:
+        new_unix_name = enclosing_group_name + '.' + name
+
+        if new_unix_name == group_name:
+            put_query = {"apiVersion": 'v1alpha1',
+                            'metadata': {'display_name': display_name,
+                                        'purpose': field_of_science,
+                                        'email': email, 'phone': phone,
+                                        'description': description,
+                                        'additional_attributes': additional_metadata}}
+        else:
             put_query = {"apiVersion": 'v1alpha1',
                             'metadata': {'name': name,
                                         'display_name': display_name,
@@ -826,19 +799,12 @@ def edit_subgroup_requests(group_name):
                                         'email': email, 'phone': phone,
                                         'description': description,
                                         'additional_attributes': additional_metadata}}
-        else:
-            put_query = {"apiVersion": 'v1alpha1',
-                            'metadata': {'name': name, 'display_name': display_name,
-                                        'purpose': field_of_science,
-                                        'email': email, 'phone': phone,
-                                        'description': description}}
         # print(put_query)
 
         r = requests.put(
             ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=token_query, json=put_query)
 
         enclosing_group_name = '.'.join(group_name.split('.')[:-1])
-        print(enclosing_group_name)
         if r.status_code == requests.codes.ok:
             flash("The OSG support team has been notified of your updated project request.", 'success')
             return redirect(url_for('view_group_subgroups_requests', group_name=enclosing_group_name))

@@ -13,12 +13,10 @@
         <ol class="breadcrumb">
           <li class="breadcrumb-item">OSG Projects</li>
         </ol>
-        {% if session['admin'] == 'active' %}
         <div class="btn-group mr-2" role="group" aria-label="first group">
           <a href="{{url_for('create_subgroup', group_name='root.osg')}}" class="btn btn-primary btn-sm">Request New Project</a>
         </div>
         <br></br>
-        {% endif %}
 
         <div class="table-responsive">
           <table class="table" id="groups-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
