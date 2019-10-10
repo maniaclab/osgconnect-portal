@@ -1115,11 +1115,11 @@ def login_node_add_user(group_name, unix_name):
                         group_name + '/members/' + unix_name, params=query, json=put_query)
 
         if user_status.status_code == requests.codes.ok:
-            flash("Successfully added member to login node", 'success')
-            return redirect(url_for('view_login_nodes_add_users', group_name=group_name))
+            flash("Successfully added user to login node", 'success')
+            return redirect(url_for('view_login_node_users', group_name=group_name))
         else:
             err_message = user_status.json()['message']
-            flash('Failed to add member to login node: {}'.format(err_message), 'warning')
+            flash('Failed to add user to login node: {}'.format(err_message), 'warning')
             return redirect(url_for('view_login_nodes_add_users', group_name=group_name))
 
 
