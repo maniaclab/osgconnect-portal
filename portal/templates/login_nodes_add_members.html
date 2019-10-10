@@ -34,7 +34,6 @@
                   <tr>
                     <th data-field="name" data-sortable="true">Name</th>
                     <th data-field="email" data-sortable="true">Email</th>
-                    <th data-field="phone" data-sortable="true">Phone</th>
                     <th data-field="institution" data-sortable="true">Institution</th>
                     <th data-field="action" data-sortable="true">Action</th>
                   </tr>
@@ -44,12 +43,10 @@
               			<td>Loading Data <i class="fas fa-sync fa-spin"></i></td>
               			<td><i class="fas fa-sync fa-spin"></i></td>
               			<td><i class="fas fa-sync fa-spin"></i></td>
-              			<td><i class="fas fa-sync fa-spin"></i></td>
                     <td><i class="fas fa-sync fa-spin"></i></td>
               		</tr>
               		<tr v-if="failed">
               			<td>Failed to load the data, please refresh the page <i class="far fa-times-circle"></i></td>
-              			<td><i class="far fa-times-circle"></i></td>
               			<td><i class="far fa-times-circle"></i></td>
               			<td><i class="far fa-times-circle"></i></td>
                     <td><i class="far fa-times-circle"></i></td>
@@ -57,11 +54,10 @@
                   <tr v-for="member in members">
                     <td>{[{member.metadata.name}]}</td>
                     <td>{[{member.metadata.email}]}</td>
-                    <td>{[{member.metadata.phone}]}</td>
                     <td>{[{member.metadata.institution}]}</td>
                     <td>
                       <form role="form" :action="'/login-nodes/' + groupname + '/add_user/' + member.metadata.unix_name" method="POST" onsubmit="return confirm('Are you sure you want to add this member?');">
-                        <button type="submit" name="add_group_member" class="btn btn-xs btn-primary" data-submit="Adding Member..."><i class="fas fa-plus"></i> Add Member</button>
+                        <button type="submit" name="add_group_member" class="btn btn-xs btn-primary" data-submit="Adding Member..."><i class="fas fa-plus"></i> Add Users</button>
                       </form>
                     </td>
                   </tr>
@@ -92,7 +88,7 @@ $(document).ready(function() {
     updated: function() {
   	    //call DataTable after view is updated
         $('#groups-table').DataTable({
-          order: [[4, 'desc'],[0, 'asc']]
+          order: [0, 'asc']
         });
   	},
     mounted(){
