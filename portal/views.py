@@ -94,7 +94,7 @@ def support():
                         "text": description
                     })
         if r.status_code == requests.codes.ok:
-            flash("Successfully sent message", 'success')
+            flash("Successfully sent message to the OSG support team.", 'success')
             return redirect(url_for('support'))
         else:
             flash("Unable to send message", 'warning')
