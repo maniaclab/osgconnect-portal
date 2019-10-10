@@ -14,7 +14,7 @@
         <ol class="breadcrumb">
           <!-- <li class="breadcrumb-item"><a href="{{url_for('view_group', group_name='root.osg')}}">Open Science Grid</a></li> -->
           {% if group_name == 'root.osg' %}
-          <li class="breadcrumb-item active">Admin</li>
+          <li class="breadcrumb-item active">Open Science Grid</li>
           {% else %}
           <li class="breadcrumb-item"><a href="{{url_for('groups')}}">OSG Projects</a></li>
           <li class="breadcrumb-item active">{{group['display_name']}}</li>
@@ -31,26 +31,18 @@
           </div>
           {% elif user_status == 'pending'%}
           <div class="btn-group mr-2" role="group", aria-label="first group">
-            <button type="submit" name="pending_membership" class="btn btn-warning btn-sm disabled" data-submit="Pending Membership..."><i class="fas fa-spinner fa-spin"></i> Requested Membership</button>
+            <button type="submit" name="pending_membership" class="btn btn-warning btn-sm disabled" data-submit="Pending Membership...">Requested Membership</button>
           </div>
           {% elif user_status == 'active' %}
             {% if group_name == 'root.osg' %}
           <div class="btn-group mr-2" role="group" aria-label="first group">
-            <a href="{{url_for('create_subgroup', group_name=group_name)}}" class="btn btn-secondary btn-sm">Request Project</a>
-          </div>
-            {% else %}
-          <div class="btn-group mr-2" role="group" aria-label="first group">
-            <a href="{{url_for('create_subgroup', group_name=group_name)}}" class="btn btn-secondary btn-sm">Request Subproject</a>
+            <a href="{{url_for('create_subgroup', group_name=group_name)}}" class="btn btn-primary btn-sm">Request New Project</a>
           </div>
             {% endif %}
           {% elif user_status == 'admin' %}
             {% if group_name == 'root.osg' %}
           <div class="btn-group mr-2" role="group" aria-label="first group">
             <a href="{{url_for('create_subgroup', group_name=group_name)}}" class="btn btn-primary btn-sm">Create Project</a>
-          </div>
-            {% else %}
-          <div class="btn-group mr-2" role="group" aria-label="first group">
-            <a href="{{url_for('create_subgroup', group_name=group_name)}}" class="btn btn-primary btn-sm">Create Subproject</a>
           </div>
             {% endif %}
           <div class="btn-group mr-2" role="group" aria-label="second group">
@@ -87,17 +79,10 @@
           <li class="nav-item" id='subprojects-request-tab'>
             <a class="nav-link" href="{{url_for('view_group_subgroups_requests', group_name=group_name)}}"><span class="badge badge-warning">{[{subgroup_requests_count}]}</span> Project Requests</a>
           </li>
-          {% else %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{url_for('view_group_subgroups', group_name=group_name)}}"><i class="fas fa-project-diagram"></i> Subprojects</a>
-          </li>
-          <li class="nav-item" id='subprojects-request-tab'>
-            <a class="nav-link" href="{{url_for('view_group_subgroups_requests', group_name=group_name)}}"><span class="badge badge-warning">{[{subgroup_requests_count}]}</span> Subproject Requests</a>
-          </li>
           {% endif %}
           {% if user_status == 'admin' %}
           <li class="nav-item">
-            <a class="nav-link" href="{{url_for('view_group_add_members', group_name=group_name)}}"><i class="fas fa-user-plus"></i> Add Users</a>
+            <a class="nav-link" href="{{url_for('view_group_add_members', group_name=group_name)}}"><i class="fas fa-user-plus"></i> Add Members</a>
           </li>
           {% endif %}
         </ul>
