@@ -45,6 +45,7 @@
                 <a href="{{url_for('users_groups')}}">My Projects</a> <i class="fas fa-users float-right"></i>
               </div>
               <div class="card-body">
+
                 <div class="table-responsive">
                   <table class="table" id="groups-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
                     <thead>
@@ -55,7 +56,7 @@
                     </thead>
                     <tbody data-link="row" class="rowlink" style="font-size:14px;">
                       {% for group in profile['group_memberships'] %}
-                        {% if group['name'] not in ['root', 'root.osg.login-nodes'] and group['state'] != 'nonmember' %}
+                        {% if group['name'] not in ['root', 'root.osg.login-nodes', 'root.osg'] and group['state'] != 'nonmember' %}
                       <tr>
                         <td><a href="{{url_for('view_group', group_name=group['name'])}}">{{'-'.join(group['name'].split('.')[1:])}}</a></td>
                         <td>{{group['state']}}</td>
@@ -65,6 +66,7 @@
                     </tbody>
                   </table>
                 </div>
+
               </div>
             </div>
           </div>
@@ -77,8 +79,10 @@
 
 <script>
 $(document).ready(function() {
-  $('#groups-table').dataTable({
-  "pageLength": 1;
+  $('#groups-table').DataTable({
+    order: [[1, 'desc'],[0, 'asc']],
+    "pageLength": 3
+  })
 });
 </script>
 {%endblock%}

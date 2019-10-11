@@ -1009,6 +1009,8 @@ def view_login_nodes_ajax_request(group_name):
     # Get all login nodes info
     login_nodes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/root.osg.login-nodes/subgroups', params=query)
     login_nodes = login_nodes.json()['groups']
+    # Sort login nodes by display name
+    print(login_nodes)
 
     return group, user_status, login_nodes
 
