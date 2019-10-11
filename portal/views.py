@@ -138,14 +138,16 @@ def groups():
     """OSG Connect groups"""
     if request.method == 'GET':
         query = {'token': session['access_token']}
-        # groups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups', params=query)
-        # groups = groups.json()['groups']
-
+        # Query to list subgroups or projects within OSG specifcally
         osg_groups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/root.osg/subgroups', params=query)
         osg_groups = osg_groups.json()['groups']
         osg_groups = [group for group in osg_groups if len(group['name'].split('.')) == 3]
-        # print(osg_groups)
-        return render_template('groups.html', groups=osg_groups)
+
+        # Check if user is active member of OSG specifically
+        user_status = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'] + '/groups/root.osg', params=query)
+        user_status = user_status.json()['membership']['state']
+
+        return render_template('groups.html', groups=osg_groups, user_status=user_status)
 
 
 @app.route('/groups/new', methods=['GET', 'POST'])
@@ -687,8 +689,14 @@ def create_subgroup(group_name):
             group_admins = [member for member in group_members if member['state'] == 'admin']
         except:
             group_admins = []
+        # Check if user is active member of OSG specifically
+        user_status = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'] + '/groups/root.osg', params=token_query)
+        user_status = user_status.json()['membership']['state']
 
-        return render_template('groups_create.html', sciences=sciences, group_name=group_name, group_admins=group_admins)
+        # Get enclosing group information
+        group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=token_query)
+        group = group.json()['metadata']
+        return render_template('groups_create.html', sciences=sciences, group_name=group_name, group_admins=group_admins, user_status=user_status, group=group)
 
     elif request.method == 'POST':
         name = request.form['name']

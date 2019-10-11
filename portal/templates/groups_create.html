@@ -14,21 +14,22 @@
     {%include 'messages.html'%}
     <div class="row">
       <div class="col-lg-8 mx-auto">
-        {% if 'ci-connect' in session['url_root'] %}
-        <h2>Request Project Creation</h2>
-        {% else %}
-        <h2>Request Project Creation</h2>
+        {% if user_status == 'active' %}
+        <h2>Request project within {{group['display_name']}}</h2>
+        {% elif user_status == 'admin' %}
+        <h2>Create project within {{group['display_name']}}</h2>
         {% endif %}
+        <p class="asterik">* = required field</p>
         <hr/>
         <form role="form" action="{{url_for('create_subgroup', group_name=group_name)}}" method="POST">
           <div class="form-group">
-            <label for="name">Project Name <span class='text-muted'>(only alpha-numeric, dash and underscore allowed)</span>*</label>
+            <label for="name">Project Name <span class='text-muted'>(only alpha-numeric, dash and underscore allowed)</span><span class="asterik">*</span></label>
             <input
               type="text"
               class="form-control"
               id="name"
               name="name"
-              placeholder="Unix Name of Project"
+              placeholder="Short Name of Project"
               required="required"
               tabindex="1"
               maxlength="32"
@@ -37,7 +38,7 @@
           </div>
 
           <div class="form-group">
-            <label for="display-name">Display Name *</label>
+            <label for="display-name">Display Name <span class="asterik">*</span></label>
             <input
               type="text"
               class="form-control"
@@ -50,7 +51,7 @@
           </div>
 
           <div class="form-group">
-            <label for="email">Email *</label>
+            <label for="email">Email <span class="asterik">*</span></label>
             <input
               type="email"
               id="email"
@@ -63,7 +64,7 @@
           </div>
 
           <div class="form-group">
-            <label for="phone">Phone *</label>
+            <label for="phone">Phone <span class="asterik">*</span></label>
             <input
               type="tel"
               id="phone"
@@ -76,7 +77,7 @@
           </div>
 
           <div class="form-group">
-            <label for="field_of_science">Field of Science *</label>
+            <label for="field_of_science">Field of Science <span class="asterik">*</span></label>
             <select class="form-control" id="field_of_science" name="field_of_science" required="required" tabindex="5" onmousedown="if(this.options.length>6){this.size=6;}"  onchange='this.size=0;' onblur="this.size=0;">
               <option value="" selected disabled>Select Field of Science</option>
               {% for science in sciences %}
@@ -86,20 +87,20 @@
           </div>
 
           <div class="form-group">
-            <label for="pi-name">PI Name *</label>
+            <label for="pi-name">PI Name <span class="asterik">*</span></label>
             <input
               type="text"
               class="form-control"
               id="pi-name"
               name="pi-name"
               required
-              placeholder="Name of Principle Investigator"
+              placeholder="Name of Principal Investigator"
               tabindex="6"
             >
           </div>
 
           <div class="form-group">
-            <label for="pi-email">PI Email *</label>
+            <label for="pi-email">PI Email <span class="asterik">*</span></label>
             <input
               type="email"
               id="pi-email"
@@ -112,7 +113,7 @@
           </div>
 
           <div class="form-group">
-            <label for="pi-org">PI Organization *</label>
+            <label for="pi-org">PI Organization <span class="asterik">*</span></label>
             <input
               type="text"
               class="form-control"
@@ -124,8 +125,24 @@
             >
           </div>
 
+          <!-- <div class="form-group">
+            <label for="members">Add Admin Members</label>
+            <select class="selectpicker"
+              multiple
+              name="members"
+              id="members"
+              tabindex="9"
+              data-live-search="true"
+              data-actions-box="true"
+              data-header="Select Admin Members">
+              {% for admin in group_admins %}
+              <option>{{admin['user_name']}}</option>
+              {% endfor %}
+            </select>
+          </div> -->
+
           <div class="form-group">
-            <label for="description">Description <span id="asterik">*</span></label>
+            <label for="description">Description <span class="asterik">*</span></label>
             <textarea
               placeholder="Brief description of your group"
               name="description"
