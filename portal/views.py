@@ -1437,6 +1437,9 @@ def profile():
             phone = profile['phone']
             institution = profile['institution']
             ssh_pubkey = profile['public_key']
+            # Check User's Status in OSG Group specifcally
+            user_status = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + profile['unix_name'] + '/groups/root.osg', params=query)
+            user_status = user_status.json()['membership']['state']
         else:
             flash(
                 'Please complete any missing profile fields and press Save.', 'warning')
@@ -1444,7 +1447,7 @@ def profile():
 
         if request.args.get('next'):
             session['next'] = get_safe_redirect()
-        return render_template('profile.html', profile=profile)
+        return render_template('profile.html', profile=profile, user_status=user_status)
 
     elif request.method == 'POST':
         name = session['name'] = request.form['name']

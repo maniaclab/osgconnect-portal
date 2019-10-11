@@ -42,10 +42,11 @@
           <div class="col-sm-12 col-md-6">
             <div class="card h-100">
               <div class="card-header">
-                <a href="{{url_for('users_groups')}}">My Projects</a> <i class="fas fa-users float-right"></i>
+                OSG Group Membership Status: <strong id='osg-user-status'>{{user_status}}</strong> <i class="fas fa-users float-right"></i>
               </div>
               <div class="card-body">
-
+                <a href="{{url_for('users_groups')}}" class="btn btn-primary btn-sm">My Projects</a>
+                <br></br>
                 <div class="table-responsive">
                   <table class="table" id="groups-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
                     <thead>
@@ -84,6 +85,14 @@
 </section>
 
 <script>
+var user_status = document.getElementById('osg-user-status').textContent;
+if (user_status === 'pending') {
+  document.getElementById('osg-user-status').style.color = "orange";
+} else if (user_status === 'active'){
+  document.getElementById('osg-user-status').style.color = "green";
+} else if (user_status == 'admin') {
+  document.getElementById('osg-user-status').style.color = "blue";
+}
 $(document).ready(function() {
   $('#groups-table').DataTable({
     order: [[1, 'desc'],[0, 'asc']],
