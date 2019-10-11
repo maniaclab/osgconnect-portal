@@ -59,7 +59,13 @@
                         {% if group['name'] not in ['root', 'root.osg.login-nodes', 'root.osg'] and group['state'] != 'nonmember' %}
                       <tr>
                         <td><a href="{{url_for('view_group', group_name=group['name'])}}">{{'-'.join(group['name'].split('.')[1:])}}</a></td>
-                        <td>{{group['state']}}</td>
+                          {% if group['state'] == 'pending' %}
+                        <td style='color: orange;'><strong>{{group['state']}}</strong></td>
+                          {% elif group['state'] == 'active' %}
+                        <td style='color: green;'><strong>{{group['state']}}</strong></td>
+                          {% elif group['state'] == 'admin' %}
+                        <td style='color: blue;'><strong>{{group['state']}}</strong></td>
+                          {% endif %}
                       </tr>
                         {% endif %}
                       {% endfor %}

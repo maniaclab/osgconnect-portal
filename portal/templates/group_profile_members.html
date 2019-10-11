@@ -134,7 +134,10 @@
                     <td>{[{member.metadata.institution}]}</td>
                     <td>
                       <div v-for="group in member.metadata.group_memberships">
-                        <div v-if="group.name == groupname && group.state !== 'pending'">{[{group.state}]}</div>
+                        <div v-if="group.name == groupname && group.state !== 'pending'">
+                          <span v-if="group.state == 'admin'" style="color: blue;"><strong>{[{group.state}]}</strong></span>
+                          <span v-else="group.state == 'active'" style="color: green;"><strong>{[{group.state}]}</strong></span>
+                        </div>
                       </div>
                     </td>
                     <td v-if="admin == 'admin'">
@@ -199,8 +202,7 @@ $(document).ready(function() {
     updated: function() {
   	    //call DataTable after view is updated
         $('#groups-table').DataTable({
-          "columnDefs": [{"width": "15%", "targets": 5}],
-          order: [[4, 'desc'],[0, 'asc']]
+          order: [[4, 'desc'],[0, 'asc']],
         });
   	},
     mounted(){
