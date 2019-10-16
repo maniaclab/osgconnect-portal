@@ -15,36 +15,82 @@
           <li class="breadcrumb-item">My Projects</li>
         </ol>
 
-        <div class="table-responsive">
-          <table class="table" id="groups-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
-            <thead>
-              <tr>
-                <th data-field="name" data-sortable="true">Name</th>
-                <th data-field="unix-name" data-sortable="true">Unix Name</th>
-                <th data-field="email" data-sortable="true">Contact Email</th>
-                <!-- <th data-field="phone" data-sortable="true">Phone</th> -->
-                <th data-field="field-of-science" data-sortable="true">Field of Science</th>
-                <!-- <th data-field="description" data-sortable="true">Description</th> -->
-              </tr>
-            </thead>
-            <tbody data-link="row" class="rowlink" style="font-size:14px;">
-              {% for group in groups %}
-                {% if group['metadata']['name'] not in ['root', 'root.osg', 'root.osg.login-nodes'] %}
-              <tr>
-                <td><a href="{{url_for('view_group', group_name=group['metadata']['name'])}}">{{group['metadata']['display_name']}}</a></td>
-                {% if group['metadata']['pending'] %}
-                <td>Pending</td>
-                {% else %}
-                <td>{{ '.'.join(group['metadata']['name'].split('.')[1:]) }}</td>
-                {% endif %}
-                <td>{{group['metadata']['email']}}</td>
-                <td>{{group['metadata']['purpose']}}</td>
-              </tr>
-                {% endif %}
-              {% endfor %}
-            </tbody>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="active-projects-tab" data-toggle="tab" href="#active-projects" role="tab" aria-controls="active-projects" aria-selected="true">Active Projects</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="pending-projects-tab" data-toggle="tab" href="#pending-projects" role="tab" aria-controls="pending-projects" aria-selected="false">Pending Projects</a>
+          </li>
+        </ul>
 
-          </table>
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane fade show active" id="active-projects" role="tabpanel" aria-labelledby="active-projects-tab">
+            <div class="table-responsive">
+              <table class="table" id="groups-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
+                <thead>
+                  <tr>
+                    <th data-field="name" data-sortable="true">Name</th>
+                    <th data-field="unix-name" data-sortable="true">Unix Name</th>
+                    <th data-field="email" data-sortable="true">Contact Email</th>
+                    <!-- <th data-field="phone" data-sortable="true">Phone</th> -->
+                    <th data-field="field-of-science" data-sortable="true">Field of Science</th>
+                    <!-- <th data-field="description" data-sortable="true">Description</th> -->
+                  </tr>
+                </thead>
+                <tbody data-link="row" class="rowlink" style="font-size:14px;">
+                  {% for group in groups %}
+                    {% if group['metadata']['name'] not in ['root', 'root.osg', 'root.osg.login-nodes'] %}
+                  <tr>
+                    <td><a href="{{url_for('view_group', group_name=group['metadata']['name'])}}">{{group['metadata']['display_name']}}</a></td>
+                    {% if group['metadata']['pending'] %}
+                    <td>Pending</td>
+                    {% else %}
+                    <td>{{ '.'.join(group['metadata']['name'].split('.')[1:]) }}</td>
+                    {% endif %}
+                    <td>{{group['metadata']['email']}}</td>
+                    <td>{{group['metadata']['purpose']}}</td>
+                  </tr>
+                    {% endif %}
+                  {% endfor %}
+                </tbody>
+
+              </table>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="pending-projects" role="tabpanel" aria-labelledby="pending-projects-tab">
+            <div class="table-responsive">
+              <table class="table" id="groups-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
+                <thead>
+                  <tr>
+                    <th data-field="name" data-sortable="true">Name</th>
+                    <th data-field="unix-name" data-sortable="true">Unix Name</th>
+                    <th data-field="email" data-sortable="true">Contact Email</th>
+                    <!-- <th data-field="phone" data-sortable="true">Phone</th> -->
+                    <th data-field="field-of-science" data-sortable="true">Field of Science</th>
+                    <!-- <th data-field="description" data-sortable="true">Description</th> -->
+                  </tr>
+                </thead>
+                <tbody data-link="row" class="rowlink" style="font-size:14px;">
+                  {% for group in groups %}
+                    {% if group['metadata']['name'] not in ['root', 'root.osg', 'root.osg.login-nodes'] %}
+                  <tr>
+                    <td><a href="{{url_for('view_group', group_name=group['metadata']['name'])}}">{{group['metadata']['name']}}</a></td>
+                    {% if group['metadata']['pending'] %}
+                    <td>Pending</td>
+                    {% else %}
+                    <td>{{ '.'.join(group['metadata']['name'].split('.')[1:]) }}</td>
+                    {% endif %}
+                    <td>{{group['metadata']['email']}}</td>
+                    <td>{{group['metadata']['purpose']}}</td>
+                  </tr>
+                    {% endif %}
+                  {% endfor %}
+                </tbody>
+
+              </table>
+            </div>
+          </div>
         </div>
 
       </div>
