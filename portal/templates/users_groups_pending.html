@@ -12,15 +12,16 @@
         {%include 'messages.html' %}
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{url_for('profile')}}">Profile</a></li>
-          <li class="breadcrumb-item">My Projects</li>
+          <li class="breadcrumb-item"><a href="{{url_for('users_groups')}}">My Projects</a></li>
+          <li class="breadcrumb-item">Pending</li>
         </ol>
 
         <ul class="nav nav-tabs">
           <li class="nav-item">
-            <a class="nav-link active" id="active-projects-tab" data-toggle="tab" href="#">Active Projects</a>
+            <a class="nav-link" id="active-projects-tab" data-toggle="tab" href="{{url_for('users_groups')}}" role="tab">Active Projects</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" id="pending-projects-tab" data-toggle="tab" href="{{url_for('users_groups_pending')}}">Pending Projects</a>
+            <a class="nav-link active" id="pending-projects-tab" data-toggle="tab" href="#" role="tab">Pending Projects</a>
           </li>
         </ul>
 
@@ -31,27 +32,23 @@
                 <thead>
                   <tr>
                     <th data-field="name" data-sortable="true">Name</th>
-                    <th data-field="unix-name" data-sortable="true">Unix Name</th>
                     <th data-field="email" data-sortable="true">Contact Email</th>
-                    <!-- <th data-field="phone" data-sortable="true">Phone</th> -->
                     <th data-field="field-of-science" data-sortable="true">Field of Science</th>
-                    <!-- <th data-field="description" data-sortable="true">Description</th> -->
+                    <th data-field="pi-name" data-sortable="true">PI Name</th>
+                    <th data-field="pi-email" data-sortable="true">PI Email</th>
+                    <th data-field="pi-org" data-sortable="true">PI Organization</th>
                   </tr>
                 </thead>
                 <tbody data-link="row" class="rowlink" style="font-size:14px;">
-                  {% for group in groups %}
-                    {% if group['metadata']['name'] not in ['root', 'root.osg', 'root.osg.login-nodes'] %}
+                  {% for project_request in project_requests %}
                   <tr>
-                    <td><a href="{{url_for('view_group', group_name=group['metadata']['name'])}}">{{group['metadata']['display_name']}}</a></td>
-                    {% if group['metadata']['pending'] %}
-                    <td>Pending</td>
-                    {% else %}
-                    <td>{{ '.'.join(group['metadata']['name'].split('.')[1:]) }}</td>
-                    {% endif %}
-                    <td>{{group['metadata']['email']}}</td>
-                    <td>{{group['metadata']['purpose']}}</td>
+                    <td><a href="{{url_for('edit_subgroup', group_name=project_request['name'])}}">{{project_request['display_name']}}</a></td>
+                    <td>{{project_request['email']}}</td>
+                    <td>{{project_request['purpose']}}</td>
+                    <td>{{project_request['additional_attributes']['OSG:PI_Name']}}</td>
+                    <td>{{project_request['additional_attributes']['OSG:PI_Email']}}</td>
+                    <td>{{project_request['additional_attributes']['OSG:PI_Organization']}}</td>
                   </tr>
-                    {% endif %}
                   {% endfor %}
                 </tbody>
               </table>
