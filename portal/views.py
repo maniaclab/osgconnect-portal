@@ -101,8 +101,9 @@ def support():
             return redirect(url_for('support'))
 
 
-@app.route('/users-groups', methods=['GET'])
-def users_groups():
+@app.route('/users-groups', defaults={'pending':None}, methods=['GET'])
+@app.route('/users-groups/<pending>', methods=['GET'])
+def users_groups(pending):
     """Groups that user's are specifically members of"""
     if request.method == 'GET':
         query = {'token': ciconnect_api_token,
@@ -754,7 +755,7 @@ def create_subgroup(group_name):
                 return redirect(url_for('view_group', group_name=full_created_group_name))
             else:
                 flash("The OSG support team has been notified of your requested project.", 'success')
-                return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
+                return redirect(url_for('users_groups', pending='#pending-projects'))
         else:
             err_message = r.json()['message']
             flash('Failed to request project creation: {}'.format(err_message), 'warning')
