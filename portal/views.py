@@ -755,7 +755,7 @@ def create_subgroup(group_name):
                 return redirect(url_for('view_group', group_name=full_created_group_name))
             else:
                 flash("The OSG support team has been notified of your requested project.", 'success')
-                return redirect(url_for('users_groups', pending='#pending-projects'))
+                return redirect(url_for('users_groups', pending='%23pending-projects'))
         else:
             err_message = r.json()['message']
             flash('Failed to request project creation: {}'.format(err_message), 'warning')
