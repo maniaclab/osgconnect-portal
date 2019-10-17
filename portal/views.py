@@ -101,9 +101,8 @@ def support():
             return redirect(url_for('support'))
 
 
-@app.route('/users-groups', defaults={'pending':None}, methods=['GET'])
-@app.route('/users-groups/<pending>', methods=['GET'])
-def users_groups(pending):
+@app.route('/users-groups', methods=['GET'])
+def users_groups():
     """Groups that user's are specifically members of"""
     if request.method == 'GET':
         query = {'token': ciconnect_api_token,
@@ -755,7 +754,7 @@ def create_subgroup(group_name):
                 return redirect(url_for('view_group', group_name=full_created_group_name))
             else:
                 flash("The OSG support team has been notified of your requested project.", 'success')
-                return redirect(url_for('users_groups', pending='%23pending-projects'))
+                return redirect(url_for('users_groups'))
         else:
             err_message = r.json()['message']
             flash('Failed to request project creation: {}'.format(err_message), 'warning')
@@ -830,11 +829,11 @@ def edit_subgroup_requests(group_name):
         enclosing_group_name = '.'.join(group_name.split('.')[:-1])
         if r.status_code == requests.codes.ok:
             flash("The OSG support team has been notified of your updated project request.", 'success')
-            return redirect(url_for('view_group_subgroups_requests', group_name=enclosing_group_name))
+            return redirect(url_for('users_groups'))
         else:
             err_message = r.json()['message']
             flash('Failed to edit project request: {}'.format(err_message), 'warning')
-            return redirect(url_for('view_group_subgroups_requests', group_name=enclosing_group_name))
+            return redirect(url_for('edit_subgroup', group_name=group_name))
 
 
 @app.route('/groups/<group_name>/edit', methods=['GET', 'POST'])
