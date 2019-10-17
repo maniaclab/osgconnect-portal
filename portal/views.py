@@ -130,7 +130,12 @@ def users_groups():
         for group in multiplex:
             users_groups.append(json.loads(multiplex[group]['body']))
         # users_groups = [group for group in users_groups if len(group['name'].split('.')) == 3]
-        return render_template('users_groups.html', groups=users_groups)
+
+        # Query user's pending project requests
+        project_requests = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name + '/group_requests', params=query)
+        project_requests = project_requests.json()['groups']
+
+        return render_template('users_groups.html', groups=users_groups, project_requests=project_requests)
 
 
 @app.route('/groups', methods=['GET'])
@@ -738,9 +743,18 @@ def create_subgroup(group_name):
             ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name +
             '/subgroup_requests/' + name, params=token_query, json=put_query)
         full_created_group_name = group_name + '.' + name
+
+        # Check if user is active member of OSG specifically
+        user_status = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'] + '/groups/root.osg', params=token_query)
+        user_status = user_status.json()['membership']['state']
+
         if r.status_code == requests.codes.ok:
-            flash("The OSG support team has been notified of your requested project.", 'success')
-            return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
+            if user_status == 'admin':
+                flash("Successfully created project.", 'success')
+                return redirect(url_for('view_group', group_name=full_created_group_name))
+            else:
+                flash("The OSG support team has been notified of your requested project.", 'success')
+                return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
         else:
             err_message = r.json()['message']
             flash('Failed to request project creation: {}'.format(err_message), 'warning')
