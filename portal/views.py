@@ -846,7 +846,7 @@ def edit_subgroup_requests(group_name):
         enclosing_group_name = '.'.join(group_name.split('.')[:-1])
         if r.status_code == requests.codes.ok:
             flash("The OSG support team has been notified of your updated project request.", 'success')
-            return redirect(url_for('users_groups'))
+            return redirect(url_for('users_groups_pending'))
         else:
             err_message = r.json()['message']
             flash('Failed to edit project request: {}'.format(err_message), 'warning')
