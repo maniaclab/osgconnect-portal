@@ -137,6 +137,23 @@ def users_groups():
 
         return render_template('users_groups.html', groups=users_groups, project_requests=project_requests)
 
+@app.route('/users-groups/pending', methods=['GET'])
+def users_groups_pending():
+    """Groups that user's are specifically members of"""
+    if request.method == 'GET':
+        query = {'token': ciconnect_api_token,
+                 'globus_id': session['primary_identity']}
+
+        user = requests.get(ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
+        user = user.json()
+        unix_name = user['metadata']['unix_name']
+
+        # Query user's pending project requests
+        project_requests = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name + '/group_requests', params=query)
+        project_requests = project_requests.json()['groups']
+
+        return render_template('users_groups_pending.html', project_requests=project_requests)
+
 
 @app.route('/groups', methods=['GET'])
 def groups():
