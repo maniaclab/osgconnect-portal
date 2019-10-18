@@ -134,8 +134,11 @@ def users_groups():
         # Query user's pending project requests
         project_requests = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name + '/group_requests', params=query)
         project_requests = project_requests.json()['groups']
+        # Check if user is active member of OSG specifically
+        user_status = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'] + '/groups/root.osg', params=query)
+        user_status = user_status.json()['membership']['state']
 
-        return render_template('users_groups.html', groups=users_groups, project_requests=project_requests)
+        return render_template('users_groups.html', groups=users_groups, project_requests=project_requests, user_status=user_status)
 
 @app.route('/users-groups/pending', methods=['GET'])
 def users_groups_pending():
@@ -151,8 +154,10 @@ def users_groups_pending():
         # Query user's pending project requests
         project_requests = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name + '/group_requests', params=query)
         project_requests = project_requests.json()['groups']
-
-        return render_template('users_groups_pending.html', project_requests=project_requests)
+        # Check if user is active member of OSG specifically
+        user_status = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'] + '/groups/root.osg', params=query)
+        user_status = user_status.json()['membership']['state']
+        return render_template('users_groups_pending.html', project_requests=project_requests, user_status=user_status)
 
 
 @app.route('/groups', methods=['GET'])
@@ -507,7 +512,7 @@ def view_group_add_members(group_name):
         group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
                             + group_name, params=query)
         group = group.json()['metadata']
-        
+
         display_name = '-'.join(group_name.split('.')[1:])
         # group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=query)
         # memberships = group_members.json()['memberships']
