@@ -171,8 +171,6 @@ $(document).ready(function() {
     .then(function (response) {
       this.non_members = response.data;
       this.loading = false;
-      console.log(this.admin);
-      console.log(this.osg_admin);
     }.bind(this)) //must use bind(this) unless using arrow function
     .catch(error => { this.failed = true; this.loading = false; })
     }
