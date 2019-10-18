@@ -477,7 +477,7 @@ def view_group_members_requests(group_name):
 
         # Query to return user's membership status in a group, specifically if user is OSG admin
         r = requests.get(
-            ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name + '/groups/root.osg', params=query)
+            ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'] + '/groups/root.osg', params=query)
         osg_status = r.json()['membership']['state']
 
         return render_template('group_profile_members_requests.html',
