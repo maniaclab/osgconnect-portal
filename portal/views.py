@@ -507,8 +507,8 @@ def view_group_add_members(group_name):
         group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
                             + group_name, params=query)
         group = group.json()['metadata']
-        #
-        # display_name = '-'.join(group_name.split('.')[1:])
+        
+        display_name = '-'.join(group_name.split('.')[1:])
         # group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=query)
         # memberships = group_members.json()['memberships']
         # memberships_names = [member['user_name'] for member in memberships]
