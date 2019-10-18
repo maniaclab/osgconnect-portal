@@ -123,12 +123,12 @@
               			<td><i class="far fa-times-circle"></i></td>
                     <td><i class="far fa-times-circle"></i></td>
               		</tr>
-                  <tr v-for="(member, index) in non_members" v-cloak >
+                  <tr v-for="member in non_members" v-cloak >
               		  <td>{[{member.metadata.name}]}</td>
                     <td>{[{member.metadata.unix_name}]}</td>
               		  <td>{[{member.metadata.email}]}</td>
                     <td>{[{member.metadata.institution}]}</td>
-                    <td v-if="(admin == 'admin' or osg_admin == 'admin')">
+                    <td>
                       <form role="form" :action="'/groups/' + groupname + '/add_group_member/' + member.metadata.unix_name" method="POST" onsubmit="return confirm('Are you sure you want to add this member?');">
                         <button type="submit" name="add_group_member" class="btn btn-xs btn-primary" data-submit="Adding Member..."><i class="fas fa-plus"></i> Add Member</button>
                       </form>
@@ -171,6 +171,8 @@ $(document).ready(function() {
     .then(function (response) {
       this.non_members = response.data;
       this.loading = false;
+      console.log(this.admin);
+      console.log(this.osg_admin);
     }.bind(this)) //must use bind(this) unless using arrow function
     .catch(error => { this.failed = true; this.loading = false; })
     }
