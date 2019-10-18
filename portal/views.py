@@ -334,8 +334,13 @@ def view_group_members(group_name):
                         group_name + '/members/' + session['unix_name'], params=query)
         user_status = user_status.json()['membership']['state']
 
+        # Query to return user's membership status in a group, specifically if user is OSG admin
+        r = requests.get(
+            ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name + '/groups/root.osg', params=query)
+        osg_status = r.json()['membership']['state']
+
         return render_template('group_profile_members.html', group_name=group_name,
-                                user_status=user_status, group=group)
+                                user_status=user_status, group=group, osg_status=osg_status)
 
 
 @app.route('/groups-xhr/<group_name>/members', methods=['GET'])
@@ -470,11 +475,17 @@ def view_group_members_requests(group_name):
         except:
             user_super = False
 
+        # Query to return user's membership status in a group, specifically if user is OSG admin
+        r = requests.get(
+            ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name + '/groups/root.osg', params=query)
+        osg_status = r.json()['membership']['state']
+
         return render_template('group_profile_members_requests.html',
                                 group_members=user_dict, group_name=group_name,
                                 display_name=display_name, user_status=user_status,
                                 user_super=user_super,
-                                users_statuses=users_statuses, group=group)
+                                users_statuses=users_statuses, group=group,
+                                osg_status=osg_status)
 
 
 @app.route('/groups/<group_name>/add_members', methods=['GET', 'POST'])
@@ -533,9 +544,15 @@ def view_group_add_members(group_name):
         except:
             user_super = False
 
+        # Query to return user's membership status in a group, specifically if user is OSG admin
+        r = requests.get(
+            ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name + '/groups/root.osg', params=query)
+        osg_status = r.json()['membership']['state']
+
         return render_template('group_profile_add_members.html',group_name=group_name,
                                 display_name=display_name, user_status=user_status,
-                                user_super=user_super, group=group, group_members=user_dict)
+                                user_super=user_super, group=group,
+                                group_members=user_dict, osg_status=osg_status)
 
 
 @app.route('/groups/<group_name>/add_group_member/<unix_name>', methods=['POST'])
