@@ -494,6 +494,77 @@ def view_group_add_members(group_name):
     """Detailed view of group's non-members"""
     query = {'token': ciconnect_api_token}
     if request.method == 'GET':
+        # # Get root base group users
+        # enclosing_group_name = '.'.join(group_name.split('.')[:-1])
+        # # print(enclosing_group_name)
+        # enclosing_group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
+        #                     + enclosing_group_name + '/members', params=query)
+        # enclosing_group = enclosing_group.json()['memberships']
+        # enclosing_group_members_names = [member['user_name'] for member in enclosing_group]
+        # # print(base_group)
+        #
+        # Get group information
+        group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
+                            + group_name, params=query)
+        group = group.json()['metadata']
+        #
+        # display_name = '-'.join(group_name.split('.')[1:])
+        # group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=query)
+        # memberships = group_members.json()['memberships']
+        # memberships_names = [member['user_name'] for member in memberships]
+        #
+        # non_members = list(set(enclosing_group_members_names) - set(memberships_names))
+        #
+        # multiplexJson = {}
+        #
+        # for user in non_members:
+        #     unix_name = user
+        #     user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
+        #     multiplexJson[user_query] = {"method":"GET"}
+        #
+        # # POST request for multiplex return
+        # multiplex = requests.post(
+        #     ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
+        # multiplex = multiplex.json()
+        # user_dict = {}
+        # for user in multiplex:
+        #     user_name = user.split('/')[3].split('?')[0]
+        #     user_dict[user_name] = json.loads(multiplex[user]['body'])
+
+        # Get User's Group Status
+        user_status = requests.get(
+                        ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                        group_name + '/members/' + session['unix_name'], params=query)
+        user_status = user_status.json()['membership']['state']
+        query = {'token': ciconnect_api_token}
+        user_super = requests.get(
+                        ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'], params=query)
+        try:
+            user_super = user_super.json()['metadata']['superuser']
+        except:
+            user_super = False
+
+        # Query to return user's membership status in a group, specifically if user is OSG admin
+        r = requests.get(
+            ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'] + '/groups/root.osg', params=query)
+        osg_status = r.json()['membership']['state']
+
+        return render_template('group_profile_add_members.html', group_name=group_name,
+                                display_name=display_name, user_status=user_status,
+                                user_super=user_super, group=group, osg_status=osg_status)
+
+
+@app.route('/groups-xhr/<group_name>/add_members', methods=['GET', 'POST'])
+@authenticated
+def view_group_add_members_xhr(group_name):
+    """Detailed view of group's 'add members' page"""
+    non_members = view_group_add_members_request(group_name)
+    return jsonify(non_members)
+
+def view_group_add_members_request(group_name):
+    """Detailed view of group's non-members"""
+    query = {'token': ciconnect_api_token}
+    if request.method == 'GET':
         # Get root base group users
         enclosing_group_name = '.'.join(group_name.split('.')[:-1])
         # print(enclosing_group_name)
@@ -549,10 +620,8 @@ def view_group_add_members(group_name):
             ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'] + '/groups/root.osg', params=query)
         osg_status = r.json()['membership']['state']
 
-        return render_template('group_profile_add_members.html',group_name=group_name,
-                                display_name=display_name, user_status=user_status,
-                                user_super=user_super, group=group,
-                                group_members=user_dict, osg_status=osg_status)
+        return user_dict
+
 
 
 @app.route('/groups/<group_name>/add_group_member/<unix_name>', methods=['POST'])
