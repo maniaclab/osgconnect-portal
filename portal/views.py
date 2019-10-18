@@ -225,6 +225,11 @@ def view_group(group_name):
                         group_name + '/members/' + unix_name, params=query)
         user_status = user_status.json()['membership']['state']
 
+        # Query to return user's membership status in a group, specifically if user is OSG admin
+        r = requests.get(
+            ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name + '/groups/root.osg', params=query)
+        osg_status = r.json()['membership']['state']
+
         pi_info = {}
 
         try:
@@ -255,7 +260,7 @@ def view_group(group_name):
             pi_info['PI_Organization'] = PI_Organization
 
         return render_template('group_profile.html', group=group,
-                                group_name=group_name, user_status=user_status, pi_info=pi_info)
+                                group_name=group_name, user_status=user_status, pi_info=pi_info, osg_status=osg_status)
     elif request.method == 'POST':
         '''Request membership to join group'''
         put_query = {"apiVersion": 'v1alpha1',
