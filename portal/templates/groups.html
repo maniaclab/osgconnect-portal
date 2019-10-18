@@ -38,7 +38,7 @@
             </thead>
             <tbody data-link="row" class="rowlink" style="font-size:14px;">
               {% for group in groups %}
-                {% if group['name'] != 'root' and not group['pending'] %}
+                {% if group['name'] != ('root' or 'root.osg.login-nodes') and not group['pending'] %}
               <tr>
                 <td><a href="{{url_for('view_group', group_name=group['name'])}}">{{group['display_name']}}</a></td>
                 <td>{{group['email']}}</td>
