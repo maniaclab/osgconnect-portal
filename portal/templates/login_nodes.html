@@ -46,7 +46,14 @@
                     Project Information:
                   </div> -->
                   <div class="card-body">
-                    <iframe src="https://grafana.mwt2.org/d-solo/TJJNJgCiz/k8s-monitoring-test?panelId=20&orgId=1&theme=light" width="100%" height="210" frameborder="0"></iframe>
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <iframe :src="'https://grafana.mwt2.org/d/JiH0SAoZk/connect-servers?orgId=1&from=1571364366972&to=1571375166973&var-Server=' + login_node.name + '&panelId=7&fullscreen'" width="100%" height="210" frameborder="0"></iframe>
+                      </div>
+                      <div class="col-sm-6">
+                        <iframe :src="'https://grafana.mwt2.org/d/JiH0SAoZk/connect-servers?orgId=1&from=1571364488490&to=1571375288490&var-Server=' + login_node.name + '&panelId=9&fullscreen'" width="100%" height="210" frameborder="0"></iframe>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
