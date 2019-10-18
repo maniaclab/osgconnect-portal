@@ -57,7 +57,7 @@
                     </thead>
                     <tbody data-link="row" class="rowlink" style="font-size:14px;">
                       {% for group in profile['group_memberships'] %}
-                        {% if group['name'] not in ['root', 'root.osg.login-nodes', 'root.osg'] and group['state'] != 'nonmember' %}
+                        {% if (group['name'] not in ['root', 'root.osg.login-nodes', 'root.osg']) and (group['state'] != 'nonmember') and ('root.osg' in group['name']) %}
                       <tr>
                         <td><a href="{{url_for('view_group', group_name=group['name'])}}">{{'.'.join(group['name'].split('.')[1:])}}</a></td>
                           {% if group['state'] == 'pending' %}
@@ -98,6 +98,10 @@ $(document).ready(function() {
     order: [[1, 'desc'],[0, 'asc']],
     "pageLength": 3
   })
+  // $('#groups-table tfoot th').each( function () {
+  //   var title = $(this).text();
+  //   $(this).html('<input type="text" placeholder="Search '+title+'" />');
+  // });
 });
 </script>
 {%endblock%}
