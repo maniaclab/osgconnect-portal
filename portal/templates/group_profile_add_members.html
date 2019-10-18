@@ -103,7 +103,7 @@
                     <th data-field="unix-name" data-sortable="true">Unix Name</th>
                     <th data-field="email" data-sortable="true">Email</th>
                     <th data-field="institution" data-sortable="true">Institution</th>
-                    {% if user_super or user_status == 'admin' %}
+                    {% if (osg_status == 'admin' or user_status == 'admin') %}
                     <th data-field="action" data-sortable="true">Action</th>
                     {% endif %}
                   </tr>
@@ -115,7 +115,7 @@
                     <td>{{info['metadata']['unix_name']}}</td>
                     <td>{{info['metadata']['email']}}</td>
                     <td>{{info['metadata']['institution']}}</td>
-                    {% if user_super or user_status == 'admin' %}
+                    {% if (osg_status == 'admin' or user_status == 'admin') %}
                     <td>
                       <form role="form" action="{{url_for('add_group_member', group_name=group_name, unix_name=info['metadata']['unix_name'])}}" method="POST" onsubmit="return confirm('Are you sure you want to add this member?');">
                         <button type="submit" name="add_group_member" class="btn btn-xs btn-primary" data-submit="Adding Member..."><i class="fas fa-plus"></i> Add Member</button>
@@ -137,15 +137,6 @@
 </section>
 
 <script>
-
-function btnConfirm() {
-    var r = confirm("Are you sure you want to delete this secret?");
-    if(r == true){
-      window.location.href = "#";
-    } else {
-      return
-    }
-}
 $(document).ready(function() {
     $('#groups-table').DataTable({
       order: [[4, 'desc'],[0, 'asc']]
