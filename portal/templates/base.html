@@ -72,14 +72,14 @@
   		// look to update the full a[href=''] uri below
   		$('nav > ul > li > a[href="'+pathname+'"]').parent().addClass('active');
   	}
-    let url_root = ({{session['url_root']}} === undefined) ? url_root : "None";
-    if (String(url_root).includes('local') ){
-      document.getElementById("connect-brand").src="{{url_for('static', filename='img/atlas-connect-logo.png')}}";
-      console.log(url_root)
-    } else {
-      document.getElementById("connect-brand").src="{{url_for('static', filename='img/CIConnectLogo3-infinity.png')}}";
-      console.log("nah")
-    }
+    // let url_root = ({{session['url_root']}} === undefined) ? url_root : "None";
+    // if (String(url_root).includes('local') ){
+    //   document.getElementById("connect-brand").src="{{url_for('static', filename='img/atlas-connect-logo.png')}}";
+    //   console.log(url_root)
+    // } else {
+    //   document.getElementById("connect-brand").src="{{url_for('static', filename='img/CIConnectLogo3-infinity.png')}}";
+    //   console.log("nah")
+    // }
   	})
   	</script>
     <style>
