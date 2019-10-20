@@ -81,7 +81,6 @@ $(document).ready(function() {
     data () {
       return {
         members: {},
-        groupname: {{group_name|tojson|safe}},
         loading: true,
         failed: false
       }
@@ -93,9 +92,10 @@ $(document).ready(function() {
         });
   	},
     mounted(){
-      axios.get('/groups-xhr/{{group_name}}/add_members')
+      axios.get('/login-nodes-xhr/{{group_name}}/members')
     .then(function (response) {
-      this.members = response.data;
+      this.members = response.data[0];
+      this.groupname = response.data[1];
       this.loading = false;
       console.log(this.members)
     }.bind(this)) //must use bind(this) unless using arrow function

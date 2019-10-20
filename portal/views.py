@@ -571,11 +571,11 @@ def view_group_add_members_request(group_name):
     query = {'token': ciconnect_api_token}
     if request.method == 'GET':
         # Get root base group users
-        if 'login-nodes' in group_name:
-            enclosing_group_name = 'root.osg'
-        else:
-            enclosing_group_name = '.'.join(group_name.split('.')[:-1])
-            
+        # if 'login-nodes' in group_name:
+        #     enclosing_group_name = 'root.osg'
+        # else:
+        enclosing_group_name = '.'.join(group_name.split('.')[:-1])
+
         enclosing_group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
                             + enclosing_group_name + '/members', params=query)
         enclosing_group = enclosing_group.json()['memberships']
