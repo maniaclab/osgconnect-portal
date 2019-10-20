@@ -97,7 +97,7 @@ $(document).ready(function() {
       this.members = response.data[0];
       this.groupname = response.data[1];
       this.loading = false;
-      // console.log(this.members_requests_count)
+      console.log(this.members)
     }.bind(this)) //must use bind(this) unless using arrow function
     .catch(error => { this.failed = true; this.loading = false; })
     }
