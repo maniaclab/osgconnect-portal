@@ -369,7 +369,7 @@ def view_group_members_ajax_request(group_name):
         # start = time.time()
         # print("START")
 
-        for user in memberships[:250]:
+        for user in memberships:
             unix_name = user['user_name']
             user_state = user['state']
             if user_state != 'nonmember':
@@ -387,7 +387,7 @@ def view_group_members_ajax_request(group_name):
         # end = time.time()
         # print(end - start)
 
-        for user in multiplex:
+        for user in multiplex[:250]:
             user_name = user.split('/')[3].split('?')[0]
             user_dict[user_name] = json.loads(multiplex[user]['body'])
 
