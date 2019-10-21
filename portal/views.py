@@ -224,7 +224,7 @@ def view_group(group_name):
         group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
                             + group_name, params=query)
         group = group.json()['metadata']
-
+        print(group)
         # Get User's Group Status
         user_status = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
@@ -264,6 +264,7 @@ def view_group(group_name):
         except:
             PI_Organization = None
             pi_info['PI_Organization'] = PI_Organization
+        print(pi_info)
 
         return render_template('group_profile.html', group=group,
                                 group_name=group_name, user_status=user_status, pi_info=pi_info, osg_status=osg_status)
@@ -368,7 +369,7 @@ def view_group_members_ajax_request(group_name):
         # start = time.time()
         # print("START")
 
-        for user in memberships:
+        for user in memberships[:250]:
             unix_name = user['user_name']
             user_state = user['state']
             if user_state != 'nonmember':
@@ -1028,13 +1029,13 @@ def edit_subgroup(group_name):
                                         'purpose': field_of_science,
                                         'email': email, 'phone': phone,
                                         'description': description}}
-        # print(put_query)
+        print(put_query)
 
         r = requests.put(
             ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=token_query, json=put_query)
-
+        # print(r)
         enclosing_group_name = '.'.join(group_name.split('.')[:-1])
-        print(enclosing_group_name)
+        # print(enclosing_group_name)
         if r.status_code == requests.codes.ok:
             flash("Successfully updated project information.", 'success')
             return redirect(url_for('view_group', group_name=group_name))
