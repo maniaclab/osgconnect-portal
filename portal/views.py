@@ -167,6 +167,7 @@ def groups():
         query = {'token': session['access_token']}
         # Query to list subgroups or projects within OSG specifcally
         osg_groups = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/root.osg/subgroups', params=query)
+        # print(osg_groups)
         osg_groups = osg_groups.json()['groups']
         osg_groups = [group for group in osg_groups if len(group['name'].split('.')) == 3]
 
@@ -1203,25 +1204,26 @@ def view_login_node_members_ajax_request(group_name):
     """
     Get detailed information about OSG login nodes specifically
     """
-    query = {'token': ciconnect_api_token,
-             'globus_id': session['primary_identity']}
+    query = {'token': ciconnect_api_token}
     # Get root base group users, in this case, it would specifically be all OSG users
     enclosing_group_name = '.'.join(group_name.split('.')[:-1])
     enclosing_group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
                         + 'root.osg' + '/members', params=query)
     enclosing_group = enclosing_group.json()['memberships']
+    # print("Enclosing group: {}".format(enclosing_group))
     enclosing_group_members_names = [member['user_name'] for member in enclosing_group]
 
     # Get login node's specific member's information
     group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=query)
     memberships = group_members.json()['memberships']
+    # print("Memberships: {}".format(memberships))
     memberships_names = [member['user_name'] for member in memberships]
     # Get non-member name
     non_members = list(set(enclosing_group_members_names) - set(memberships_names))
 
     # Set up multiplex to query all non member's information
     multiplexJson = {}
-    for user in non_members:
+    for user in non_members[:10]:
         unix_name = user
         user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
         multiplexJson[user_query] = {"method":"GET"}
@@ -1234,7 +1236,6 @@ def view_login_node_members_ajax_request(group_name):
     for user in multiplex:
         user_name = user.split('/')[3].split('?')[0]
         user_dict[user_name] = json.loads(multiplex[user]['body'])
-
     return user_dict
 
 
