@@ -1225,7 +1225,7 @@ def view_login_node_members_ajax_request(group_name):
     multiplexJson = {}
     user_dict = {}
     while non_members:
-        for user in non_members[:50]:
+        for user in non_members[:10]:
             unix_name = user
             user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
             multiplexJson[user_query] = {"method":"GET"}
@@ -1237,7 +1237,7 @@ def view_login_node_members_ajax_request(group_name):
         for user in multiplex:
             user_name = user.split('/')[3].split('?')[0]
             user_dict[user_name] = json.loads(multiplex[user]['body'])
-        non_members = non_members[50:]
+        non_members = non_members[10:]
         multiplexJson = {}
     return user_dict
 
