@@ -376,7 +376,6 @@ def view_group_members_ajax_request(group_name):
                 user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
                 multiplexJson[user_query] = {"method":"GET"}
                 users_statuses[unix_name] = user_state
-
         # POST request for multiplex return
         multiplex = requests.post(
             ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
@@ -387,7 +386,7 @@ def view_group_members_ajax_request(group_name):
         # end = time.time()
         # print(end - start)
 
-        for user in multiplex[:250]:
+        for user in multiplex:
             user_name = user.split('/')[3].split('?')[0]
             user_dict[user_name] = json.loads(multiplex[user]['body'])
 
@@ -598,7 +597,7 @@ def view_group_add_members_request(group_name):
 
         multiplexJson = {}
 
-        for user in non_members[:250]:
+        for user in non_members:
             unix_name = user
             user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
             multiplexJson[user_query] = {"method":"GET"}
@@ -1226,7 +1225,7 @@ def view_login_node_members_ajax_request(group_name):
     multiplexJson = {}
     user_dict = {}
     # while non_members:
-    for user in non_members[:100]:
+    for user in non_members:
         unix_name = user
         user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
         multiplexJson[user_query] = {"method":"GET"}
