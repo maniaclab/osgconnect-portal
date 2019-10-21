@@ -117,7 +117,7 @@ def users_groups():
 
         multiplexJson = {}
         for group in users_group_memberships:
-            if group['state'] != 'nonmember':
+            if group['state'] not in ['nonmember']:
                 group_name = group['name']
                 group_query = "/v1alpha1/groups/" + group_name + "?token=" + query['token']
                 multiplexJson[group_query] = {"method":"GET"}
