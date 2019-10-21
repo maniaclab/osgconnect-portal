@@ -597,7 +597,7 @@ def view_group_add_members_request(group_name):
 
         multiplexJson = {}
 
-        for user in non_members:
+        for user in non_members[:250]:
             unix_name = user
             user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
             multiplexJson[user_query] = {"method":"GET"}
