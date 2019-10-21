@@ -43,24 +43,30 @@
                   <tr>
                     <th data-field="name" data-sortable="true">Name</th>
                     <th data-field="unix-name" data-sortable="true">Unix Name</th>
+                    {% if (user_status == 'admin' or osg_status == 'admin') %}
                     <th data-field="email" data-sortable="true">Contact Email</th>
-                    <!-- <th data-field="phone" data-sortable="true">Phone</th> -->
+                    {% endif %}
                     <th data-field="field-of-science" data-sortable="true">Field of Science</th>
-                    <!-- <th data-field="description" data-sortable="true">Description</th> -->
+                    <th data-field="status" data-sortable="true">Member Status</th>
                   </tr>
                 </thead>
                 <tbody data-link="row" class="rowlink" style="font-size:14px;">
-                  {% for group in groups %}
-                    {% if group['metadata']['name'] not in ['root', 'root.osg', 'root.osg.login-nodes'] %}
+                  {% for group, status in groups %}
+                    {% if (group['metadata']['name'] not in ['root', 'root.osg', 'root.osg.login-nodes']) and ('root.osg' in group['metadata']['name']) %}
                   <tr>
                     <td><a href="{{url_for('view_group', group_name=group['metadata']['name'])}}">{{group['metadata']['display_name']}}</a></td>
-                    {% if group['metadata']['pending']|safe == 'False' %}
                     <td>{{ '.'.join(group['metadata']['name'].split('.')[1:]) }}</td>
-                    {% else %}
-                    <td>Pending</td>
-                    {% endif %}
+                    {% if (user_status == 'admin' or osg_status == 'admin') %}
                     <td>{{group['metadata']['email']}}</td>
+                    {% endif %}
                     <td>{{group['metadata']['purpose']}}</td>
+                    {% if status == 'active' %}
+                    <td style="color: green;"><strong>{{status}}</strong></td>
+                    {% elif status == 'pending' %}
+                    <td style="color: orange;"><strong>{{status}}</strong></td>
+                    {% elif status == 'admin' %}
+                    <td style="color: blue;"><strong>{{status}}</strong></td>
+                    {% endif %}
                   </tr>
                     {% endif %}
                   {% endfor %}

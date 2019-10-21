@@ -23,7 +23,7 @@
         <h2>{{group['display_name']}}</h2>
         <br>
         <div class="btn-toolbar" role="toolbar">
-          {% if (user_status == 'nonmember' and osg_status =='active') %}
+          {% if (user_status == 'nonmember' and (osg_status == 'active' or osg_status == 'admin')) %}
           <div class="btn-group mr-2" role="group", aria-label="first group">
             <form role="form" action="{{url_for('view_group', group_name=group_name)}}" method="POST" onsubmit="return confirm('Are you sure you want to request to join this group?');">
               <button type="submit" name="request_group" class="btn btn-primary btn-sm" data-submit="Requesting Membership...">Request Membership</button>
@@ -97,12 +97,14 @@
                 Project Information:
               </div> -->
               <div class="card-body">
+                {% if (user_status == 'admin' or osg_status == 'admin') %}
                 <p>
                   <strong>Contact Email:</strong> <a href="mailto:#">{[{group.email}]}</a>
                 </p>
                 <p>
                   <strong>Phone Number:</strong> {[{group.phone}]}
                 </p>
+                {% endif %}
                 <p>
                   <strong>Field of Science:</strong> {[{group.purpose}]}
                 </p>
@@ -128,9 +130,11 @@
                 <p>
                   <strong>PI Name:</strong> {{pi_info['PI_Name']}}
                 </p>
+                {% if (user_status == 'admin' or osg_status == 'admin') %}
                 <p>
                   <strong>PI Email:</strong> {{pi_info['PI_Email']}}
                 </p>
+                {% endif %}
                 <p>
                   <strong>PI Organization:</strong> {{pi_info['PI_Organization']}}
                 </p>

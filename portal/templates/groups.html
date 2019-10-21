@@ -28,9 +28,10 @@
           <table class="table" id="groups-table" data-toggle="table" data-sort-name="name" data-sort-order="desc">
             <thead>
               <tr>
-                <th data-field="name" data-sortable="true">Name</th>
-                <th data-field="email" data-sortable="true">Contact Email</th>
+                <th data-field="name" data-sortable="true">Project Name</th>
+                <th data-field="unix-name" data-sortable="true">Unix Name</th>
                 {% if session['admin'] == 'admin' %}
+                <th data-field="email" data-sortable="true">Contact Email</th>
                 <th data-field="phone" data-sortable="true">Phone</th>
                 {% endif %}
                 <th data-field="field-of-science" data-sortable="true">Field of Science</th>
@@ -41,8 +42,9 @@
                 {% if group['name'] not in ['root', 'root.osg.login-nodes'] and not group['pending'] %}
               <tr>
                 <td><a href="{{url_for('view_group', group_name=group['name'])}}">{{group['display_name']}}</a></td>
-                <td>{{group['email']}}</td>
+                <td>{{group['name'][5:]}}</td>
                 {% if session['admin'] == 'admin' %}
+                <td>{{group['email']}}</td>
                 <td>{{group['phone']}}</td>
                 {% endif %}
                 <td>{{group['purpose']}}</td>
@@ -52,9 +54,10 @@
             </tbody>
             <tfoot>
               <tr>
-                  <th>Name</th>
-                  <th>Email</th>
+                  <th>Project Name</th>
+                  <th>Unix Name</th>
                   {% if session['admin'] == 'admin' %}
+                  <th>Email</th>
                   <th data-field="phone" data-sortable="true">Phone</th>
                   {% endif %}
                   <th>Field of Science</th>

@@ -124,19 +124,22 @@ def users_groups():
         users_group_memberships = users_group_memberships.json()['group_memberships']
 
         multiplexJson = {}
+        group_membership_status = {}
         for group in users_group_memberships:
             if group['state'] not in ['nonmember']:
                 group_name = group['name']
                 group_query = "/v1alpha1/groups/" + group_name + "?token=" + query['token']
                 multiplexJson[group_query] = {"method":"GET"}
+                group_membership_status[group_query] = group['state']
         # POST request for multiplex return
         multiplex = requests.post(
             ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
         multiplex = multiplex.json()
+        # print(multiplex)
 
         users_groups = []
         for group in multiplex:
-            users_groups.append(json.loads(multiplex[group]['body']))
+            users_groups.append((json.loads(multiplex[group]['body']), group_membership_status[group]))
         # users_groups = [group for group in users_groups if len(group['name'].split('.')) == 3]
 
         # Query user's pending project requests
@@ -377,21 +380,13 @@ def view_group_members_ajax_request(group_name):
         # start = time.time()
         # print("START")
 
-        for user in memberships[:50]:
+        for user in memberships:
             unix_name = user['user_name']
             user_state = user['state']
             if user_state != 'nonmember':
                 user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
                 multiplexJson[user_query] = {"method":"GET"}
                 users_statuses[unix_name] = user_state
-        if group_name == 'root.osg':
-            multiplexJson["/v1alpha1/users/ppaschos?token=" + query['token']] = {"method":"GET"}
-            multiplexJson["/v1alpha1/users/lmichael?token=" + query['token']] = {"method":"GET"}
-            multiplexJson["/v1alpha1/users/ckoch5?token=" + query['token']] = {"method":"GET"}
-            multiplexJson["/v1alpha1/users/cathrine98?token=" + query['token']] = {"method":"GET"}
-            multiplexJson["/v1alpha1/users/jeremyvan614?token=" + query['token']] = {"method":"GET"}
-            multiplexJson["/v1alpha1/users/cnweaver?token=" + query['token']] = {"method":"GET"}
-            multiplexJson["/v1alpha1/users/lincolnb?token=" + query['token']] = {"method":"GET"}
         # POST request for multiplex return
         multiplex = requests.post(
             ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
@@ -613,18 +608,10 @@ def view_group_add_members_request(group_name):
 
         multiplexJson = {}
 
-        for user in non_members[:50]:
+        for user in non_members:
             unix_name = user
             user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
             multiplexJson[user_query] = {"method":"GET"}
-
-        multiplexJson["/v1alpha1/users/ppaschos?token=" + query['token']] = {"method":"GET"}
-        multiplexJson["/v1alpha1/users/lmichael?token=" + query['token']] = {"method":"GET"}
-        multiplexJson["/v1alpha1/users/ckoch5?token=" + query['token']] = {"method":"GET"}
-        multiplexJson["/v1alpha1/users/cathrine98?token=" + query['token']] = {"method":"GET"}
-        multiplexJson["/v1alpha1/users/jeremyvan614?token=" + query['token']] = {"method":"GET"}
-        multiplexJson["/v1alpha1/users/cnweaver?token=" + query['token']] = {"method":"GET"}
-        multiplexJson["/v1alpha1/users/lincolnb?token=" + query['token']] = {"method":"GET"}
 
         # POST request for multiplex return
         multiplex = requests.post(
@@ -744,8 +731,12 @@ def view_group_subgroups(group_name):
 
         user_status = user_status.json()['membership']['state']
 
+        # Check if user is active member of OSG specifically
+        osg_status = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'] + '/groups/root.osg', params=query)
+        osg_status = osg_status.json()['membership']['state']
+
         return render_template('group_profile_subgroups.html', group_name=group_name,
-                                user_status=user_status, group=group)
+                                user_status=user_status, group=group, osg_status=osg_status)
 
 @app.route('/groups-xhr/<group_name>/subgroups', methods=['GET', 'POST'])
 @authenticated
@@ -1250,19 +1241,10 @@ def view_login_node_members_ajax_request(group_name):
     multiplexJson = {}
     user_dict = {}
     # while non_members:
-    for user in non_members[:50]:
+    for user in non_members:
         unix_name = user
         user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
         multiplexJson[user_query] = {"method":"GET"}
-
-    # ppaschos, lmichael, ckoch5, cathrine98, jeremyvan614, cnweaver
-    multiplexJson["/v1alpha1/users/ppaschos?token=" + query['token']] = {"method":"GET"}
-    multiplexJson["/v1alpha1/users/lmichael?token=" + query['token']] = {"method":"GET"}
-    multiplexJson["/v1alpha1/users/ckoch5?token=" + query['token']] = {"method":"GET"}
-    multiplexJson["/v1alpha1/users/cathrine98?token=" + query['token']] = {"method":"GET"}
-    multiplexJson["/v1alpha1/users/jeremyvan614?token=" + query['token']] = {"method":"GET"}
-    multiplexJson["/v1alpha1/users/cnweaver?token=" + query['token']] = {"method":"GET"}
-    multiplexJson["/v1alpha1/users/lincolnb?token=" + query['token']] = {"method":"GET"}
 
     # POST request for multiplex return
     multiplex = requests.post(

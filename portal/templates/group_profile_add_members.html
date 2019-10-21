@@ -25,7 +25,7 @@
         <h2>{{group['display_name']}}</h2>
         <br>
         <div class="btn-toolbar" role="toolbar">
-          {% if user_status == 'nonmember' %}
+          {% if (user_status == 'nonmember' and (osg_status == 'active' or osg_status == 'admin')) %}
           <div class="btn-group mr-2" role="group", aria-label="first group">
             <form role="form" action="{{url_for('view_group', group_name=group_name)}}" method="POST" onsubmit="return confirm('Are you sure you want to request to join this group?');">
               <button type="submit" name="request_group" class="btn btn-primary btn-sm" data-submit="Requesting Membership...">Request Membership</button>
@@ -101,7 +101,6 @@
                   <tr>
                     <th data-field="name" data-sortable="true">Name</th>
                     <th data-field="unix-name" data-sortable="true">Unix Name</th>
-                    <th data-field="email" data-sortable="true">Email</th>
                     <th data-field="institution" data-sortable="true">Institution</th>
                     {% if (osg_status == 'admin' or user_status == 'admin') %}
                     <th data-field="action" data-sortable="true">Action</th>
@@ -114,19 +113,16 @@
               			<td><i class="fas fa-sync fa-spin"></i></td>
               			<td><i class="fas fa-sync fa-spin"></i></td>
               			<td><i class="fas fa-sync fa-spin"></i></td>
-                    <td><i class="fas fa-sync fa-spin"></i></td>
               		</tr>
               		<tr v-if="failed">
               			<td>Failed to load the data, please refresh the page <i class="far fa-times-circle"></i></td>
               			<td><i class="far fa-times-circle"></i></td>
               			<td><i class="far fa-times-circle"></i></td>
               			<td><i class="far fa-times-circle"></i></td>
-                    <td><i class="far fa-times-circle"></i></td>
               		</tr>
                   <tr v-for="member in non_members" v-cloak >
               		  <td>{[{member.metadata.name}]}</td>
                     <td>{[{member.metadata.unix_name}]}</td>
-              		  <td>{[{member.metadata.email}]}</td>
                     <td>{[{member.metadata.institution}]}</td>
                     <td>
                       <form role="form" :action="'/groups/' + groupname + '/add_group_member/' + member.metadata.unix_name" method="POST" onsubmit="return confirm('Are you sure you want to add this member?');">
@@ -163,7 +159,7 @@ $(document).ready(function() {
     updated: function() {
   	    //call DataTable after view is updated
         $('#groups-table').DataTable({
-          order: [[4, 'desc'],[0, 'asc']],
+          order: [[0, 'asc']],
         });
   	},
     mounted(){
