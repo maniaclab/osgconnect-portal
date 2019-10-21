@@ -383,7 +383,7 @@ def view_group_members_ajax_request(group_name):
         for user in memberships:
             unix_name = user['user_name']
             user_state = user['state']
-            if user_state != 'nonmember':
+            if (user_state != 'nonmember' and unix_name != 'root'):
                 user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
                 multiplexJson[user_query] = {"method":"GET"}
                 users_statuses[unix_name] = user_state
