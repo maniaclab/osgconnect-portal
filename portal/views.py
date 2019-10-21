@@ -377,7 +377,7 @@ def view_group_members_ajax_request(group_name):
         # start = time.time()
         # print("START")
 
-        for user in memberships[:90]:
+        for user in memberships[:50]:
             unix_name = user['user_name']
             user_state = user['state']
             if user_state != 'nonmember':
@@ -613,7 +613,7 @@ def view_group_add_members_request(group_name):
 
         multiplexJson = {}
 
-        for user in non_members[:90]:
+        for user in non_members[:50]:
             unix_name = user
             user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
             multiplexJson[user_query] = {"method":"GET"}
@@ -1250,7 +1250,7 @@ def view_login_node_members_ajax_request(group_name):
     multiplexJson = {}
     user_dict = {}
     # while non_members:
-    for user in non_members[:90]:
+    for user in non_members[:50]:
         unix_name = user
         user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
         multiplexJson[user_query] = {"method":"GET"}
