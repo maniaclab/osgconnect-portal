@@ -14,6 +14,8 @@ from portal.utils import (load_portal_client, get_portal_tokens,
 from werkzeug.exceptions import HTTPException
 # Use these four lines on container
 import sys
+from datetime import datetime
+
 sys.path.insert(0, '/etc/ci-connect/secrets')
 
 try:
@@ -63,6 +65,12 @@ def handle_exception(e):
         return e
     # now you're handling non-HTTP exceptions only
     return render_template("500.html", e=e), 500
+
+
+# @app.template_filter('datetimeformat')
+# def datetimeformat(value, format='%m/%d/%Y, %H:%M:%S'):
+#     d = datetime.strptime(value, '%Y-%b-%m %I:%M:%S.%f %Z')
+#     return d.strftime(format)
 
 
 @app.route('/', methods=['GET'])
@@ -369,13 +377,21 @@ def view_group_members_ajax_request(group_name):
         # start = time.time()
         # print("START")
 
-        for user in memberships:
+        for user in memberships[:90]:
             unix_name = user['user_name']
             user_state = user['state']
             if user_state != 'nonmember':
                 user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
                 multiplexJson[user_query] = {"method":"GET"}
                 users_statuses[unix_name] = user_state
+
+        multiplexJson["/v1alpha1/users/ppaschos?token=" + query['token']] = {"method":"GET"}
+        multiplexJson["/v1alpha1/users/lmichael?token=" + query['token']] = {"method":"GET"}
+        multiplexJson["/v1alpha1/users/ckoch5?token=" + query['token']] = {"method":"GET"}
+        multiplexJson["/v1alpha1/users/cathrine98?token=" + query['token']] = {"method":"GET"}
+        multiplexJson["/v1alpha1/users/jeremyvan614?token=" + query['token']] = {"method":"GET"}
+        multiplexJson["/v1alpha1/users/cnweaver?token=" + query['token']] = {"method":"GET"}
+        multiplexJson["/v1alpha1/users/lincolnb?token=" + query['token']] = {"method":"GET"}
         # POST request for multiplex return
         multiplex = requests.post(
             ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
@@ -597,10 +613,18 @@ def view_group_add_members_request(group_name):
 
         multiplexJson = {}
 
-        for user in non_members:
+        for user in non_members[:90]:
             unix_name = user
             user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
             multiplexJson[user_query] = {"method":"GET"}
+
+        multiplexJson["/v1alpha1/users/ppaschos?token=" + query['token']] = {"method":"GET"}
+        multiplexJson["/v1alpha1/users/lmichael?token=" + query['token']] = {"method":"GET"}
+        multiplexJson["/v1alpha1/users/ckoch5?token=" + query['token']] = {"method":"GET"}
+        multiplexJson["/v1alpha1/users/cathrine98?token=" + query['token']] = {"method":"GET"}
+        multiplexJson["/v1alpha1/users/jeremyvan614?token=" + query['token']] = {"method":"GET"}
+        multiplexJson["/v1alpha1/users/cnweaver?token=" + query['token']] = {"method":"GET"}
+        multiplexJson["/v1alpha1/users/lincolnb?token=" + query['token']] = {"method":"GET"}
 
         # POST request for multiplex return
         multiplex = requests.post(
@@ -1198,6 +1222,7 @@ def view_login_nodes_add_users(group_name):
 @authenticated
 def view_login_node_members_ajax(group_name):
     user_dict = view_login_node_members_ajax_request(group_name)
+    print(user_dict)
     return jsonify(user_dict, group_name)
 
 def view_login_node_members_ajax_request(group_name):
@@ -1225,10 +1250,19 @@ def view_login_node_members_ajax_request(group_name):
     multiplexJson = {}
     user_dict = {}
     # while non_members:
-    for user in non_members:
+    for user in non_members[:90]:
         unix_name = user
         user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
         multiplexJson[user_query] = {"method":"GET"}
+
+    # ppaschos, lmichael, ckoch5, cathrine98, jeremyvan614, cnweaver
+    multiplexJson["/v1alpha1/users/ppaschos?token=" + query['token']] = {"method":"GET"}
+    multiplexJson["/v1alpha1/users/lmichael?token=" + query['token']] = {"method":"GET"}
+    multiplexJson["/v1alpha1/users/ckoch5?token=" + query['token']] = {"method":"GET"}
+    multiplexJson["/v1alpha1/users/cathrine98?token=" + query['token']] = {"method":"GET"}
+    multiplexJson["/v1alpha1/users/jeremyvan614?token=" + query['token']] = {"method":"GET"}
+    multiplexJson["/v1alpha1/users/cnweaver?token=" + query['token']] = {"method":"GET"}
+    multiplexJson["/v1alpha1/users/lincolnb?token=" + query['token']] = {"method":"GET"}
 
     # POST request for multiplex return
     multiplex = requests.post(
