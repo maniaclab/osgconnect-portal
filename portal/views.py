@@ -384,14 +384,14 @@ def view_group_members_ajax_request(group_name):
                 user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
                 multiplexJson[user_query] = {"method":"GET"}
                 users_statuses[unix_name] = user_state
-
-        multiplexJson["/v1alpha1/users/ppaschos?token=" + query['token']] = {"method":"GET"}
-        multiplexJson["/v1alpha1/users/lmichael?token=" + query['token']] = {"method":"GET"}
-        multiplexJson["/v1alpha1/users/ckoch5?token=" + query['token']] = {"method":"GET"}
-        multiplexJson["/v1alpha1/users/cathrine98?token=" + query['token']] = {"method":"GET"}
-        multiplexJson["/v1alpha1/users/jeremyvan614?token=" + query['token']] = {"method":"GET"}
-        multiplexJson["/v1alpha1/users/cnweaver?token=" + query['token']] = {"method":"GET"}
-        multiplexJson["/v1alpha1/users/lincolnb?token=" + query['token']] = {"method":"GET"}
+        if group_name == 'root.osg':
+            multiplexJson["/v1alpha1/users/ppaschos?token=" + query['token']] = {"method":"GET"}
+            multiplexJson["/v1alpha1/users/lmichael?token=" + query['token']] = {"method":"GET"}
+            multiplexJson["/v1alpha1/users/ckoch5?token=" + query['token']] = {"method":"GET"}
+            multiplexJson["/v1alpha1/users/cathrine98?token=" + query['token']] = {"method":"GET"}
+            multiplexJson["/v1alpha1/users/jeremyvan614?token=" + query['token']] = {"method":"GET"}
+            multiplexJson["/v1alpha1/users/cnweaver?token=" + query['token']] = {"method":"GET"}
+            multiplexJson["/v1alpha1/users/lincolnb?token=" + query['token']] = {"method":"GET"}
         # POST request for multiplex return
         multiplex = requests.post(
             ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
