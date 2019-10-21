@@ -1224,19 +1224,21 @@ def view_login_node_members_ajax_request(group_name):
     # Set up multiplex to query all non member's information
     multiplexJson = {}
     user_dict = {}
-    # while non_members:
-    for user in non_members[:100]:
-        unix_name = user
-        user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
-        multiplexJson[user_query] = {"method":"GET"}
+    while non_members:
+        for user in non_members[:50]:
+            unix_name = user
+            user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
+            multiplexJson[user_query] = {"method":"GET"}
 
-    # POST request for multiplex return
-    multiplex = requests.post(
-        ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
-    multiplex = multiplex.json()
-    for user in multiplex:
-        user_name = user.split('/')[3].split('?')[0]
-        user_dict[user_name] = json.loads(multiplex[user]['body'])
+        # POST request for multiplex return
+        multiplex = requests.post(
+            ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
+        multiplex = multiplex.json()
+        for user in multiplex:
+            user_name = user.split('/')[3].split('?')[0]
+            user_dict[user_name] = json.loads(multiplex[user]['body'])
+        non_members = non_members[50:]
+        multiplexJson = {}
     return user_dict
 
 
