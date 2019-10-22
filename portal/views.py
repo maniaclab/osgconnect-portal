@@ -1595,9 +1595,14 @@ def profile():
                 'Please complete any missing profile fields and press Save.', 'warning')
             return redirect(url_for('create_profile'))
 
+        user_login_nodes = []
+        for group in profile['group_memberships']:
+            if 'root.osg.login-nodes.' in group['name']:
+                user_login_nodes.append(group)
+
         if request.args.get('next'):
             session['next'] = get_safe_redirect()
-        return render_template('profile.html', profile=profile, user_status=user_status)
+        return render_template('profile.html', profile=profile, user_status=user_status, user_login_nodes=user_login_nodes)
 
     elif request.method == 'POST':
         name = session['name'] = request.form['name']
