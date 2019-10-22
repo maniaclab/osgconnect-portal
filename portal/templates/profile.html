@@ -113,6 +113,7 @@ if (user_status === 'pending') {
 $(document).ready(function() {
   $('#groups-table').DataTable({
     order: [[1, 'desc'],[0, 'asc']],
+    "aLengthMenu": [[5, 10, 15, -1], [5, 10, 15, "All"]],
     "pageLength": 5
   })
   // $('#groups-table tfoot th').each( function () {
