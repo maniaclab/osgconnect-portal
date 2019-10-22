@@ -235,7 +235,8 @@ def view_group(group_name):
         group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
                             + group_name, params=query)
         group = group.json()['metadata']
-        print(group)
+        group_creation_date = group['creation_date'].split(' ')[0]
+        # print(group_creation_date)
         # Get User's Group Status
         user_status = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
@@ -275,10 +276,11 @@ def view_group(group_name):
         except:
             PI_Organization = None
             pi_info['PI_Organization'] = PI_Organization
-        print(pi_info)
 
         return render_template('group_profile.html', group=group,
-                                group_name=group_name, user_status=user_status, pi_info=pi_info, osg_status=osg_status)
+                                group_name=group_name, user_status=user_status,
+                                pi_info=pi_info, osg_status=osg_status,
+                                group_creation_date=group_creation_date)
     elif request.method == 'POST':
         '''Request membership to join group'''
         put_query = {"apiVersion": 'v1alpha1',
