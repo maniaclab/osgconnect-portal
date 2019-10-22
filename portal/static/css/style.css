@@ -174,3 +174,7 @@ ul, #myUL {
 .form-control::-webkit-input-placeholder {
   opacity: 0.5;
 }
+
+.dataTables_info, .dataTables_paginate {
+  font-size: 0.8em;
+}
