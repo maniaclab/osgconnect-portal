@@ -43,8 +43,8 @@
                     <strong>Login Nodes:</strong>
                     <ul style="list-style: inside; padding-left:0;">
                     {% if user_login_nodes %}
-                      {% for login_node in user_login_nodes %}
-                      <li>{{login_node['name'][5:]}}</li>
+                      {% for login_node, info in user_login_nodes.iteritems() %}
+                      <li>{{info['metadata']['display_name']}}</li>
                       {% endfor %}
                     {% else %}
                       <li>Not currently assigned</li>

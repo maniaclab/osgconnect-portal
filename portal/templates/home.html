@@ -8,18 +8,7 @@
 
 <header class="text-white" style="height: 100%;" id="hero">
   <div class="container text-center">
-    {% if 'local' in session['url_root'] %}
-    <!-- <img src="{{url_for('static', filename='img/CIConnect_Logo.png')}}" style="width:30%;"> -->
     <img src="{{url_for('static', filename='img/OSGConnect_Logo.png')}}" style="width:30%;">
-    {% elif 'atlas' in session['url_root'] %}
-    <img src="{{url_for('static', filename='img/atlas-connect-logo_trans.png')}}" style="width:30%;">
-    {% elif 'ci-connect' in session['url_root'] %}
-    <img src="{{url_for('static', filename='img/OSGConnect_Logo.png')}}" style="width:30%;">
-    {% elif 'osg' in session['url_root'] %}
-    <img src="{{url_for('static', filename='img/CMSConnect_Logo.png')}}" style="width:30%;">
-    {% else %}
-    <img src="{{url_for('static', filename='img/OSGConnect_Logo.png')}}" style="width:30%;">
-    {% endif %}
     <h2>Front door to the <a href="https://opensciencegrid.org/" target="_blank">Open Science Grid</a></h2>
     <h4 class="lead">
       <span class="rotating text-muted">

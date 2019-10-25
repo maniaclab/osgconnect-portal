@@ -1597,10 +1597,21 @@ def profile():
                 'Please complete any missing profile fields and press Save.', 'warning')
             return redirect(url_for('create_profile'))
 
-        user_login_nodes = []
+        # Set up multiplex to query all non member's information
+        multiplexJson = {}
+        user_login_nodes = {}
         for group in profile['group_memberships']:
             if 'root.osg.login-nodes.' in group['name']:
-                user_login_nodes.append(group)
+                # user_login_nodes.append(group)
+                login_node_query = "/v1alpha1/groups/" + group['name'] + "?token=" + query['token']
+                multiplexJson[login_node_query] = {"method":"GET"}
+        # POST request for multiplex return
+        multiplex = requests.post(
+            ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
+        multiplex = multiplex.json()
+        for login_node in multiplex:
+            login_node_name = login_node.split('/')[3].split('?')[0]
+            user_login_nodes[login_node_name] = json.loads(multiplex[login_node]['body'])
 
         if request.args.get('next'):
             session['next'] = get_safe_redirect()
