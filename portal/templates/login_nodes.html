@@ -48,26 +48,26 @@
                   <div class="card-body">
                     <div v-if="login_node.display_name === 'login02.osgconnect.net'" class="row">
                       <div class="col-sm-6">
-                        <iframe src="https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=1571430862499&to=1571441662499&var-Server=login02_osgconnect_net&panelId=7" width="100%" height="200" frameborder="0"></iframe>
+                        <iframe src="{{login02_load_grafana}}" width="100%" height="200" frameborder="0"></iframe>
                       </div>
                       <div class="col-sm-6">
-                        <iframe src="https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=1571430940467&to=1571441740467&var-Server=login02_osgconnect_net&panelId=9" width="100%" height="200" frameborder="0"></iframe>
+                        <iframe src="{{login02_jobs_grafana}}" width="100%" height="200" frameborder="0"></iframe>
                       </div>
                     </div>
                     <div v-else-if="login_node.display_name === 'login03.osgconnect.net'" class="row">
                       <div class="col-sm-6">
-                        <iframe src="https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=1571430862499&to=1571441662499&var-Server=login03_osgconnect_net&panelId=7" width="100%" height="200" frameborder="0"></iframe>
+                        <iframe src="{{login03_load_grafana}}" width="100%" height="200" frameborder="0"></iframe>
                       </div>
                       <div class="col-sm-6">
-                        <iframe src="https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=1571430940467&to=1571441740467&var-Server=login03_osgconnect_net&panelId=9" width="100%" height="200" frameborder="0"></iframe>
+                        <iframe src="{{login03_jobs_grafana}}" width="100%" height="200" frameborder="0"></iframe>
                       </div>
                     </div>
                     <div v-else class="row">
                       <div class="col-sm-6">
-                        <iframe src="https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=1571430862499&to=1571441662499&var-Server=login-test_osgconnect_net&panelId=7" width="100%" height="200" frameborder="0"></iframe>
+                        <iframe src="{{login_test_load_grafana}}" width="100%" height="200" frameborder="0"></iframe>
                       </div>
                       <div class="col-sm-6">
-                        <iframe src="https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=1571430940467&to=1571441740467&var-Server=login-test_osgconnect_net&panelId=9" width="100%" height="200" frameborder="0"></iframe>
+                        <iframe src="{{login_test_jobs_grafana}}" width="100%" height="200" frameborder="0"></iframe>
                       </div>
                     </div>
                   </div>
