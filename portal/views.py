@@ -197,6 +197,8 @@ def create_group():
     if request.method == 'GET':
         sciences = requests.get(ciconnect_api_endpoint + '/v1alpha1/fields_of_science')
         sciences = sciences.json()['fields_of_science']
+        sciences = sorted(sciences)
+        # print(sciences)
         return render_template('groups_create.html', sciences=sciences)
     elif request.method == 'POST':
         name = request.form['name']
@@ -822,6 +824,7 @@ def create_subgroup(group_name):
     if request.method == 'GET':
         sciences = requests.get(ciconnect_api_endpoint + '/v1alpha1/fields_of_science')
         sciences = sciences.json()['fields_of_science']
+        sciences = sorted(sciences)
         group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=token_query)
         try:
             group_members = group_members.json()['memberships']
@@ -903,6 +906,7 @@ def edit_subgroup_requests(group_name):
     if request.method == 'GET':
         sciences = requests.get(ciconnect_api_endpoint + '/v1alpha1/fields_of_science')
         sciences = sciences.json()['fields_of_science']
+        sciences = sorted(sciences)
         group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=token_query)
         group = group.json()['metadata']
 
@@ -977,6 +981,7 @@ def edit_subgroup(group_name):
     if request.method == 'GET':
         sciences = requests.get(ciconnect_api_endpoint + '/v1alpha1/fields_of_science')
         sciences = sciences.json()['fields_of_science']
+        sciences = sorted(sciences)
         group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=token_query)
         group = group.json()['metadata']
 
