@@ -1540,7 +1540,8 @@ def edit_profile(unix_name):
         email = request.form['email']
         phone = request.form['phone-number']
         institution = request.form['institution']
-        public_key = request.form['sshpubstring']
+        # public_key = request.form['sshpubstring']
+        public_key = None
         try:
             email_preference = request.form['email_preference']
             email_preference = 'on'
