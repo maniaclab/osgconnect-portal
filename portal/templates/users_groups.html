@@ -14,11 +14,7 @@
           <li class="breadcrumb-item"><a href="{{url_for('profile')}}">Profile</a></li>
           <li class="breadcrumb-item">My Projects</li>
         </ol>
-        {% if user_status == 'active' %}
-        <div class="btn-group mr-2" role="group" aria-label="first group">
-          <a href="{{url_for('create_subgroup', group_name='root.osg')}}" class="btn btn-primary btn-sm">Request New Project</a>
-        </div>
-        {% elif user_status == 'admin' %}
+        {% if user_status == 'admin' %}
         <div class="btn-group mr-2" role="group" aria-label="first group">
           <a href="{{url_for('create_subgroup', group_name='root.osg')}}" class="btn btn-primary btn-sm">Create New Project</a>
         </div>
