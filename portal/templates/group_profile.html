@@ -67,6 +67,7 @@
           <li class="nav-item">
             <a class="nav-link" href="{{url_for('view_group_members', group_name=group_name)}}"><i class="fas fa-user-friends"></i> Members</a>
           </li>
+          {% if (osg_status == 'admin') %}
           <li class="nav-item" id='members-request-tab'>
             <a class="nav-link" href="{{url_for('view_group_members_requests', group_name=group_name)}}">
               <span class="badge badge-warning" v-if="loading"><i class="fas fa-sync fa-spin"></i></span>
@@ -74,6 +75,7 @@
                Members Pending
             </a>
           </li>
+          {% endif %}
           {% if group_name == 'root.osg' %}
           <li class="nav-item">
             <a class="nav-link" href="{{url_for('view_group_subgroups', group_name=group_name)}}"><i class="fas fa-project-diagram"></i> Projects</a>

@@ -69,6 +69,7 @@
           <li class="nav-item">
             <a class="nav-link active" href="#"><i class="fas fa-user-friends"></i> Members</a>
           </li>
+          {% if (osg_status == 'admin') %}
           <li class="nav-item" id='members-request-tab'>
             <a class="nav-link" href="{{url_for('view_group_members_requests', group_name=group_name)}}">
               <span class="badge badge-warning" v-if="loading"><i class="fas fa-sync fa-spin"></i></span>
@@ -76,6 +77,7 @@
                Members Pending
             </a>
           </li>
+          {% endif %}
           {% if group_name == 'root.osg' %}
           <li class="nav-item">
             <a class="nav-link" href="{{url_for('view_group_subgroups', group_name=group_name)}}"><i class="fas fa-project-diagram"></i> Projects</a>
@@ -100,8 +102,10 @@
                 <thead>
                   <tr>
                     <th data-field="name" data-sortable="true">Name</th>
+                    {% if user_status == 'admin' %}
                     <th data-field="email" data-sortable="true" class="email-th">Email</th>
                     <th data-field="phone" data-sortable="true">Phone</th>
+                    {% endif %}
                     <th data-field="institution" data-sortable="true">Institution</th>
                     <th data-field="status" data-sortable="true">Status</th>
                     {% if user_status == 'admin' %}
@@ -128,9 +132,9 @@
                   <tr v-for="(member, index) in members" v-cloak >
               		  <td>{[{member.metadata.name}]}</td>
               		  <td v-if="admin == 'admin'" class="email-th">{[{member.metadata.email}]}</td>
-                    <td v-else class="email-th">Admin View Only</td>
+                    <!-- <td v-else class="email-th">Admin View Only</td> -->
               		  <td v-if="admin == 'admin'">{[{member.metadata.phone}]}</td>
-                    <td v-else>Admin View Only</td>
+                    <!-- <td v-else>Admin View Only</td> -->
                     <td>{[{member.metadata.institution}]}</td>
                     <td>
                       <div v-for="group in member.metadata.group_memberships">
@@ -202,7 +206,7 @@ $(document).ready(function() {
     updated: function() {
   	    //call DataTable after view is updated
         $('#groups-table').DataTable({
-          order: [[4, 'desc'],[0, 'asc']],
+          order: [[0, 'asc']],
         });
   	},
     mounted(){
