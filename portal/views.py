@@ -285,13 +285,29 @@ def view_group(group_name):
                                 group_creation_date=group_creation_date)
     elif request.method == 'POST':
         '''Request membership to join group'''
-        put_query = {"apiVersion": 'v1alpha1',
-                        'group_membership': {'state': 'pending'}}
-        user_status = requests.put(
-                        ciconnect_api_endpoint + '/v1alpha1/groups/' +
-                        group_name + '/members/' + unix_name, params=query, json=put_query)
-        # print("UPDATED MEMBERSHIP: {}".format(user_status))
-        return redirect(url_for('view_group', group_name=group_name))
+
+        try:
+            comment = request.form['join-project-message']
+            put_query = {"apiVersion": 'v1alpha1',
+                            'group_membership': {'state': 'pending'},
+                            'comment': comment}
+            user_status = requests.put(
+                            ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                            group_name + '/members/' + unix_name, params=query, json=put_query)
+        except:
+            put_query = {"apiVersion": 'v1alpha1',
+                            'group_membership': {'state': 'pending'}}
+            user_status = requests.put(
+                            ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                            group_name + '/members/' + unix_name, params=query, json=put_query)
+
+        if user_status.status_code == requests.codes.ok:
+            flash("Successfully requested to join project", 'success')
+            return redirect(url_for('view_group', group_name=group_name))
+        else:
+            err_message = user_status.json()['message']
+            flash('Failed to request project membership: {}'.format(err_message), 'warning')
+            return redirect(url_for('view_group', group_name=group_name))
 
 
 @app.route('/groups-xhr/<group_name>', methods=['GET'])
