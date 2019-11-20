@@ -1452,7 +1452,7 @@ def create_profile():
         email = request.form['email']
         phone = request.form['phone-number']
         institution = request.form['institution']
-        public_key = request.form['sshpubstring']
+        # public_key = request.form['sshpubstring']
         try:
             email_preference = request.form['email_preference']
             email_preference = 'on'
@@ -1464,19 +1464,19 @@ def create_profile():
 
         additional_metadata = {'OSG:Email_Preference': email_preference}
         # Schema and query for adding users to CI Connect DB
-        if public_key:
-            post_user = {"apiVersion": 'v1alpha1',
-                        'metadata': {'globusID': globus_id, 'name': name, 'email': email,
-                                     'phone': phone, 'institution': institution,
-                                     'public_key': public_key,
-                                     'unix_name': unix_name, 'superuser': superuser,
-                                     'service_account': service_account}}
-        else:
-            post_user = {"apiVersion": 'v1alpha1',
-                        'metadata': {'globusID': globus_id, 'name': name, 'email': email,
-                                     'phone': phone, 'institution': institution,
-                                     'unix_name': unix_name, 'superuser': superuser,
-                                     'service_account': service_account}}
+        # if public_key:
+        #     post_user = {"apiVersion": 'v1alpha1',
+        #                 'metadata': {'globusID': globus_id, 'name': name, 'email': email,
+        #                              'phone': phone, 'institution': institution,
+        #                              'public_key': public_key,
+        #                              'unix_name': unix_name, 'superuser': superuser,
+        #                              'service_account': service_account}}
+        # else:
+        post_user = {"apiVersion": 'v1alpha1',
+                    'metadata': {'globusID': globus_id, 'name': name, 'email': email,
+                                 'phone': phone, 'institution': institution,
+                                 'unix_name': unix_name, 'superuser': superuser,
+                                 'service_account': service_account}}
 
         # print("POSTED: {}".format(post_user))
         r = requests.post(ciconnect_api_endpoint + '/v1alpha1/users', params=query, json=post_user)
@@ -1497,13 +1497,25 @@ def create_profile():
 
             # Auto generate group membership into OSG - eventually change to
             # dynamically choose connect site based on URL
-            put_query = {"apiVersion": 'v1alpha1',
-                            'group_membership': {'state': 'pending'}}
-            user_status = requests.put(
-                            ciconnect_api_endpoint +
-                            '/v1alpha1/groups/root.osg/members/' + unix_name,
-                            params=query, json=put_query)
-
+            # Include user comment on reason for joining OSG
+            try:
+                comment = request.form['join-project-message']
+                put_query = {"apiVersion": 'v1alpha1',
+                                'group_membership': {'state': 'pending'},
+                                'comment': comment}
+                user_status = requests.put(
+                                ciconnect_api_endpoint +
+                                '/v1alpha1/groups/root.osg/members/' + unix_name,
+                                params=query, json=put_query)
+            except:
+                put_query = {"apiVersion": 'v1alpha1',
+                                'group_membership': {'state': 'pending'}}
+                user_status = requests.put(
+                                ciconnect_api_endpoint +
+                                '/v1alpha1/groups/root.osg/members/' + unix_name,
+                                params=query, json=put_query)
+            print(put_query)
+            print(user_status)
             flash(
                 'Account registration successful. A request for Unix account '
                 + 'activation on the OSG Connect job submission server has been '
