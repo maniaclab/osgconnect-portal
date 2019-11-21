@@ -84,8 +84,8 @@ def webhooks():
     """Endpoint that acepts post requests from Github Webhooks"""
     # if request.headers['Content-Type'] == 'application/json':
     #     return json.dumps(request.json)
-    cmd = ['git', 'pull', 'systemctl', 'restart', 'website']
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+    cmd = ['/etc/ci-connect/github_webhook.sh']
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     out, err = p.communicate()
     print(p)
     print(out)
