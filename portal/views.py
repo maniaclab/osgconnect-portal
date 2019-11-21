@@ -79,19 +79,17 @@ def home():
     """Home page - play with it if you must!"""
     return render_template('home.html')
 
-@app.route('/webhooks/github', methods=['POST'])
+@app.route('/webhooks/github', methods=['GET', 'POST'])
 def webhooks():
     """Endpoint that acepts post requests from Github Webhooks"""
-    if request.headers['Content-Type'] == 'application/json':
+    # if request.headers['Content-Type'] == 'application/json':
     #     return json.dumps(request.json)
-        cmd = ['git', 'pull', 'systemctl', 'restart', 'website']
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-        out, err = p.communicate()
-        print(p)
-        print(out)
-        return out
-    else:
-        print("Not from github.")
+    cmd = ['git', 'pull', 'systemctl', 'restart', 'website']
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+    out, err = p.communicate()
+    print(p)
+    print(out)
+    return out
 
 
 @app.route('/support', methods=['GET', 'POST'])
