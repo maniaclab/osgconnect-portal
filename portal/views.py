@@ -16,6 +16,7 @@ from werkzeug.exceptions import HTTPException
 import sys
 import datetime
 import subprocess
+import os, signal
 
 sys.path.insert(0, '/etc/ci-connect/secrets')
 
@@ -82,13 +83,17 @@ def home():
 @app.route('/webhooks/github', methods=['GET', 'POST'])
 def webhooks():
     """Endpoint that acepts post requests from Github Webhooks"""
-    # if request.headers['Content-Type'] == 'application/json':
-    #     return json.dumps(request.json)
+
     cmd = ['/etc/ci-connect/github_webhook.sh']
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     out, err = p.communicate()
     print("Return code: {}".format(p.returncode))
     print("Error message: {}".format(err))
+
+    parent_pid = os.getppid()
+    print("Parent PID: {}".format(parent_pid))
+    os.kill(parent_pid, signal.SIGHUP)
+
     return out
 
 
