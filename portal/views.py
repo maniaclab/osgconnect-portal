@@ -87,9 +87,8 @@ def webhooks():
     cmd = ['/etc/ci-connect/github_webhook.sh']
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     out, err = p.communicate()
-    print(p)
-    print(p.returncode)
-    print(out)
+    print("Return code: {}".format(p.returncode))
+    print("Error message: {}".format(err))
     return out
 
 
