@@ -19,7 +19,7 @@
         <hr/>
         <form role="form" action="{{url_for('create_profile')}}" method="POST">
           <div class="form-group">
-            <label for="name">Name <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Full name, ex: John Smith"></i></label>
+            <label for="name">Name <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="{%include '/markdowns/form_descriptions/phone_description.md' %}"></i></label>
             <input
               type="text"
               class="form-control"
@@ -33,7 +33,7 @@
           </div>
 
           <div class="form-group">
-            <label for="unix_name">UNIX User Name <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Unique UNIX convention user name. No whitespace or special characters."></i></label>
+            <label for="unix_name">UNIX User Name <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="{%include '/markdowns/form_descriptions/unix_name_description.md' %}"></i></label>
             <input
               type="text"
               class="form-control"
@@ -47,7 +47,7 @@
           </div>
 
           <div class="form-group">
-            <label for="phone-number">Phone <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Contact phone number"></i></label>
+            <label for="phone-number">Phone <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="{%include '/markdowns/form_descriptions/phone_description.md' %}"></i></label>
             <input
               type="tel"
               id="phone-number"
@@ -61,7 +61,7 @@
           </div>
 
           <div class="form-group">
-            <label for="institution">Institution <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Name of institutional organization"></i></label>
+            <label for="institution">Institution <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="{%include '/markdowns/form_descriptions/institution_description.md' %}"></i></label>
             <input
               type="text"
               id="institution"
@@ -75,7 +75,7 @@
           </div>
 
           <div class="form-group">
-            <label for="email">Email <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Contact email, please use institutional email"></i></label>
+            <label for="email">Email <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="{%include '/markdowns/form_descriptions/email_description.md' %}"></i></label>
             <input
               type="email"
               id="email"
@@ -89,7 +89,7 @@
           </div>
 
           <div class="form-group">
-            <label for="join-project-message">Please include a brief reason, describing your interests in joining OSG <span id="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Will you be joining an existing project that already uses OSG Connect, or do you think you are the first person joining from your research group?"></i></label>
+            <label for="join-project-message">Please include a brief reason, describing your interests in joining OSG <span id="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="{%include '/markdowns/form_descriptions/comment_description.md' %}"></i></label>
             <textarea
               placeholder="Brief reason for joining project"
               id="join-project-message"

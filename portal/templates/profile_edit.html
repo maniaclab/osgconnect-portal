@@ -20,7 +20,7 @@
         <hr/>
         <form role="form" action="{{url_for('edit_profile', unix_name=unix_name)}}" method="POST">
           <div class="form-group">
-            <label for="name">Name <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Full name, ex: John Smith"></i></label>
+            <label for="name">Name <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="{%include '/markdowns/form_descriptions/name_description.md' %}"></i></label>
             <input
               type="text"
               class="form-control"
@@ -33,7 +33,7 @@
           </div>
 
           <div class="form-group">
-            <label for="phone-number">Phone <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Contact phone number"></i></label>
+            <label for="phone-number">Phone <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="{%include '/markdowns/form_descriptions/phone_description.md' %}"></i></label>
             <input
               type="tel"
               id="phone-number"
@@ -46,7 +46,7 @@
           </div>
 
           <div class="form-group">
-            <label for="institution">Institution <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Name of Institutional Organization"></i></label>
+            <label for="institution">Institution <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="{%include '/markdowns/form_descriptions/institution_description.md' %}"></i></label>
             <input
               type="text"
               id="institution"
@@ -59,7 +59,7 @@
           </div>
 
           <div class="form-group">
-            <label for="email">Email <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Contact email, please use institutional email"></i></label>
+            <label for="email">Email <span class="asterik">*</span> <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="{%include '/markdowns/form_descriptions/email_description.md' %}"></i></label>
             <input
               type="email"
               id="email"
@@ -82,7 +82,7 @@
           </div>
 
           <div class="form-group">
-            <label for="sshpubstring">SSH Public Key <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="Instructions on adding your SSH key on the rightside of this page"></i></label>
+            <label for="sshpubstring">SSH Public Key <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="{%include '/markdowns/form_descriptions/sshkey_description.md' %}"></i></label>
             <textarea
               placeholder="Please enter your SSH public key here..."
               name="sshpubstring"
