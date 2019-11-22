@@ -1396,9 +1396,9 @@ def create_login_node(group_name):
 @app.route('/signup', methods=['GET'])
 def signup():
     """Send the user to Globus Auth with signup=1."""
-    f = open("portal/templates/markdowns/signup_modal.md", "r")
-    g = open("portal/templates/markdowns/signup_instructions.md", "r")
-    j = open("portal/templates/markdowns/signup.md", "r")
+    f = open("portal/templates/markdowns/signup_content/signup_modal.md", "r")
+    g = open("portal/templates/markdowns/signup_content/signup_instructions.md", "r")
+    j = open("portal/templates/markdowns/signup_content/signup.md", "r")
     signup_modal_md = f.read()
     signup_instructions_md = g.read()
     signup_md = j.read()
