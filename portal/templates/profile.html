@@ -40,7 +40,7 @@
                     <br>
                   </div>
                   <div class="col-sm-6">
-                    <strong>Login Nodes:</strong>
+                    <strong>Connect to your assigned submission host(s) via ssh:</strong>
                     <ul style="list-style: inside; padding-left:0;">
                     {% if user_login_nodes %}
                       {% for login_node, info in user_login_nodes.iteritems() %}
@@ -95,7 +95,35 @@
             </div>
           </div>
 
-        </div>
+        </div><!-- row -->
+        <!-- <br>
+        <div class="row">
+          <div class="col-sm-6 col-md-6">
+            <div class="card h-100">
+              <div class="card-header">
+                Submission Host Information <i class="fas fa-user-edit float-right"></i>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <strong>To connect to your assigned submission host(s) via ssh, open a terminal and type in:</strong>
+                    <div><kbd>ssh &lt;your_osg_connect_username&gt;@&lt;submission-host-name&gt;</kbd></div>
+                    <br>
+                    <ul style="list-style: inside; padding-left:0;">
+                    {% if user_login_nodes %}
+                      {% for login_node, info in user_login_nodes.iteritems() %}
+                      <li>{{info['metadata']['display_name']}}</li>
+                      {% endfor %}
+                    {% else %}
+                      <li>Not currently assigned</li>
+                    {% endif %}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> -->
       </div>
     </div> <!-- row -->
   </div>
