@@ -1161,7 +1161,7 @@ def view_login_nodes():
         unix_name = user['metadata']['unix_name']
 
         group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
-                            + 'root.osg.login-nodes', params=query)
+                            + 'root.osg.submit-hosts', params=query)
         group = group.json()['metadata']
 
         current_time = datetime.datetime.now()
@@ -1213,7 +1213,7 @@ def view_login_nodes_ajax_request(group_name):
     user_status = user_status.json()['membership']['state']
 
     # Get all login nodes info
-    login_nodes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/root.osg.login-nodes/subgroups', params=query)
+    login_nodes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/root.osg.submit-hosts/subgroups', params=query)
     login_nodes = login_nodes.json()['groups']
     # Sort login nodes by display name
     login_nodes = sorted(login_nodes, key = lambda i: i['display_name'])
@@ -1328,7 +1328,7 @@ def login_node_add_user(group_name, unix_name):
                         'group_membership': {'state': 'active'}}
         # First add user to login nodes umbrella group
         requests.put(ciconnect_api_endpoint + '/v1alpha1/groups/' +
-                    'root.osg.login-nodes' + '/members/' + unix_name, params=query, json=put_query)
+                    'root.osg.submit-hosts' + '/members/' + unix_name, params=query, json=put_query)
         # Add user to actual login node group
         user_status = requests.put(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
@@ -1672,7 +1672,7 @@ def profile():
         multiplexJson = {}
         user_login_nodes = {}
         for group in profile['group_memberships']:
-            if 'root.osg.login-nodes.' in group['name']:
+            if 'root.osg.submit-hosts.' in group['name']:
                 # user_login_nodes.append(group)
                 login_node_query = "/v1alpha1/groups/" + group['name'] + "?token=" + query['token']
                 multiplexJson[login_node_query] = {"method":"GET"}

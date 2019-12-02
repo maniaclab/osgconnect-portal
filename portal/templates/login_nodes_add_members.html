@@ -13,14 +13,14 @@
         {%include 'messages.html' %}
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{url_for('view_group', group_name='root.osg')}}">Open Science Grid</a></li>
-          <li class="breadcrumb-item"><a href="{{url_for('view_login_nodes')}}">Login Nodes</a></li>
+          <li class="breadcrumb-item"><a href="{{url_for('view_login_nodes')}}">Submission Hosts</a></li>
           <li class="breadcrumb-item active">Add Users</li>
         </ol>
         <h2>{{group['display_name']}}</h2>
         <br>
         <div class="btn-toolbar" role="toolbar">
           <div class="btn-group mr-2" role="group" aria-label="first group">
-            <a href="{{url_for('view_login_node_users', group_name=group_name)}}" class="btn btn-primary btn-sm">View Login Node Users</a>
+            <a href="{{url_for('view_login_node_users', group_name=group_name)}}" class="btn btn-primary btn-sm">View Submission Host Users</a>
           </div>
         </div>
         <br>

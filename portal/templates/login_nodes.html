@@ -13,7 +13,7 @@
         {%include 'messages.html' %}
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{url_for('view_group', group_name='root.osg')}}">Open Science Grid</a></li>
-          <li class="breadcrumb-item active">Login Nodes</li>
+          <li class="breadcrumb-item active">Submission Hosts</li>
         </ol>
         <h2>{{group['display_name']}}</h2>
         <br>
@@ -97,7 +97,7 @@ $(document).ready(function() {
 	    }
 	},
 	mounted() {
-            axios.get('/login-nodes-xhr/root.osg.login-nodes')
+            axios.get('/login-nodes-xhr/root.osg.submit-hosts')
 	        .then(function (response) {
 		    this.group = response.data[0];
 		    this.user_status = response.data[1];
