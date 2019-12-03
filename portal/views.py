@@ -1147,7 +1147,7 @@ def deny_subgroup(group_name, subgroup_name):
 ######################### LOGIN-NODE ROUTES ####################################
 ################################################################################
 
-@app.route('/login-nodes', methods=['GET'])
+@app.route('/submit-hosts', methods=['GET'])
 @authenticated
 def view_login_nodes():
     """Detailed view of Login Nodes specifically for OSG"""
@@ -1221,7 +1221,7 @@ def view_login_nodes_ajax_request(group_name):
     return group, user_status, login_nodes
 
 
-@app.route('/login-nodes/<group_name>/users', methods=['GET'])
+@app.route('/submit-hosts/<group_name>/users', methods=['GET'])
 @authenticated
 def view_login_node_users(group_name):
     """Detailed view of Login Node's users"""
@@ -1241,7 +1241,7 @@ def view_login_node_users(group_name):
         return render_template('login_nodes_members.html', group=group, group_name=group_name)
 
 
-@app.route('/login-nodes/<group_name>/add_users', methods=['GET'])
+@app.route('/submit-hosts/<group_name>/add_users', methods=['GET'])
 @authenticated
 def view_login_nodes_add_users(group_name):
     """Detailed view of Login Node's non-members"""
@@ -1273,7 +1273,6 @@ def view_login_nodes_add_users(group_name):
 @authenticated
 def view_login_node_members_ajax(group_name):
     user_dict = view_login_node_members_ajax_request(group_name)
-    print(user_dict)
     return jsonify(user_dict, group_name)
 
 def view_login_node_members_ajax_request(group_name):
