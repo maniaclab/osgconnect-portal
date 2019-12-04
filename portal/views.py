@@ -1060,9 +1060,14 @@ def edit_subgroup(group_name):
         description = request.form['description']
 
         additional_metadata = {}
-        pi_name = request.form['pi-name']
-        pi_email = request.form['pi-email']
-        pi_organization = request.form['pi-org']
+        try:
+            pi_name = request.form['pi-name']
+            pi_email = request.form['pi-email']
+            pi_organization = request.form['pi-org']
+        except:
+            pi_name = None
+            pi_email = None
+            pi_organization = None
 
         if pi_name:
             additional_metadata['OSG:PI_Name'] = pi_name

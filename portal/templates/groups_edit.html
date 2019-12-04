@@ -66,7 +66,7 @@
               {% endfor %}
             </select>
           </div>
-
+          {% if group_name != 'root.osg' %}
           <div class="form-group">
             <label for="pi-name">PI Name *</label>
             <input
@@ -105,6 +105,7 @@
               tabindex="7"
             >
           </div>
+          {% endif %}
 
           <div class="form-group">
             <label for="description">Description <span id="asterik">*</span></label>
