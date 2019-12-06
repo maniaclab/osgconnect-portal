@@ -1,7 +1,7 @@
 from flask import Flask
 import json
 
-from portal.database import Database
+# from portal.database import Database
 # from flask import Markup
 from flask_misaka import markdown
 from flask_misaka import Misaka
