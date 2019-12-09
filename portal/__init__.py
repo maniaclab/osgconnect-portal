@@ -6,14 +6,19 @@ import json
 # from flask_misaka import Misaka
 import logging.handlers
 import logging
+import sys
 
 __author__ = 'Jeremy Van <jeremyvan@uchicago.edu>'
 
 app = Flask(__name__)
-app.config.from_pyfile('portal.conf')
-app.url_map.strict_slashes = False
+try:
+    print("Arguments from osgconnect.ini: {}".format(sys.argv[5]))
+    config_file = sys.argv[5]
+    app.config.from_pyfile(config_file)
+except:
+    app.config.from_pyfile('portal.conf')
 
-# database = Database(app)
+app.url_map.strict_slashes = False
 
 # set up Markdown Rendering
 # md = Misaka()
