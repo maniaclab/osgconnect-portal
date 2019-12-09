@@ -84,7 +84,11 @@ def home():
 def webhooks():
     """Endpoint that acepts post requests from Github Webhooks"""
 
-    cmd = ['/etc/ci-connect/github_webhook.sh']
+    # cmd = ['/etc/ci-connect/github_webhook.sh']
+    cmd = """
+    cd /etc/ci-connect/ci-connect-website/portal/templates/markdowns
+    git pull origin master
+    """
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     out, err = p.communicate()
     print("Return code: {}".format(p.returncode))
