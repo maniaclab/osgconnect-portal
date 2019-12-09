@@ -2,8 +2,8 @@ from flask import Flask
 import json
 
 # from flask import Markup
-from flask_misaka import markdown
-from flask_misaka import Misaka
+# from flask_misaka import markdown
+# from flask_misaka import Misaka
 import logging.handlers
 import logging
 
@@ -16,8 +16,8 @@ app.url_map.strict_slashes = False
 # database = Database(app)
 
 # set up Markdown Rendering
-md = Misaka()
-md.__init__(app, tables=True, autolink=True, fenced_code=True, smartypants=True, quote=True, math=True, math_explicit=True)
+# md = Misaka()
+# md.__init__(app, tables=True, autolink=True, fenced_code=True, smartypants=True, quote=True, math=True, math_explicit=True)
 
 # set up logging
 # handler = logging.handlers.RotatingFileHandler(
