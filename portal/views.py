@@ -1605,8 +1605,10 @@ def edit_profile(unix_name):
         email = request.form['email']
         phone = request.form['phone-number']
         institution = request.form['institution']
-        # public_key = request.form['sshpubstring']
-        public_key = None
+        try:
+            public_key = request.form['sshpubstring']
+        except:
+            public_key = None
         try:
             email_preference = request.form['email_preference']
             email_preference = 'on'
@@ -1616,7 +1618,7 @@ def edit_profile(unix_name):
         globus_id = session['primary_identity']
         additional_metadata = {'OSG:Email_Preference': email_preference}
         # Schema and query for adding users to CI Connect DB
-        if public_key != ' ':
+        if public_key:
             post_user = {"apiVersion": 'v1alpha1',
                         'metadata': {'name': name, 'email': email,
                                      'phone': phone, 'institution': institution,
@@ -1626,6 +1628,7 @@ def edit_profile(unix_name):
             post_user = {"apiVersion": 'v1alpha1',
                         'metadata': {'name': name, 'email': email,
                                      'phone': phone, 'institution': institution,
+                                     'public_key': '',
                                      'additional_attributes': additional_metadata}}
         # PUT request to update user information
         r = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name, params=query, json=post_user)
@@ -1634,7 +1637,7 @@ def edit_profile(unix_name):
                         "data": email_preference}
         set_additional_attr = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name + '/attributes/OSG:Email_Preference', params=query, json=email_query)
         # print("SET ADD ATTR: {}".format(set_additional_attr))
-        # print("Updated User: ", r)
+        print("Updated User: ", r, post_user)
 
         session['name'] = name
         session['email'] = email
