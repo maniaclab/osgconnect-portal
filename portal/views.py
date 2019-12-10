@@ -1153,7 +1153,7 @@ def deny_subgroup(group_name, subgroup_name):
 ######################### LOGIN-NODE ROUTES ####################################
 ################################################################################
 
-@app.route('/submit-hosts', methods=['GET'])
+@app.route('/login-nodes', methods=['GET'])
 @authenticated
 def view_login_nodes():
     """Detailed view of Login Nodes specifically for OSG"""
@@ -1167,7 +1167,7 @@ def view_login_nodes():
         unix_name = user['metadata']['unix_name']
 
         group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
-                            + 'root.osg.submit-hosts', params=query)
+                            + 'root.osg.login-nodes', params=query)
         group = group.json()['metadata']
 
         current_time = datetime.datetime.now()
@@ -1219,7 +1219,7 @@ def view_login_nodes_ajax_request(group_name):
     user_status = user_status.json()['membership']['state']
 
     # Get all login nodes info
-    login_nodes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/root.osg.submit-hosts/subgroups', params=query)
+    login_nodes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/root.osg.login-nodes/subgroups', params=query)
     login_nodes = login_nodes.json()['groups']
     # Sort login nodes by display name
     login_nodes = sorted(login_nodes, key = lambda i: i['display_name'])
@@ -1227,7 +1227,7 @@ def view_login_nodes_ajax_request(group_name):
     return group, user_status, login_nodes
 
 
-@app.route('/submit-hosts/<group_name>/users', methods=['GET'])
+@app.route('/login-nodes/<group_name>/users', methods=['GET'])
 @authenticated
 def view_login_node_users(group_name):
     """Detailed view of Login Node's users"""
@@ -1247,7 +1247,7 @@ def view_login_node_users(group_name):
         return render_template('login_nodes_members.html', group=group, group_name=group_name)
 
 
-@app.route('/submit-hosts/<group_name>/add_users', methods=['GET'])
+@app.route('/login-nodes/<group_name>/add_users', methods=['GET'])
 @authenticated
 def view_login_nodes_add_users(group_name):
     """Detailed view of Login Node's non-members"""
@@ -1333,7 +1333,7 @@ def login_node_add_user(group_name, unix_name):
                         'group_membership': {'state': 'active'}}
         # First add user to login nodes umbrella group
         requests.put(ciconnect_api_endpoint + '/v1alpha1/groups/' +
-                    'root.osg.submit-hosts' + '/members/' + unix_name, params=query, json=put_query)
+                    'root.osg.login-nodes' + '/members/' + unix_name, params=query, json=put_query)
         # Add user to actual login node group
         user_status = requests.put(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
@@ -1677,7 +1677,7 @@ def profile():
         multiplexJson = {}
         user_login_nodes = {}
         for group in profile['group_memberships']:
-            if 'root.osg.submit-hosts.' in group['name']:
+            if 'root.osg.login-nodes.' in group['name']:
                 # user_login_nodes.append(group)
                 login_node_query = "/v1alpha1/groups/" + group['name'] + "?token=" + query['token']
                 multiplexJson[login_node_query] = {"method":"GET"}

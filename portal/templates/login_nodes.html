@@ -13,7 +13,7 @@
         {%include 'messages.html' %}
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{{url_for('view_group', group_name='root.osg')}}">Open Science Grid</a></li>
-          <li class="breadcrumb-item active">Submission Hosts</li>
+          <li class="breadcrumb-item active">Login Nodes</li>
         </ol>
         <h2>{{group['display_name']}}</h2>
         <br>
@@ -35,8 +35,8 @@
                     <h5 class="card-title">{[{login_node.display_name}]}</h5>
                     <!-- <h6 class="card-subtitle mb-2 text-muted">44 users online</h6> -->
                     <p class="card-text">{[{login_node.description}]}</p>
-                    <a :href="'/submit-hosts/' + login_node.name + '/add_users'" class="btn btn-sm btn-primary">Add Users</a>
-                    <a :href="'/submit-hosts/' + login_node.name + '/users'" class="btn btn-sm btn-primary">List Users</a>
+                    <a :href="'/login-nodes/' + login_node.name + '/add_users'" class="btn btn-sm btn-primary">Add Users</a>
+                    <a :href="'/login-nodes/' + login_node.name + '/users'" class="btn btn-sm btn-primary">List Users</a>
                   </div>
                 </div>
               </div>
@@ -97,7 +97,7 @@ $(document).ready(function() {
 	    }
 	},
 	mounted() {
-            axios.get('/login-nodes-xhr/root.osg.submit-hosts')
+            axios.get('/login-nodes-xhr/root.osg.login-nodes')
 	        .then(function (response) {
 		    this.group = response.data[0];
 		    this.user_status = response.data[1];
