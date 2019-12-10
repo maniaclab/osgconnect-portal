@@ -10,13 +10,14 @@ except ImportError:
 from portal import app
 from portal.decorators import authenticated
 from portal.utils import (load_portal_client, get_portal_tokens,
-                          get_safe_redirect)
+                          get_safe_redirect, flash_message_parser)
 from werkzeug.exceptions import HTTPException
 # Use these four lines on container
 import sys
 import datetime
 import subprocess
 import os, signal
+import ConfigParser
 
 sys.path.insert(0, app.config['SECRETS_DIR'])
 
@@ -121,7 +122,8 @@ def support():
                         "text": description
                     })
         if r.status_code == requests.codes.ok:
-            flash("Successfully sent message to the OSG support team.", 'success')
+            flash_message = flash_message_parser('support')
+            flash(flash_message, 'success')
             return redirect(url_for('support'))
         else:
             flash("Unable to send message", 'warning')
@@ -233,7 +235,8 @@ def create_group():
                                     'description': description}}
         create_group = requests.put(ciconnect_api_endpoint + '/v1alpha1/groups/root/subgroups/' + name, params=query, json=put_group)
         if create_group.status_code == requests.codes.ok:
-            flash("Successfully created group", 'success')
+            flash_message = flash_message_parser('create_group')
+            flash(flash_message, 'success')
             return redirect(url_for('groups'))
         else:
             err_message = create_group.json()['message']
@@ -321,7 +324,8 @@ def view_group(group_name):
                             group_name + '/members/' + unix_name, params=query, json=put_query)
 
         if user_status.status_code == requests.codes.ok:
-            flash("Successfully requested to join project", 'success')
+            flash_message = flash_message_parser('view_group')
+            flash(flash_message, 'success')
             return redirect(url_for('view_group', group_name=group_name))
         else:
             err_message = user_status.json()['message']
@@ -366,7 +370,8 @@ def delete_group(group_name):
         print(r)
 
         if r.status_code == requests.codes.ok:
-            flash("Successfully deleted group", 'success')
+            flash_message = flash_message_parser('delete_group')
+            flash(flash_message, 'success')
             return redirect(url_for('groups'))
         else:
             err_message = r.json()['message']
@@ -697,7 +702,8 @@ def add_group_member(group_name, unix_name):
         # print("UPDATED MEMBERSHIP: {}".format(user_status))
 
         if user_status.status_code == requests.codes.ok:
-            flash("Successfully added member to group", 'success')
+            flash_message = flash_message_parser('add_group_member')
+            flash(flash_message, 'success')
             return redirect(url_for('view_group_members', group_name=group_name))
         else:
             err_message = user_status.json()['message']
@@ -723,7 +729,8 @@ def remove_group_member(group_name, unix_name):
         # print("UPDATED remove_user: {}".format(remove_user))
 
         if remove_user.status_code == requests.codes.ok:
-            flash("Successfully removed member from group", 'success')
+            flash_message = flash_message_parser('remove_group_member')
+            flash(flash_message, 'success')
             return redirect(url_for('view_group_members', group_name=group_name))
         else:
             err_message = remove_user.json()['message']
@@ -745,7 +752,8 @@ def admin_group_member(group_name, unix_name):
         # print("UPDATED MEMBERSHIP: {}".format(user_status))
 
         if user_status.status_code == requests.codes.ok:
-            flash("Successfully updated member to admin", 'success')
+            flash_message = flash_message_parser('admin_group_member')
+            flash(flash_message, 'success')
             return redirect(url_for('view_group_members', group_name=group_name))
         else:
             err_message = user_status.json()['message']
@@ -922,7 +930,8 @@ def create_subgroup(group_name):
 
         if r.status_code == requests.codes.ok:
             if user_status == 'admin':
-                flash("Successfully created project.", 'success')
+                flash_message = flash_message_parser('create_subgroup')
+                flash(flash_message, 'success')
                 return redirect(url_for('view_group', group_name=full_created_group_name))
             else:
                 flash("The OSG support team has been notified of your requested project.", 'success')
@@ -1001,7 +1010,8 @@ def edit_subgroup_requests(group_name):
 
         enclosing_group_name = '.'.join(group_name.split('.')[:-1])
         if r.status_code == requests.codes.ok:
-            flash("The OSG support team has been notified of your updated project request.", 'success')
+            flash_message = flash_message_parser('edit_subgroup_requests')
+            flash(flash_message, 'success')
             return redirect(url_for('users_groups_pending'))
         else:
             err_message = r.json()['message']
@@ -1049,8 +1059,6 @@ def edit_subgroup(group_name):
             PI_Organization = None
             pi_info['PI_Organization'] = PI_Organization
 
-        print(pi_info)
-
         return render_template('groups_edit.html', sciences=sciences, group_name=group_name, group=group)
 
     elif request.method == 'POST':
@@ -1090,7 +1098,6 @@ def edit_subgroup(group_name):
                                         'purpose': field_of_science,
                                         'email': email, 'phone': phone,
                                         'description': description}}
-        print(put_query)
 
         r = requests.put(
             ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=token_query, json=put_query)
@@ -1098,7 +1105,8 @@ def edit_subgroup(group_name):
         enclosing_group_name = '.'.join(group_name.split('.')[:-1])
         # print(enclosing_group_name)
         if r.status_code == requests.codes.ok:
-            flash("Successfully updated project information.", 'success')
+            flash_message = flash_message_parser('edit_subgroup')
+            flash(flash_message, 'success')
             return redirect(url_for('view_group', group_name=group_name))
         else:
             err_message = r.json()['message']
@@ -1119,7 +1127,8 @@ def approve_subgroup(group_name, subgroup_name):
             '/subgroup_requests/' + subgroup_name + '/approve', params=token_query)
 
         if r.status_code == requests.codes.ok:
-            flash("Successfully approved project creation", 'success')
+            flash_message = flash_message_parser('approve_subgroup')
+            flash(flash_message, 'success')
             print(r.content)
             return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
         else:
@@ -1141,7 +1150,9 @@ def deny_subgroup(group_name, subgroup_name):
             '/subgroup_requests/' + subgroup_name, params=token_query, json=denial_message)
 
         if r.status_code == requests.codes.ok:
-            flash("Denied Project Request", 'success')
+            flash_message = flash_message_parser('deny_subgroup')
+            flash(flash_message, 'success')
+            # flash("Denied Project Request", 'success')
             print(r.content)
             return redirect(url_for('view_group_subgroups_requests', group_name=group_name))
         else:
@@ -1340,7 +1351,8 @@ def login_node_add_user(group_name, unix_name):
                         group_name + '/members/' + unix_name, params=query, json=put_query)
 
         if user_status.status_code == requests.codes.ok:
-            flash("Successfully added user to login node", 'success')
+            flash_message = flash_message_parser('login_node_add_user')
+            flash(flash_message, 'success')
             return redirect(url_for('view_login_node_users', group_name=group_name))
         else:
             err_message = user_status.json()['message']
@@ -1358,7 +1370,8 @@ def login_node_remove_user(group_name, unix_name):
                         group_name + '/members/' + unix_name, params=query)
 
         if remove_user.status_code == requests.codes.ok:
-            flash("Successfully removed user from login node", 'success')
+            flash_message = flash_message_parser('login_node_remove_user')
+            flash(flash_message, 'success')
             return redirect(url_for('view_login_node_users', group_name=group_name))
         else:
             err_message = remove_user.json()['message']
@@ -1389,7 +1402,8 @@ def create_login_node(group_name):
             '/subgroup_requests/' + name, params=token_query, json=put_query)
 
         if r.status_code == requests.codes.ok:
-            flash("Successfully created login node", 'success')
+            flash_message = flash_message_parser('create_login_node')
+            flash(flash_message, 'success')
             return redirect(url_for('view_login_nodes'))
         else:
             err_message = r.json()['message']
@@ -1537,12 +1551,12 @@ def create_profile():
                                 ciconnect_api_endpoint +
                                 '/v1alpha1/groups/root.osg/members/' + unix_name,
                                 params=query, json=put_query)
-            print(put_query)
-            print(user_status)
-            flash(
-                'Account registration successful. A request for Unix account '
-                + 'activation on the OSG Connect job submission server has been '
-                + 'forwarded to OSG staff.', 'success')
+            flash_message = flash_message_parser('create_profile')
+            flash(flash_message, 'success')
+            # flash(
+            #     'Account registration successful. A request for Unix account '
+            #     + 'activation on the OSG Connect job submission server has been '
+            #     + 'forwarded to OSG staff.', 'success')
             if 'next' in session:
                 redirect_to = session['next']
                 session.pop('next')
@@ -1627,7 +1641,8 @@ def edit_profile(unix_name):
         session['phone'] = phone
         session['institution'] = institution
 
-        flash("Successfully updated profile information", 'success')
+        flash_message = flash_message_parser('edit_profile')
+        flash(flash_message, 'success')
 
         if 'next' in session:
             redirect_to = session['next']
