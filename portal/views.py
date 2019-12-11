@@ -1566,12 +1566,12 @@ def create_profile():
         else:
             error_msg = r.json()['message']
             session['email_pref'] = email_preference
-            print(name, unix_name, email, phone, institution, public_key, email_preference)
+            print(name, unix_name, email, phone, institution, email_preference)
             flash(
                 'Failed to create your account: {}'.format(error_msg), 'warning')
             return render_template('profile_create.html', name=name, unix_name=unix_name,
                                     email=email, phone=phone, institution=institution,
-                                    public_key=public_key, email_preference=email_preference)
+                                    email_preference=email_preference)
 
 
 @app.route('/profile/edit/<unix_name>', methods=['GET', 'POST'])
