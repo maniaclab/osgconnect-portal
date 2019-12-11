@@ -84,7 +84,7 @@ def webhooks():
     """Endpoint that acepts post requests from Github Webhooks"""
 
     cmd = """
-    cd /etc/ci-connect/ci-connect-website/portal/templates/markdowns
+    cd /usr/local/ci-connect/ci-connect-website/portal/templates/markdowns
     git pull origin master
     """
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
@@ -116,7 +116,7 @@ def support():
                     auth=('api', mailgun_api_token),
                     data={
                         "from": "<"+email+">",
-                        "to": ["fijalawa@inappmail.com"],
+                        "to": ["user-support@opensciencegrid.org"],
                         "cc": "<{}>".format(email),
                         "subject": "OSG Support Inquiry",
                         "text": description
