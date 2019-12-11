@@ -12,8 +12,8 @@ __author__ = 'Jeremy Van <jeremyvan@uchicago.edu>'
 
 app = Flask(__name__)
 try:
-    print("Arguments from osgconnect.ini: {}".format(sys.argv[5]))
-    config_file = sys.argv[5]
+    print("Arguments from osgconnect.ini: {}".format(sys.argv[1]))
+    config_file = sys.argv[1]
     app.config.from_pyfile(config_file)
 except:
     app.config.from_pyfile('portal.conf')
