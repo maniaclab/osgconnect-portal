@@ -19,8 +19,6 @@ import subprocess
 import os, signal
 import ConfigParser
 
-sys.path.insert(0, app.config['SECRETS_DIR'])
-
 try:
     ciconnect_api_token = app.config['CONNECT_API_TOKEN']
     ciconnect_api_endpoint = app.config['CONNECT_API_ENDPOINT']
