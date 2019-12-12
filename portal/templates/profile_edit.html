@@ -71,26 +71,18 @@
             >
           </div>
 
-          <div class="form-group custom-control custom-switch">
-            <input
-              type="checkbox"
-              class="custom-control-input"
-              name="email_preference"
-              id="email_preference"
-              tabindex="5">
-            <label class="custom-control-label" for="email_preference">Subscribe me to OSG's mailing list</label>
-          </div>
-
           <div class="form-group">
             <label for="sshpubstring">SSH Public Key <i class="fas fa-question-circle" data-container="body" data-toggle="popover" data-trigger="hover" data-placement="right" data-content="{%include '/markdowns/form_descriptions/sshkey_description.md' %}"></i></label>
             <textarea
               placeholder="Please enter your SSH public key here..."
               name="sshpubstring"
               id="sshpubstring"
-              tabindex="6"
+              tabindex="5"
               style="background-color:white; color:black; border-radius:4px; border-color:lightgrey;"
               ></textarea>
           </div>
+
+          <!-- <p>* By signing up for OSG Connect, you agree to receive essential emails concerning the status of the service and your use of it</p> -->
 
           <div class="form-group">
             <button type="submit" class="btn btn-primary">Update Profile</button>
@@ -182,21 +174,15 @@ var email = {{profile['email']|tojson}};
 var phone = {{profile['phone']|tojson}};
 var institution = {{profile['institution']|tojson}};
 var ssh_pubkey = {{profile['public_key']|tojson}};
-var email_pref = {{email_preference|tojson}};
 
-window.onload = setEditFields(name, email, phone, institution, ssh_pubkey, email_pref);
+window.onload = setEditFields(name, email, phone, institution, ssh_pubkey);
 
-function setEditFields(name, email, phone, institution, ssh_pubkey, email_pref){
+function setEditFields(name, email, phone, institution, ssh_pubkey){
   document.getElementById('name').value = name;
   document.getElementById('email').value = email;
   document.getElementById('phone-number').value = phone;
   document.getElementById('institution').value = institution;
   document.getElementById('sshpubstring').value = ssh_pubkey;
-  if(email_pref === 'on'){
-    document.getElementById('email_preference').checked = true;
-  } else {
-    document.getElementById('email_preference').checked = false;
-  }
 }
 
 $(function () {

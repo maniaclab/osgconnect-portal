@@ -100,6 +100,7 @@ def webhooks():
 
 
 @app.route('/support', methods=['GET', 'POST'])
+@authenticated
 def support():
     """
     Support page, utilize mailgun to send message
@@ -108,16 +109,16 @@ def support():
     if request.method == 'GET':
         return render_template('support_email_form.html')
     elif request.method == 'POST':
-        email = request.form['email']
         description = request.form['description']
+        user_email = session['email']
         # mailgun setup here
         # user-support@opensciencegrid.org
         r = requests.post("https://api.mailgun.net/v3/api.ci-connect.net/messages",
                     auth=('api', mailgun_api_token),
                     data={
-                        "from": "<"+email+">",
+                        "from": "<"+user_email+">",
                         "to": ["user-support@opensciencegrid.org"],
-                        "cc": "<{}>".format(email),
+                        "cc": "<{}>".format(user_email),
                         "subject": "OSG Support Inquiry",
                         "text": description
                     })
@@ -131,6 +132,7 @@ def support():
 
 
 @app.route('/users-groups', methods=['GET'])
+@authenticated
 def users_groups():
     """Groups that user's are specifically members of"""
     if request.method == 'GET':
@@ -1489,26 +1491,10 @@ def create_profile():
         email = request.form['email']
         phone = request.form['phone-number']
         institution = request.form['institution']
-        # public_key = request.form['sshpubstring']
-        try:
-            email_preference = request.form['email_preference']
-            email_preference = 'on'
-        except:
-            email_preference = 'off'
         globus_id = session['primary_identity']
         superuser = False
         service_account = False
 
-        additional_metadata = {'OSG:Email_Preference': email_preference}
-        # Schema and query for adding users to CI Connect DB
-        # if public_key:
-        #     post_user = {"apiVersion": 'v1alpha1',
-        #                 'metadata': {'globusID': globus_id, 'name': name, 'email': email,
-        #                              'phone': phone, 'institution': institution,
-        #                              'public_key': public_key,
-        #                              'unix_name': unix_name, 'superuser': superuser,
-        #                              'service_account': service_account}}
-        # else:
         post_user = {"apiVersion": 'v1alpha1',
                     'metadata': {'globusID': globus_id, 'name': name, 'email': email,
                                  'phone': phone, 'institution': institution,
@@ -1565,13 +1551,11 @@ def create_profile():
             return redirect(url_for('profile'))
         else:
             error_msg = r.json()['message']
-            session['email_pref'] = email_preference
-            print(name, unix_name, email, phone, institution, email_preference)
+            # print(name, unix_name, email, phone, institution)
             flash(
                 'Failed to create your account: {}'.format(error_msg), 'warning')
             return render_template('profile_create.html', name=name, unix_name=unix_name,
-                                    email=email, phone=phone, institution=institution,
-                                    email_preference=email_preference)
+                                    email=email, phone=phone, institution=institution)
 
 
 @app.route('/profile/edit/<unix_name>', methods=['GET', 'POST'])
@@ -1594,7 +1578,6 @@ def edit_profile(unix_name):
             additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/'
                                             + unix_name + '/attributes/OSG:Email_Preference', params=query)
             email_preference = additional_attributes.json()['data']
-            print(email_preference)
         except:
             email_preference = 'off'
 

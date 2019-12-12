@@ -130,8 +130,10 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="support-dropdown-menu">
                   <a class="dropdown-item" href="https://support.opensciencegrid.org/support/home" target="_blank">Helpdesk</a>
+                  {% if session.get('is_authenticated') %}
                   <!-- Mail email mailgun form -->
                   <a class="dropdown-item" href="{{url_for('support')}}">Contact Us</a>
+                  {% endif %}
                 </div>
               </li>
               <li class="nav-item">
@@ -144,8 +146,10 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="support-dropdown-menu">
                   <a class="dropdown-item" href="https://support.opensciencegrid.org/support/home" target="_blank">Helpdesk</a>
+                  {% if session.get('is_authenticated') %}
                   <!-- Mail email mailgun form -->
                   <a class="dropdown-item" href="{{url_for('support')}}">Contact Us</a>
+                  {% endif %}
                 </div>
               </li>
               <li class="nav-item">
