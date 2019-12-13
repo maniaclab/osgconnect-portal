@@ -24,16 +24,19 @@ try:
     ciconnect_api_endpoint = app.config['CONNECT_API_ENDPOINT']
 except:
     # Use these two lines below on local
-    f = open("secrets/ciconnect_api_token.txt", "r")
-    g = open("secrets/ciconnect_api_endpoint.txt", "r")
-    ciconnect_api_token = f.read().split()[0]
-    ciconnect_api_endpoint = g.read().split()[0]
+    with open("secrets/ciconnect_api_token.txt", "r") as file:
+      f = file.read()
+      ciconnect_api_token = f.read().split()[0]
+    with open("secrets/ciconnect_api_endpoint.txt", "r") as file:
+      g = file.read()
+      ciconnect_api_endpoint = g.read().split()[0]
 
 try:
     mailgun_api_token = app.config['MAILGUN_API_TOKEN']
 except:
-    j = open("secrets/mailgun_api_token.txt", "r")
-    mailgun_api_token = j.read().split()[0]
+    with open("secrets/mailgun_api_token.txt", "r") as file:
+      j = file.read()
+      mailgun_api_token = j.read().split()[0]
 
 # Create a custom error handler for Exceptions
 @app.errorhandler(Exception)
@@ -1415,12 +1418,12 @@ def create_login_node(group_name):
 @app.route('/signup', methods=['GET'])
 def signup():
     """Send the user to Globus Auth with signup=1."""
-    f = open("portal/templates/markdowns/signup_content/signup_modal.md", "r")
-    g = open("portal/templates/markdowns/signup_content/signup_instructions.md", "r")
-    j = open("portal/templates/markdowns/signup_content/signup.md", "r")
-    signup_modal_md = f.read()
-    signup_instructions_md = g.read()
-    signup_md = j.read()
+    with open("portal/templates/markdowns/signup_content/signup_modal.md", "r") as file:
+      signup_modal_md = file.read()
+    with open("portal/templates/markdowns/signup_content/signup_instructions.md", "r") as file:
+      signup_instructions_md = file.read()
+    with open("portal/templates/markdowns/signup_content/signup.md", "r") as file:
+      signup_md = file.read()
     # return redirect(url_for('authcallback', signup=1))
     return render_template('signup.html', signup_modal_md=signup_modal_md, signup_instructions_md=signup_instructions_md, signup_md=signup_md)
 
