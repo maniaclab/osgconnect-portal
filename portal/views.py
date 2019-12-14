@@ -1037,7 +1037,7 @@ def edit_subgroup(group_name):
 
         try:
             additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
-                                            + group_name + '/attributes/OSG:PI_Name', params=query)
+                                            + group_name + '/attributes/OSG:PI_Name', params=token_query)
             PI_Name = additional_attributes.json()['data']
             pi_info['PI_Name'] = PI_Name
         except:
@@ -1046,7 +1046,7 @@ def edit_subgroup(group_name):
 
         try:
             additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
-                                            + group_name + '/attributes/OSG:PI_Email', params=query)
+                                            + group_name + '/attributes/OSG:PI_Email', params=token_query)
             PI_Email = additional_attributes.json()['data']
             pi_info['PI_Email'] = PI_Email
         except:
@@ -1055,7 +1055,7 @@ def edit_subgroup(group_name):
 
         try:
             additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
-                                            + group_name + '/attributes/OSG:PI_Organization', params=query)
+                                            + group_name + '/attributes/OSG:PI_Organization', params=token_query)
             PI_Organization = additional_attributes.json()['data']
             pi_info['PI_Organization'] = PI_Organization
         except:
