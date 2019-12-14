@@ -1514,9 +1514,9 @@ def create_profile():
             session['unix_name'] = r['unix_name']
 
             # Additional PUT request to set additional attributes metadata
-            email_query = {"apiVersion": 'v1alpha1',
-                            "data": email_preference}
-            set_additional_attr = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' + r['unix_name'] + '/attributes/OSG:Email_Preference', params=query, json=email_query)
+            # email_query = {"apiVersion": 'v1alpha1',
+            #                 "data": email_preference}
+            # set_additional_attr = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' + r['unix_name'] + '/attributes/OSG:Email_Preference', params=query, json=email_query)
             # print("SET ADD ATTR: {}".format(set_additional_attr))
 
             # Auto generate group membership into OSG - eventually change to
