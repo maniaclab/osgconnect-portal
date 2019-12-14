@@ -1188,22 +1188,16 @@ def view_login_nodes():
         previous_time_unix = int((current_time - datetime.timedelta(hours=5)).strftime("%s"))
         current_time_unix = current_time.strftime("%s")
 
-        login02_load_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=login02_osgconnect_net&panelId=7'
-        login02_jobs_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=login02_osgconnect_net&panelId=9'
+        # login02_load_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=login02_osgconnect_net&panelId=7'
+        # login02_jobs_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=login02_osgconnect_net&panelId=9'
+        #
+        # login03_load_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=login03_osgconnect_net&panelId=7'
+        # login03_jobs_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=login03_osgconnect_net&panelId=9'
+        #
+        # login_test_load_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=test_osgconnect_net&panelId=7'
+        # login_test_jobs_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=test_osgconnect_net&panelId=9'
 
-        login03_load_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=login03_osgconnect_net&panelId=7'
-        login03_jobs_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=login03_osgconnect_net&panelId=9'
-
-        login_test_load_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=test_osgconnect_net&panelId=7'
-        login_test_jobs_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=test_osgconnect_net&panelId=9'
-
-        return render_template('login_nodes.html', group=group,
-                                login02_load_grafana=login02_load_grafana,
-                                login02_jobs_grafana=login02_jobs_grafana,
-                                login03_load_grafana=login03_load_grafana,
-                                login03_jobs_grafana=login03_jobs_grafana,
-                                login_test_load_grafana=login_test_load_grafana,
-                                login_test_jobs_grafana=login_test_jobs_grafana)
+        return render_template('login_nodes.html', group=group)
 
 
 @app.route('/login-nodes-xhr/<group_name>', methods=['GET'])
