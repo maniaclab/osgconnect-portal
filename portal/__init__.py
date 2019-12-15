@@ -17,6 +17,7 @@ if len(sys.argv) > 1:
         # Try to read config location from .ini file
         config_file = sys.argv[1]
         app.config.from_pyfile(config_file)
+        print("Reading config file from VM .ini file")
     except:
         print("Could not read config location from {}".format(sys.argv[1]))
 else:

@@ -22,21 +22,26 @@ import ConfigParser
 try:
     ciconnect_api_token = app.config['CONNECT_API_TOKEN']
     ciconnect_api_endpoint = app.config['CONNECT_API_ENDPOINT']
+    print("Reading connect token and endpoints from config")
 except:
     # Use these two lines below on local
     with open("secrets/ciconnect_api_token.txt", "r") as file:
-      f = file.read()
-      ciconnect_api_token = f.read().split()[0]
+        print("Reading connect token from config")
+        f = file.read()
+        ciconnect_api_token = f.read().split()[0]
     with open("secrets/ciconnect_api_endpoint.txt", "r") as file:
-      g = file.read()
-      ciconnect_api_endpoint = g.read().split()[0]
+        print("Reading connect endpoint from config")
+        g = file.read()
+        ciconnect_api_endpoint = g.read().split()[0]
 
 try:
     mailgun_api_token = app.config['MAILGUN_API_TOKEN']
+    print("Reading mailgun token from config")
 except:
     with open("secrets/mailgun_api_token.txt", "r") as file:
-      j = file.read()
-      mailgun_api_token = j.read().split()[0]
+        print("Reading mailgun token from local")
+        j = file.read()
+        mailgun_api_token = j.read().split()[0]
 
 # Create a custom error handler for Exceptions
 @app.errorhandler(Exception)
@@ -67,12 +72,6 @@ def handle_exception(e):
         return e
     # now you're handling non-HTTP exceptions only
     return render_template("500.html", e=e), 500
-
-
-# @app.template_filter('datetimeformat')
-# def datetimeformat(value, format='%m/%d/%Y, %H:%M:%S'):
-#     d = datetime.strptime(value, '%Y-%b-%m %I:%M:%S.%f %Z')
-#     return d.strftime(format)
 
 
 @app.route('/', methods=['GET'])
@@ -1187,15 +1186,6 @@ def view_login_nodes():
         current_time = datetime.datetime.now()
         previous_time_unix = int((current_time - datetime.timedelta(hours=5)).strftime("%s"))
         current_time_unix = current_time.strftime("%s")
-
-        # login02_load_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=login02_osgconnect_net&panelId=7'
-        # login02_jobs_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=login02_osgconnect_net&panelId=9'
-        #
-        # login03_load_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=login03_osgconnect_net&panelId=7'
-        # login03_jobs_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=login03_osgconnect_net&panelId=9'
-        #
-        # login_test_load_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=test_osgconnect_net&panelId=7'
-        # login_test_jobs_grafana = 'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=test_osgconnect_net&panelId=9'
 
         return render_template('login_nodes.html', group=group)
 
