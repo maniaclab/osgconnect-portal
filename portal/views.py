@@ -1231,6 +1231,15 @@ def view_login_nodes_ajax_request(group_name):
     login_nodes = login_nodes.json()['groups']
     # Sort login nodes by display name
     login_nodes = sorted(login_nodes, key = lambda i: i['display_name'])
+    # print(login_nodes)
+
+    for login_node in login_nodes:
+        additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'+login_node['name']+'/attributes/OSG:Node_stats_name', params=query)
+        if additional_attributes.status_code == requests.codes.ok:
+            additional_attributes = additional_attributes.json()['data']
+            login_node.update({ "node_stats_name" : additional_attributes })
+        else:
+            login_node.update({ "node_stats_name" : None })
 
     return group, user_status, login_nodes
 

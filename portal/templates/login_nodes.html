@@ -48,10 +48,10 @@
                   <div class="card-body">
                     <div class="row">
                       <div class="col-sm-6">
-                        <iframe :src="'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=' + login_node.display_name.split('.').join('_') + '&panelId=7'" width="100%" height="200" frameborder="0"></iframe>
+                        <iframe :src="'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=' + login_node.node_stats_name + '&panelId=7'" width="100%" height="200" frameborder="0"></iframe>
                       </div>
                       <div class="col-sm-6">
-                        <iframe :src="'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=' + login_node.display_name.split('.').join('_') + '&panelId=9'" width="100%" height="200" frameborder="0"></iframe>
+                        <iframe :src="'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=' + login_node.node_stats_name + '&panelId=9'" width="100%" height="200" frameborder="0"></iframe>
                       </div>
                   </div>
                 </div>
