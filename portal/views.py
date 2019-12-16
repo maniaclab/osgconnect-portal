@@ -90,6 +90,7 @@ def webhooks():
     cmd = """
     cd {}
     git pull origin master
+    systemctl restart uwsgi
     """.format(markdown_dir)
     # print(cmd)
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
