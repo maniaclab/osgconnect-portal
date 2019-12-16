@@ -10,10 +10,10 @@ except ImportError:
     from urlparse import urlparse, urljoin
 
 from portal import app
-
+markdown_dir = app.config['MARKDOWN_DIR']
 def flash_message_parser(route_name):
     config = ConfigParser.RawConfigParser(allow_no_value=True)
-    config.read('./portal/templates/markdowns/flash_messages/flash_messages.cfg')
+    config.read(markdown_dir + '/flash_messages/flash_messages.cfg')
     flash_message = config.get('flash_messages', route_name)
     return flash_message
 

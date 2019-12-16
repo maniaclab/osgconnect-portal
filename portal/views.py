@@ -42,12 +42,8 @@ except:
         j = file.read()
         mailgun_api_token = j.read().split()[0]
         print("Reading mailgun token from local")
-try:
-    markdown_dir = app.config['MARKDOWN_DIR']
-    print("Reading markdown dir from file")
-except:
-    markdown_dir = 'portal/templates/markdowns'
-    print("Reading markdown dir from local")
+
+markdown_dir = app.config['MARKDOWN_DIR']
 
 # Create a custom error handler for Exceptions
 @app.errorhandler(Exception)
@@ -83,7 +79,9 @@ def handle_exception(e):
 @app.route('/', methods=['GET'])
 def home():
     """Home page - play with it if you must!"""
-    return render_template('home.html')
+    with open(markdown_dir + "/home_content/home_text_rotating.md", "r") as file:
+      home_text_rotating = file.read()
+    return render_template('home.html', home_text_rotating=home_text_rotating)
 
 @app.route('/webhooks/github', methods=['GET', 'POST'])
 def webhooks():
@@ -1418,11 +1416,11 @@ def create_login_node(group_name):
 @app.route('/signup', methods=['GET'])
 def signup():
     """Send the user to Globus Auth with signup=1."""
-    with open("portal/templates/markdowns/signup_content/signup_modal.md", "r") as file:
+    with open(markdown_dir + "/signup_content/signup_modal.md", "r") as file:
       signup_modal_md = file.read()
-    with open("portal/templates/markdowns/signup_content/signup_instructions.md", "r") as file:
+    with open(markdown_dir + "/signup_content/signup_instructions.md", "r") as file:
       signup_instructions_md = file.read()
-    with open("portal/templates/markdowns/signup_content/signup.md", "r") as file:
+    with open(markdown_dir + "/signup_content/signup.md", "r") as file:
       signup_md = file.read()
     # return redirect(url_for('authcallback', signup=1))
     return render_template('signup.html', signup_modal_md=signup_modal_md, signup_instructions_md=signup_instructions_md, signup_md=signup_md)
@@ -1484,7 +1482,26 @@ def create_profile():
         unix_name = ''
         phone = ''
         public_key = ''
-        return render_template('profile_create.html', unix_name=unix_name, phone=phone, public_key=public_key)
+        with open(markdown_dir + "/form_descriptions/name_description.md", "r") as file:
+            name_description = file.read()
+        with open(markdown_dir + "/form_descriptions/unix_name_description.md", "r") as file:
+            unix_name_description = file.read()
+        with open(markdown_dir + "/form_descriptions/phone_description.md", "r") as file:
+            phone_description = file.read()
+        with open(markdown_dir + "/form_descriptions/institution_description.md", "r") as file:
+            institution_description = file.read()
+        with open(markdown_dir + "/form_descriptions/email_description.md", "r") as file:
+            email_description = file.read()
+        with open(markdown_dir + "/form_descriptions/comment_description.md", "r") as file:
+            comment_description = file.read()
+
+        return render_template('profile_create.html', unix_name=unix_name,
+                                phone=phone, public_key=public_key,
+                                name_description=name_description,
+                                unix_name_description=unix_name_description,
+                                phone_description=phone_description,
+                                email_description=email_description,
+                                comment_description=comment_description)
 
     elif request.method == 'POST':
         name = request.form['name']
@@ -1575,14 +1592,23 @@ def edit_profile(unix_name):
                     ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name, params=query)
         profile = profile.json()['metadata']
 
-        try:
-            additional_attributes = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/'
-                                            + unix_name + '/attributes/OSG:Email_Preference', params=query)
-            email_preference = additional_attributes.json()['data']
-        except:
-            email_preference = 'off'
+        with open(markdown_dir + "/form_descriptions/name_description.md", "r") as file:
+            name_description = file.read()
+        with open(markdown_dir + "/form_descriptions/phone_description.md", "r") as file:
+            phone_description = file.read()
+        with open(markdown_dir + "/form_descriptions/institution_description.md", "r") as file:
+            institution_description = file.read()
+        with open(markdown_dir + "/form_descriptions/email_description.md", "r") as file:
+            email_description = file.read()
+        with open(markdown_dir + "/form_descriptions/sshkey_description.md", "r") as file:
+            sshkey_description = file.read()
 
-        return render_template('profile_edit.html', profile=profile, unix_name=unix_name, email_preference=email_preference)
+        return render_template('profile_edit.html', profile=profile,
+                                unix_name=unix_name, name_description=name_description,
+                                institution_description=institution_description,
+                                phone_description=phone_description,
+                                email_description=email_description,
+                                sshkey_description=sshkey_description)
 
     elif request.method == 'POST':
         name = request.form['name']
