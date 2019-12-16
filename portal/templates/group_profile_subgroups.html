@@ -35,12 +35,6 @@
           <div class="btn-group mr-2" role="group", aria-label="first group">
             <button type="submit" name="pending_membership" class="btn btn-warning btn-sm disabled" data-submit="Pending Membership...">Requested Membership</button>
           </div>
-          {% elif user_status == 'active' %}
-            {% if group_name == 'root.osg' %}
-          <div class="btn-group mr-2" role="group" aria-label="first group">
-            <a href="{{url_for('create_subgroup', group_name=group_name)}}" class="btn btn-primary btn-sm">Request New Project</a>
-          </div>
-            {% endif %}
           {% elif user_status == 'admin' %}
             {% if group_name == 'root.osg' %}
           <div class="btn-group mr-2" role="group" aria-label="first group">
@@ -69,6 +63,7 @@
           <li class="nav-item">
             <a class="nav-link" href="{{url_for('view_group_members', group_name=group_name)}}"><i class="fas fa-user-friends"></i> Members</a>
           </li>
+          {% if (osg_status == 'admin') %}
           <li class="nav-item" id='members-request-tab'>
             <a class="nav-link" href="{{url_for('view_group_members_requests', group_name=group_name)}}">
               <span class="badge badge-warning" v-if="loading"><i class="fas fa-sync fa-spin"></i></span>
@@ -76,13 +71,16 @@
                Members Pending
             </a>
           </li>
+          {% endif %}
           {% if group_name == 'root.osg' %}
           <li class="nav-item">
             <a class="nav-link active" href="{{url_for('view_group_subgroups', group_name=group_name)}}"><i class="fas fa-project-diagram"></i> Projects</a>
           </li>
+            {% if (osg_status == 'admin') %}
           <li class="nav-item" id='subprojects-request-tab'>
             <a class="nav-link" href="{{url_for('view_group_subgroups_requests', group_name=group_name)}}"><span class="badge badge-warning">{[{subgroup_requests_count}]}</span> Project Requests</a>
           </li>
+            {% endif %}
           {% else %}
           <li class="nav-item">
             <a class="nav-link active" href="{{url_for('view_group_subgroups', group_name=group_name)}}"><i class="fas fa-project-diagram"></i> Subprojects</a>
