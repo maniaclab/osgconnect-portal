@@ -22,26 +22,32 @@ import ConfigParser
 try:
     ciconnect_api_token = app.config['CONNECT_API_TOKEN']
     ciconnect_api_endpoint = app.config['CONNECT_API_ENDPOINT']
-    print("Reading connect token and endpoints from config")
+    print("Reading connect token and endpoints from file")
 except:
     # Use these two lines below on local
     with open("secrets/ciconnect_api_token.txt", "r") as file:
-        print("Reading connect token from config")
         f = file.read()
         ciconnect_api_token = f.read().split()[0]
+        print("Reading connect token from local")
     with open("secrets/ciconnect_api_endpoint.txt", "r") as file:
-        print("Reading connect endpoint from config")
         g = file.read()
         ciconnect_api_endpoint = g.read().split()[0]
+        print("Reading connect endpoint from local")
 
 try:
     mailgun_api_token = app.config['MAILGUN_API_TOKEN']
-    print("Reading mailgun token from config")
+    print("Reading mailgun token from file")
 except:
     with open("secrets/mailgun_api_token.txt", "r") as file:
-        print("Reading mailgun token from local")
         j = file.read()
         mailgun_api_token = j.read().split()[0]
+        print("Reading mailgun token from local")
+try:
+    markdown_dir = app.config['MARKDOWN_DIR']
+    print("Reading markdown dir from file")
+except:
+    markdown_dir = 'portal/templates/markdowns'
+    print("Reading markdown dir from local")
 
 # Create a custom error handler for Exceptions
 @app.errorhandler(Exception)
@@ -84,9 +90,10 @@ def webhooks():
     """Endpoint that acepts post requests from Github Webhooks"""
 
     cmd = """
-    cd /usr/local/ci-connect/ci-connect-website/portal/templates/markdowns
+    cd {}
     git pull origin master
-    """
+    """.format(markdown_dir)
+    # print(cmd)
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     out, err = p.communicate()
     print("Return code: {}".format(p.returncode))
