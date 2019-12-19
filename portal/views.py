@@ -560,42 +560,12 @@ def view_group_add_members(group_name):
     """Detailed view of group's non-members"""
     query = {'token': ciconnect_api_token}
     if request.method == 'GET':
-        # # Get root base group users
-        # enclosing_group_name = '.'.join(group_name.split('.')[:-1])
-        # # print(enclosing_group_name)
-        # enclosing_group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
-        #                     + enclosing_group_name + '/members', params=query)
-        # enclosing_group = enclosing_group.json()['memberships']
-        # enclosing_group_members_names = [member['user_name'] for member in enclosing_group]
-        # # print(base_group)
-        #
         # Get group information
         group = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/'
                             + group_name, params=query)
         group = group.json()['metadata']
 
         display_name = '-'.join(group_name.split('.')[1:])
-        # group_members = requests.get(ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/members', params=query)
-        # memberships = group_members.json()['memberships']
-        # memberships_names = [member['user_name'] for member in memberships]
-        #
-        # non_members = list(set(enclosing_group_members_names) - set(memberships_names))
-        #
-        # multiplexJson = {}
-        #
-        # for user in non_members:
-        #     unix_name = user
-        #     user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
-        #     multiplexJson[user_query] = {"method":"GET"}
-        #
-        # # POST request for multiplex return
-        # multiplex = requests.post(
-        #     ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
-        # multiplex = multiplex.json()
-        # user_dict = {}
-        # for user in multiplex:
-        #     user_name = user.split('/')[3].split('?')[0]
-        #     user_dict[user_name] = json.loads(multiplex[user]['body'])
 
         # Get User's Group Status
         user_status = requests.get(
@@ -659,7 +629,7 @@ def view_group_add_members_request(group_name):
 
         for user in non_members:
             unix_name = user
-            user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
+            user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token'] + "&omit_groups=true"
             multiplexJson[user_query] = {"method":"GET"}
 
         # POST request for multiplex return
