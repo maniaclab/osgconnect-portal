@@ -132,12 +132,12 @@
                 <thead>
                   <tr>
                     <th data-field="name" data-sortable="true">Name</th>
+                    <th data-field="status" data-sortable="true">Status</th>
                     {% if user_status == 'admin' %}
                     <th data-field="email" data-sortable="true" class="email-th">Email</th>
                     <th data-field="phone" data-sortable="true">Phone</th>
                     {% endif %}
                     <th data-field="institution" data-sortable="true">Institution</th>
-                    <th data-field="status" data-sortable="true">Status</th>
                     {% if user_status == 'admin' %}
                     <th data-field="action" data-sortable="true">Action</th>
                     {% endif %}
@@ -161,20 +161,18 @@
               		</tr>
                   <tr v-for="(member, index) in members" v-cloak >
               		  <td>{[{member.metadata.name}]}</td>
+                    <td>
+                      <div>
+                        <span v-if="users_statuses[member.metadata.unix_name] == 'admin'" style="color: blue;"><strong>{[{users_statuses[member.metadata.unix_name]}]}</strong></span>
+                        <span v-else-if="users_statuses[member.metadata.unix_name] == 'active'" style="color: green;"><strong>{[{users_statuses[member.metadata.unix_name]}]}</strong></span>
+                        <span v-else="users_statuses[member.metadata.unix_name] == 'pending'" style="color: orange;"><strong>{[{users_statuses[member.metadata.unix_name]}]}</strong></span>
+                      </div>
+                    </td>
               		  <td v-if="admin == 'admin'" class="email-th">{[{member.metadata.email}]}</td>
                     <!-- <td v-else class="email-th">Admin View Only</td> -->
               		  <td v-if="admin == 'admin'">{[{member.metadata.phone}]}</td>
                     <!-- <td v-else>Admin View Only</td> -->
                     <td>{[{member.metadata.institution}]}</td>
-                    <td>
-                      <div v-for="group in member.metadata.group_memberships">
-                        <div v-if="group.name == groupname && group.state">
-                          <span v-if="group.state == 'admin'" style="color: blue;"><strong>{[{group.state}]}</strong></span>
-                          <span v-else-if="group.state == 'active'" style="color: green;"><strong>{[{group.state}]}</strong></span>
-                          <span v-else="group.state == 'pending'" style="color: orange;"><strong>{[{group.state}]}</strong></span>
-                        </div>
-                      </div>
-                    </td>
                     <td v-if="admin == 'admin'">
                       <div v-if="users_statuses[member.metadata.unix_name] == 'pending'">
                         <div class="btn-group">
@@ -237,7 +235,7 @@ $(document).ready(function() {
     updated: function() {
   	    //call DataTable after view is updated
         $('#groups-table').DataTable({
-          order: [[0, 'asc']],
+          order: [[1, 'desc'],[0, 'asc']],
         });
   	},
     mounted(){
