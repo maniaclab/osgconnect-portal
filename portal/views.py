@@ -435,7 +435,7 @@ def view_group_members_ajax_request(group_name):
             unix_name = user['user_name']
             user_state = user['state']
             if (user_state != 'nonmember' and unix_name != 'root'):
-                user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
+                user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token'] + "&omit_groups"
                 multiplexJson[user_query] = {"method":"GET"}
                 users_statuses[unix_name] = user_state
         # POST request for multiplex return
@@ -443,26 +443,23 @@ def view_group_members_ajax_request(group_name):
             ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
         multiplex = multiplex.json()
         user_dict = {}
-        group_user_dict = {}
-
-        # end = time.time()
-        # print(end - start)
+        # group_user_dict = {}
 
         for user in multiplex:
             user_name = user.split('/')[3].split('?')[0]
             user_dict[user_name] = json.loads(multiplex[user]['body'])
 
-        for user, info in user_dict.items():
-            for group_membership in info['metadata']['group_memberships']:
-                if group_membership['name'] == group_name:
-                    group_user_dict[user] = info
+        # for user, info in user_dict.items():
+        #     for group_membership in info['metadata']['group_memberships']:
+        #         if group_membership['name'] == group_name:
+        #             group_user_dict[user] = info
 
         # Get User's Group Status
         user_status = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/groups/' +
                         group_name + '/members/' + session['unix_name'], params=query)
         user_status = user_status.json()['membership']['state']
-        query = {'token': ciconnect_api_token}
+        # query = {'token': ciconnect_api_token}
         user_super = requests.get(
                         ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'], params=query)
         try:
@@ -1320,7 +1317,7 @@ def view_login_node_members_ajax_request(group_name):
     # while non_members:
     for user in non_members:
         unix_name = user
-        user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
+        user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token'] + "&omit_groups"
         multiplexJson[user_query] = {"method":"GET"}
 
     # POST request for multiplex return
