@@ -416,6 +416,7 @@ def view_group_members(group_name):
 @authenticated
 def view_group_members_ajax(group_name):
     user_dict, users_statuses = view_group_members_ajax_request(group_name)
+    # print(users_statuses)
     return jsonify(user_dict, users_statuses)
 
 def view_group_members_ajax_request(group_name):
@@ -435,7 +436,7 @@ def view_group_members_ajax_request(group_name):
             unix_name = user['user_name']
             user_state = user['state']
             if (user_state != 'nonmember' and unix_name != 'root'):
-                user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token']
+                user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token'] + "&omit_groups"
                 multiplexJson[user_query] = {"method":"GET"}
                 users_statuses[unix_name] = user_state
         # POST request for multiplex return
