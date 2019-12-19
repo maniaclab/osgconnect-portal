@@ -436,7 +436,7 @@ def view_group_members_ajax_request(group_name):
             unix_name = user['user_name']
             user_state = user['state']
             if (user_state != 'nonmember' and unix_name != 'root'):
-                user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token'] + "&omit_groups"
+                user_query = "/v1alpha1/users/" + unix_name + "?token=" + query['token'] + "&omit_groups=true"
                 multiplexJson[user_query] = {"method":"GET"}
                 users_statuses[unix_name] = user_state
         # POST request for multiplex return
