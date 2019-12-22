@@ -193,6 +193,8 @@ def users_groups_pending():
         # Query user's pending project requests
         project_requests = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + unix_name + '/group_requests', params=query)
         project_requests = project_requests.json()['groups']
+        project_requests = [project_requests for project_request in project_requests if 'root.osg' in project_request['name']]
+        # print(project_requests)
         # Check if user is active member of OSG specifically
         user_status = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' + session['unix_name'] + '/groups/root.osg', params=query)
         user_status = user_status.json()['membership']['state']

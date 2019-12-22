@@ -15,7 +15,7 @@
     <div class="row">
       <div class="col-lg-6 mx-auto">
         <h2>Edit Profile</h2>
-        <h6>Unix Name: {{session['unix_name']}}</h6>
+        <h6>Unix Username: {{session['unix_name']}}</h6>
         <p class="asterik">* = required field</p>
         <hr/>
         <form role="form" action="{{url_for('edit_profile', unix_name=unix_name)}}" method="POST">
@@ -114,7 +114,7 @@
                   <li>Type:  <kbd>cat ~/.ssh/id_rsa.pub</kbd> in order to see your key.</li>
                   <li>Copy the selection to the clipboard.</li>
                   <li>Paste the contents of the clipboard in the
-                    corresponding box on your CI Connect Profile. Please <b>only</b> paste the SSH ( typically ending in .pub) public key into this box.
+                    corresponding box on your Connect Profile. Please <b>only</b> paste the SSH ( typically ending in .pub) public key into this box.
                   </li>
                 </ol>
               </div>
@@ -139,7 +139,7 @@
                   </li>
                   <li>Hit enter for the default location, and optionally enter a
                     password. This will generate two files: A private key file
-                    (typically <kbd>id_rsa</kbd>) and a key file (typically <kbd>id_rsa.pub</kbd>). The private key should <b>never</b> be shared, and VC3 will never ask you for your private key.
+                    (typically <kbd>id_rsa</kbd>) and a key file (typically <kbd>id_rsa.pub</kbd>). The private key should <b>never</b> be shared, and OSG Connect will never ask you for your private key.
                   </li>
                   <li>In order to see your SSH public key type:
                     <div>

@@ -25,9 +25,9 @@
           <li class="nav-item">
             <a class="nav-link active" id="active-projects-tab" href="#">My Projects</a>
           </li>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a class="nav-link" id="pending-projects-tab" href="{{url_for('users_groups_pending')}}">Pending Projects</a>
-          </li>
+          </li> -->
         </ul>
 
         <div class="row">
@@ -38,7 +38,7 @@
                 <thead>
                   <tr>
                     <th data-field="name" data-sortable="true">Name</th>
-                    <th data-field="unix-name" data-sortable="true">Unix Name</th>
+                    <th data-field="unix-name" data-sortable="true">Project Unix Name</th>
                     {% if (user_status == 'admin' or osg_status == 'admin') %}
                     <th data-field="email" data-sortable="true">Contact Email</th>
                     {% endif %}
