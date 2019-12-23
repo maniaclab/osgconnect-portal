@@ -34,7 +34,7 @@
                   <div class="card-body">
                     <h5 class="card-title">{[{login_node.display_name}]}</h5>
                     <!-- <h6 class="card-subtitle mb-2 text-muted">44 users online</h6> -->
-                    <p class="card-text">{[{login_node.description}]}</p>
+                    <iframe :src="'https://grafana.mwt2.org/d-solo/JiH0SAoZk/connect-servers?orgId=1&from=now-3h&to=now&var-Server=' + login_node.node_stats_name + '&panelId=2'" width="100%" height="200" frameborder="0"></iframe>
                     <a :href="'/login-nodes/' + login_node.name + '/add_users'" class="btn btn-sm btn-primary">Add Users</a>
                     <a :href="'/login-nodes/' + login_node.name + '/users'" class="btn btn-sm btn-primary">List Users</a>
                   </div>
