@@ -1,1 +1,1 @@
-# CI Connect Portal
+# OSG Connect Portal
