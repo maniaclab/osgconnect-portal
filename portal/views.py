@@ -81,7 +81,10 @@ def home():
     """Home page - play with it if you must!"""
     with open(markdown_dir + "/home_content/home_text_rotating.md", "r") as file:
       home_text_rotating = file.read()
-    return render_template('home.html', home_text_rotating=home_text_rotating)
+
+    with open(markdown_dir + "/home_content/home_text_headline.md", "r") as file:
+      home_text_headline = file.read()
+    return render_template('home.html', home_text_rotating=home_text_rotating, home_text_headline=home_text_headline)
 
 @app.route('/webhooks/github', methods=['GET', 'POST'])
 def webhooks():
