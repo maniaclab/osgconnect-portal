@@ -1399,6 +1399,16 @@ def signup():
     return render_template('signup.html', signup_modal_md=signup_modal_md, signup_instructions_md=signup_instructions_md, signup_md=signup_md)
 
 
+@app.route('/aup', methods=['GET'])
+def aup():
+    """Send the user to Acceptable Use Policy page"""
+    # Read AUP from markdown dir
+    domain_name = request.headers['Host']
+    with open(markdown_dir+'/signup_content/signup_modal.md', "r") as file:
+        aup_md = file.read()
+    return render_template('aup.html', aup_md=aup_md)
+
+
 @app.route('/login', methods=['GET'])
 def login():
     """Send the user to Globus Auth."""
