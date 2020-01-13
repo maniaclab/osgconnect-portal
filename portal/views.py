@@ -484,15 +484,14 @@ def view_group_member_details(group_name, member_name):
             ciconnect_api_endpoint + '/v1alpha1/groups/' +
             group_name + '/members/' + session['unix_name'], params=query)
         user_status = user_status.json()['membership']['state']
-
         # Set up multiplex to query all non member's information
         multiplexJson = {}
         user_login_nodes = {}
-        for group in user_groups:
-            if 'root.osg.login-nodes.' in group['name']:
+        for user_group in user_groups:
+            if 'root.osg.login-nodes.' in user_group['name']:
                 # user_login_nodes.append(group)
                 login_node_query = "/v1alpha1/groups/" + \
-                    group['name'] + "?token=" + query['token']
+                    user_group['name'] + "?token=" + query['token']
                 multiplexJson[login_node_query] = {"method": "GET"}
         # POST request for multiplex return
         multiplex = requests.post(
@@ -508,6 +507,7 @@ def view_group_member_details(group_name, member_name):
             ciconnect_api_endpoint + '/v1alpha1/users/'
             + session['unix_name'] + '/groups/root.osg', params=query)
         osg_status = r.json()['membership']['state']
+        print(group)
 
         return render_template('group_profile_members_details.html',
                                group_name=group_name,
