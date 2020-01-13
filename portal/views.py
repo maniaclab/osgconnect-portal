@@ -17,11 +17,9 @@ from portal.utils import (load_portal_client, get_safe_redirect,
 from werkzeug.exceptions import HTTPException
 # Use these four lines on container
 import sys
-import datetime
 import subprocess
 import os
 import signal
-import ConfigParser
 
 try:
     ciconnect_api_token = app.config['CONNECT_API_TOKEN']
@@ -487,6 +485,24 @@ def view_group_member_details(group_name, member_name):
             group_name + '/members/' + session['unix_name'], params=query)
         user_status = user_status.json()['membership']['state']
 
+        # Set up multiplex to query all non member's information
+        multiplexJson = {}
+        user_login_nodes = {}
+        for group in user_groups:
+            if 'root.osg.login-nodes.' in group['name']:
+                # user_login_nodes.append(group)
+                login_node_query = "/v1alpha1/groups/" + \
+                    group['name'] + "?token=" + query['token']
+                multiplexJson[login_node_query] = {"method": "GET"}
+        # POST request for multiplex return
+        multiplex = requests.post(
+            ciconnect_api_endpoint + '/v1alpha1/multiplex', params=query, json=multiplexJson)
+        multiplex = multiplex.json()
+        for login_node in multiplex:
+            login_node_name = login_node.split('/')[3].split('?')[0]
+            user_login_nodes[login_node_name] = json.loads(
+                multiplex[login_node]['body'])
+
         # Query to return user's membership status in a group, specifically if user is OSG admin
         r = requests.get(
             ciconnect_api_endpoint + '/v1alpha1/users/'
@@ -497,7 +513,8 @@ def view_group_member_details(group_name, member_name):
                                group_name=group_name,
                                user_status=user_status, group=group,
                                osg_status=osg_status, member_name=member_name,
-                               user_groups=user_groups, profile=profile)
+                               user_groups=user_groups, profile=profile,
+                               user_login_nodes=user_login_nodes)
 
 
 @app.route('/groups-xhr/<group_name>/members', methods=['GET'])
@@ -1975,7 +1992,6 @@ def authcallback():
             token=access_token, include='identity_set')
         identity_set = token_introspect.data['identity_set']
         profile = None
-
         for identity in identity_set:
             query = {'token': ciconnect_api_token,
                      'globus_id': identity}
