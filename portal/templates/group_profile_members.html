@@ -25,6 +25,11 @@
         <h2>{{group['display_name']}}</h2>
         <br>
         <div class="btn-toolbar" role="toolbar">
+          {% if osg_status == 'admin' %}
+          <div class="btn-group mr-2" role="group" aria-label="first group">
+            <a href="{{url_for('add_all_admins', group_name=group_name)}}" class="btn btn-primary btn-sm">Add All Admins</a>
+          </div>
+          {% endif %}
           {% if (user_status == 'nonmember' and (osg_status == 'active' or osg_status == 'admin')) %}
           <div class="btn-group mr-2" role="group", aria-label="first group">
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModalCenter">Request Membership</button>

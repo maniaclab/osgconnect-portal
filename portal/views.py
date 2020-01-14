@@ -14,6 +14,7 @@ from portal import app
 from portal.decorators import authenticated
 from portal.utils import (load_portal_client, get_safe_redirect,
                           flash_message_parser)
+from connect_api import list_connect_admins
 from werkzeug.exceptions import HTTPException
 # Use these four lines on container
 import sys
@@ -870,6 +871,50 @@ def admin_group_member(group_name, unix_name):
             return redirect(url_for('view_group_members', group_name=group_name))
 
 
+@app.route('/groups/<group_name>/add_all_admins', methods=['GET'])
+@authenticated
+def add_all_admins(group_name):
+    if request.method == 'GET':
+        query = {'token': session['access_token']}
+
+        connect_admins = list_connect_admins(group_name)
+        print(connect_admins)
+
+        # multiplexJson = {}
+        #
+        # for connect_admin in connect_admins:
+        #     unix_name = connect_admins['user_name']
+        #     user_query = "/v1alpha1/groups/" + group_name
+        #                     + "members/" + unix_name
+        #                     + "?token=" + query['token']
+        #     multiplexJson[user_query] = {"method": "GET"}
+        #
+        # # POST request for multiplex return
+        # multiplex = requests.post(
+        #     ciconnect_api_endpoint + '/v1alpha1/multiplex',
+        #     params=query, json=multiplexJson)
+        # multiplex = multiplex.json()
+
+        put_query = {"apiVersion": 'v1alpha1',
+                     'group_membership': {'state': 'admin'}}
+        for connect_admin in connect_admins:
+            unix_name = connect_admin['user_name']
+            user_status = requests.put(
+                ciconnect_api_endpoint + '/v1alpha1/groups/' +
+                group_name + '/members/' + unix_name, params=query, json=put_query)
+        # print("UPDATED MEMBERSHIP: {}".format(user_status))
+
+        if user_status.status_code == requests.codes.ok:
+            flash_message = flash_message_parser('add_group_member')
+            flash(flash_message, 'success')
+            return redirect(url_for('view_group_members', group_name=group_name))
+        else:
+            err_message = user_status.json()['message']
+            flash('Failed to add admins to group: {}'.format(
+                err_message), 'warning')
+            return redirect(url_for('view_group_members', group_name=group_name))
+
+
 @app.route('/groups/<group_name>/subgroups', methods=['GET', 'POST'])
 @authenticated
 def view_group_subgroups(group_name):
@@ -946,12 +991,18 @@ def view_group_subgroups_requests(group_name):
             + group_name + '/subgroup_requests', params=query)
         subgroup_requests = subgroup_requests.json()['groups']
 
+        # Check if user is active member of OSG specifically
+        osg_status = requests.get(ciconnect_api_endpoint + '/v1alpha1/users/' +
+                                  session['unix_name']
+                                  + '/groups/root.osg', params=query)
+        osg_status = osg_status.json()['membership']['state']
+
         return render_template('group_profile_subgroups_requests.html',
                                display_name=display_name,
                                subgroup_requests=subgroup_requests,
                                group_name=group_name,
                                user_status=user_status,
-                               group=group)
+                               group=group, osg_status=osg_status)
 
 
 @app.route('/groups-xhr/<group_name>/subgroups-requests', methods=['GET', 'POST'])
