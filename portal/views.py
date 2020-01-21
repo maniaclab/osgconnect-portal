@@ -651,7 +651,7 @@ def view_group_members_requests(group_name):
             ciconnect_api_endpoint + '/v1alpha1/groups/' +
             group_name + '/members/' + session['unix_name'], params=query)
         user_status = user_status.json()['membership']['state']
-        query = {'token': ciconnect_api_token}
+        # query = {'token': ciconnect_api_token}
         user_super = requests.get(
             ciconnect_api_endpoint + '/v1alpha1/users/'
             + session['unix_name'], params=query)
