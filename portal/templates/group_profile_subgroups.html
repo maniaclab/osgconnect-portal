@@ -114,6 +114,7 @@
                 <thead>
                   <tr>
                     <th data-field="name" data-sortable="true">Name</th>
+                    <th data-field="project-unix-name" data-sortable="true">Project Unix Name</th>
                     <th data-field="field_of_science" data-sortable="true">Field of Science</th>
                     {% if osg_status == 'admin' %}
                     <th data-field="email" data-sortable="true">Contact Email</th>
@@ -124,15 +125,18 @@
                   <tr v-if="loading">
               			<td>Loading Data <i class="fas fa-sync fa-spin"></i></td>
               			<td><i class="fas fa-sync fa-spin"></i></td>
+                    <td><i class="fas fa-sync fa-spin"></i></td>
               			<td v-if="osg_status === 'admin'" ><i class="fas fa-sync fa-spin"></i></td>
               		</tr>
               		<tr v-if="failed">
               			<td>Failed to load the data, please refresh the page <i class="far fa-times-circle"></i></td>
               			<td><i class="far fa-times-circle"></i></td>
+                    <td><i class="far fa-times-circle"></i></td>
               			<td v-if="osg_status === 'admin'" ><i class="far fa-times-circle"></i></td>
               		</tr>
                   <tr v-for="subgroup in subgroups" v-cloak >
                     <td><a :href="'/groups/' + subgroup.name">{[{subgroup.display_name}]}</a></td>
+                    <td>{[{subgroup.name.slice(5)}]}</td>
                     <td>{[{subgroup.purpose}]}</td>
                     <td v-if="osg_status === 'admin'" ><a href="mailto:{[{subgroup.email}]}?subject=Project Inquiry">{[{subgroup.email}]}</a></td>
                   </tr>
@@ -188,7 +192,6 @@ $(document).ready(function() {
     .then(function (response) {
       this.subgroup_requests_count = response.data[1];
       this.loading = false;
-      console.log(this.subgroup_requests_count)
     }.bind(this)) //must use bind(this) unless using arrow function
     .catch(error => { this.failed = true; this.loading = false; })
     }
