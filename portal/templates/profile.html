@@ -59,7 +59,48 @@
           <div class="col-sm-12 col-md-6">
             <div class="card h-100">
               <div class="card-header">
+                {% if user_status == 'nonmember' %}
+                OSG Group Membership Status:
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModalCenter">Request Membership</button>
+                <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Reason for joining</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+
+                        <form role="form" action="{{url_for('view_group', group_name='root.osg')}}" method="POST">
+
+                          <div class="form-group">
+                            <label for="description">Please include a brief reason, describing your interests in joining this project <span id="asterik">*</span></label>
+                            <textarea
+                              placeholder="Brief reason for joining project"
+                              name="join-project-message"
+                              required
+                              tabindex="1"
+                              style="background-color:white; color:black; border-radius:4px; border-color:lightgrey;"
+                              value=""
+                              ></textarea>
+                          </div>
+                          <div class="modal-footer">
+                            <div class="form-group">
+                              <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+                              <button type="submit" name="request_group" class="btn btn-sm btn-primary" data-submit="Requesting Membership..."> Request Membership</button>
+                            </div>
+                          </div>
+                        </form>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% else %}
                 OSG Group Membership Status: <strong id='osg-user-status'>{{user_status}}</strong> <i class="fas fa-users float-right"></i>
+                {% endif %}
               </div>
               <div class="card-body">
                 <a href="{{url_for('users_groups')}}" class="btn btn-primary btn-sm">My Projects</a>
