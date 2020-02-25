@@ -107,6 +107,7 @@
                     <th data-field="email" data-sortable="true">Email</th>
                     <th data-field="phone" data-sortable="true">Phone</th>
                     <th data-field="institution" data-sortable="true">Institution</th>
+                    <th data-field="join-date" data-sortable="true">Join Date</th>
                     <th data-field="status" data-sortable="true">Status</th>
                     {% if user_super or user_status == 'admin' %}
                     <th data-field="action" data-sortable="true">Action</th>
@@ -125,6 +126,7 @@
                     <td>Admin View Only</td>
                     {% endif %}
                     <td>{{info['metadata']['institution']}}</td>
+                    <td>{{info['metadata']['join_date'][:11]}}</td>
                     {% for group_membership in info['metadata']['group_memberships'] %}
                       {% if group_membership['name'] == group_name %}
                         {% if group_membership['state'] == 'pending' %}
