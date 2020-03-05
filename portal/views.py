@@ -832,12 +832,12 @@ def remove_group_member(group_name, unix_name):
         if remove_user.status_code == requests.codes.ok:
             flash_message = flash_message_parser('remove_group_member')
             flash(flash_message, 'success')
-            return redirect(url_for('view_group_members', group_name=group_name))
+            return redirect(url_for('view_group_members_requests', group_name=group_name))
         else:
             err_message = remove_user.json()['message']
             flash('Failed to remove member from group: {}'.format(
                 err_message), 'warning')
-            return redirect(url_for('view_group_members', group_name=group_name))
+            return redirect(url_for('view_group_members_requests', group_name=group_name))
 
 
 @app.route('/groups/<group_name>/admin_group_member/<unix_name>', methods=['POST'])
