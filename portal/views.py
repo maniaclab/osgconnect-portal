@@ -522,7 +522,9 @@ def view_group_member_details(group_name, member_name):
 @authenticated
 def view_group_members_ajax(group_name):
     user_dict, users_statuses = view_group_members_ajax_request(group_name)
-    # print(users_statuses)
+    for user in user_dict.keys():
+        if users_statuses[user] == 'pending':
+            del user_dict[user]
     return jsonify(user_dict, users_statuses)
 
 
@@ -533,13 +535,9 @@ def view_group_members_ajax_request(group_name):
         group_members = requests.get(
             ciconnect_api_endpoint + '/v1alpha1/groups/'
             + group_name + '/members', params=query)
-        # print(group_members.json())
         memberships = group_members.json()['memberships']
         multiplexJson = {}
         users_statuses = {}
-
-        # start = time.time()
-        # print("START")
 
         for user in memberships:
             unix_name = user['user_name']
@@ -560,11 +558,6 @@ def view_group_members_ajax_request(group_name):
         for user in multiplex:
             user_name = user.split('/')[3].split('?')[0]
             user_dict[user_name] = json.loads(multiplex[user]['body'])
-
-        # for user, info in user_dict.items():
-        #     for group_membership in info['metadata']['group_memberships']:
-        #         if group_membership['name'] == group_name:
-        #             group_user_dict[user] = info
 
         # Get User's Group Status
         user_status = requests.get(
@@ -1894,7 +1887,7 @@ def edit_profile(unix_name):
         r = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' +
                          unix_name, params=query, json=post_user)
         # print("SET ADD ATTR: {}".format(set_additional_attr))
-        print("Updated User: ", r, post_user)
+        print("Updated User: ", r.content, post_user)
 
         session['name'] = name
         session['email'] = email
