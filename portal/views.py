@@ -1819,9 +1819,9 @@ def create_profile():
                                    institution=institution)
 
 
-@app.route('/profile/edit/<unix_name>', methods=['GET', 'POST'])
+@app.route('/profile/edit', methods=['GET', 'POST'])
 @authenticated
-def edit_profile(unix_name):
+def edit_profile():
     identity_id = session.get('primary_identity')
     query = {'token': ciconnect_api_token,
              'globus_id': identity_id}
@@ -1871,7 +1871,7 @@ def edit_profile(unix_name):
         globus_id = session['primary_identity']
         additional_metadata = {'OSG:Email_Preference': email_preference}
         # Schema and query for adding users to CI Connect DB
-        if public_key:
+        if public_key.split():
             post_user = {"apiVersion": 'v1alpha1',
                          'metadata': {'name': name, 'email': email,
                                       'phone': phone, 'institution': institution,

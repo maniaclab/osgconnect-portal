@@ -18,7 +18,7 @@
         <h6>Unix Username: {{session['unix_name']}}</h6>
         <p class="asterik">* = required field</p>
         <hr/>
-        <form role="form" action="{{url_for('edit_profile', unix_name=unix_name)}}" method="POST">
+        <form role="form" action="{{url_for('edit_profile')}}" method="POST">
           <div class="form-group">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           </div>
