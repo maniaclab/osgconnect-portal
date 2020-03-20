@@ -1819,15 +1819,20 @@ def create_profile():
                                    institution=institution)
 
 
-@app.route('/profile/edit', methods=['GET', 'POST'])
+@app.route('/profile/edit/<unix_name>', methods=['GET', 'POST'])
 @authenticated
-def edit_profile():
+def edit_profile(unix_name):
     identity_id = session.get('primary_identity')
     query = {'token': ciconnect_api_token,
              'globus_id': identity_id}
     user = requests.get(
         ciconnect_api_endpoint + '/v1alpha1/find_user', params=query)
-    unix_name = user.json()['metadata']['unix_name']
+    expected_unix_name = user.json()['metadata']['unix_name']
+
+    try:
+        unix_name == expected_unix_name
+    except Exception:
+        return redirect(url_for('handle_exception', e=Exception))
 
     if request.method == 'GET':
         # Get user info, pass through as args, convert to json and load input fields
@@ -1887,7 +1892,7 @@ def edit_profile():
         r = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' +
                          unix_name, params=query, json=post_user)
         # print("SET ADD ATTR: {}".format(set_additional_attr))
-        print("Updated User: ", r.content, post_user)
+        # print("Updated User: ", r.content, post_user)
 
         session['name'] = name
         session['email'] = email

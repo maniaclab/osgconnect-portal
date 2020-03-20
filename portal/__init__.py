@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from flask_wtf.csrf import CSRFProtect
+from datetime import timedelta
 import json
 
 import logging.handlers
@@ -26,9 +27,8 @@ else:
     app.config.from_pyfile('portal.conf')
 
 app.url_map.strict_slashes = False
-
+app.permanent_session_lifetime = timedelta(minutes=1440)
 app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='Lax')
-# response.set_cookie('username', 'flask', secure=True, httponly=True, samesite='Lax')
 
 
 import portal.views
