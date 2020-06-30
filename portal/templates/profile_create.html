@@ -15,6 +15,7 @@
     <div class="row">
       <div class="col-lg-8 mx-auto">
         <h2>Create Profile</h2>
+        <h6>User Globus ID: {{session['primary_identity']}}</h6>
         <p class="asterik">* = required field</p>
         <hr/>
         <form role="form" action="{{url_for('create_profile')}}" method="POST">
