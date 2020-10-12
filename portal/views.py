@@ -10,7 +10,7 @@ try:
 except ImportError:
     from urllib import urlencode
 
-from portal import app
+from portal import app, csrf
 from portal.decorators import authenticated
 from portal.utils import (load_portal_client, get_safe_redirect,
                           flash_message_parser)
@@ -93,6 +93,7 @@ def home():
 
 
 @app.route('/webhooks/github', methods=['GET', 'POST'])
+@csrf.exempt
 def webhooks():
     """Endpoint that acepts post requests from Github Webhooks"""
 
