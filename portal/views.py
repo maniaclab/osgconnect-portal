@@ -1281,10 +1281,19 @@ def edit_subgroup(group_name):
 
         if pi_name:
             additional_metadata['OSG:PI_Name'] = pi_name
+            data = {"data": pi_name}
+            r = requests.put(
+                ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/attributes/OSG:PI_Name', params=query, json=data)
         if pi_email:
             additional_metadata['OSG:PI_Email'] = pi_email
+            data = {"data": pi_email}
+            r = requests.put(
+                ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/attributes/OSG:PI_Email', params=query, json=data)
         if pi_organization:
             additional_metadata['OSG:PI_Organization'] = pi_organization
+            data = {"data": pi_organization}
+            r = requests.put(
+                ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name + '/attributes/OSG:PI_Organization', params=query, json=data)
 
         if len(additional_metadata) > 0:
             put_query = {"apiVersion": 'v1alpha1',
@@ -1302,7 +1311,6 @@ def edit_subgroup(group_name):
 
         r = requests.put(
             ciconnect_api_endpoint + '/v1alpha1/groups/' + group_name, params=query, json=put_query)
-        # print(r)
         # enclosing_group_name = '.'.join(group_name.split('.')[:-1])
         # print(enclosing_group_name)
         if r.status_code == requests.codes.ok:
