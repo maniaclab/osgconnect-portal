@@ -528,10 +528,12 @@ def view_group_member_details(group_name, member_name):
 @authenticated
 def view_group_members_ajax(group_name):
     user_dict, users_statuses = view_group_members_ajax_request(group_name)
+    # make copy of user_dict to remove pending members
+    non_pending_user_dict = {}
     for user in user_dict.keys():
-        if users_statuses[user] == 'pending':
-            del user_dict[user]
-    return jsonify(user_dict, users_statuses)
+        if users_statuses[user] != 'pending':
+            non_pending_user_dict[user] = user_dict[user]
+    return jsonify(non_pending_user_dict, users_statuses)
 
 
 def view_group_members_ajax_request(group_name):
