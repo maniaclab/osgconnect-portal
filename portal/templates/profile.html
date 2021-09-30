@@ -43,7 +43,7 @@
                     <strong>Connect to your assigned login node(s) via ssh:</strong>
                     <ul style="list-style: inside; padding-left:0;">
                     {% if user_login_nodes %}
-                      {% for login_node, info in user_login_nodes.iteritems() %}
+                      {% for login_node, info in user_login_nodes.items() %}
                       <li>{{info['metadata']['display_name']}}</li>
                       {% endfor %}
                     {% else %}
@@ -154,7 +154,7 @@
                     <br>
                     <ul style="list-style: inside; padding-left:0;">
                     {% if user_login_nodes %}
-                      {% for login_node, info in user_login_nodes.iteritems() %}
+                      {% for login_node, info in user_login_nodes.items() %}
                       <li>{{info['metadata']['display_name']}}</li>
                       {% endfor %}
                     {% else %}

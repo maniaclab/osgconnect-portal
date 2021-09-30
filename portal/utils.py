@@ -2,7 +2,10 @@ from flask import request
 from threading import Lock
 
 import globus_sdk
-import ConfigParser
+try: 
+    import ConfigParser
+except:
+    import configparser as ConfigParser
 
 try:
     from urllib.parse import urlparse, urljoin
