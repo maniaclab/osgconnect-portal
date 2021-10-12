@@ -1955,7 +1955,7 @@ def profile():
             profile = profile['metadata']
             # The auth string should never get used if the totp_secret key doesn't exist anyhow.
             try:
-                issuer = quote(session["url_host"]["display_name"])
+                issuer = "OSG Connect"
                 authenticator_string = (
                     "otpauth://totp/"
                     + unix_name
@@ -1965,7 +1965,7 @@ def profile():
                     + issuer
                 )
             except KeyError as e:
-                print("Couldn't find a totp_secret in the profile for ", unix_name)
+                print("Could not create an authenticator string: ", e)
                 authenticator_string = None
            
             # Check User's Status in OSG Group specifcally
