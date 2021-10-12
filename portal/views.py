@@ -1,12 +1,13 @@
 from flask import (flash, redirect, render_template, request,
                    session, url_for, jsonify)
+from flask_qrcode import QRcode
 import requests
 import traceback
 import json
 import time
 
 try:
-    from urllib.parse import urlencode
+    from urllib.parse import urlencode, quote
 except ImportError:
     from urllib import urlencode
 
@@ -21,6 +22,8 @@ import sys
 import subprocess
 import os
 import signal
+
+QRcode(app)
 
 try:
     ciconnect_api_token = app.config['CONNECT_API_TOKEN']
