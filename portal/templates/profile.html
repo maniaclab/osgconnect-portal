@@ -170,6 +170,7 @@
       </div>
     </div> <!-- row -->
     <br>
+    {% if profile['totp_secret'] %}
     <div class="row"> <!-- MFA card begin -->
       <div class="col-lg-12 mx-auto">
         <div class="row">
@@ -212,6 +213,7 @@
         </div>
       </div>
     </div><!-- MFA card end -->
+    {% endif %}
   </div>
 </section>
 
