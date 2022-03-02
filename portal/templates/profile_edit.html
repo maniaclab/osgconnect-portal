@@ -89,6 +89,16 @@
               ></textarea>
           </div>
 
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="totpsecret" name="totpsecret">
+            <label class="form-check-label" for="totpsecret">Set up Multi-Factor Authentication</label>
+            {% if profile['totp_secret'] %}
+            <small id="mfaHelp" class="form-text text-muted">This will <b>delete</b> your current MFA secret and generate a new one </small>
+            {% else %}
+            <small id="mfaHelp" class="form-text text-muted">Enabling MFA will add an additional layer of security for SSH connections </small>
+            {% endif %}
+          </div></br>
+
           <!-- <p>* By signing up for OSG Connect, you agree to receive essential emails concerning the status of the service and your use of it</p> -->
 
           <div class="form-group">

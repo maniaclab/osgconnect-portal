@@ -1,12 +1,13 @@
 from flask import (flash, redirect, render_template, request,
                    session, url_for, jsonify)
+from flask_qrcode import QRcode
 import requests
 import traceback
 import json
 import time
 
 try:
-    from urllib.parse import urlencode
+    from urllib.parse import urlencode, quote
 except ImportError:
     from urllib import urlencode
 
@@ -21,6 +22,8 @@ import sys
 import subprocess
 import os
 import signal
+
+QRcode(app)
 
 try:
     ciconnect_api_token = app.config['CONNECT_API_TOKEN']
@@ -1768,6 +1771,7 @@ def create_profile():
         globus_id = session['primary_identity']
         superuser = False
         service_account = False
+        create_totp_secret = False 
 
         post_user = {"apiVersion": 'v1alpha1',
                      'metadata': {'globusID': globus_id, 'name': name,
@@ -1775,7 +1779,9 @@ def create_profile():
                                   'institution': institution,
                                   'unix_name': unix_name,
                                   'superuser': superuser,
-                                  'service_account': service_account}}
+                                  'service_account': service_account,
+                                  'create_totp_secret': create_totp_secret,
+                    }}
 
         # print("POSTED: {}".format(post_user))
         r = requests.post(ciconnect_api_endpoint +
@@ -1875,6 +1881,10 @@ def edit_profile(unix_name):
         email = request.form['email']
         phone = request.form['phone-number']
         institution = request.form['institution']
+        if request.form.get("totpsecret") is not None:
+            create_totp_secret = True
+        else: 
+            create_totp_secret = False
         try:
             public_key = request.form['sshpubstring']
         except:
@@ -1893,12 +1903,14 @@ def edit_profile(unix_name):
                          'metadata': {'name': name, 'email': email,
                                       'phone': phone, 'institution': institution,
                                       'public_key': public_key,
+                                      'create_totp_secret': create_totp_secret,
                                       'additional_attributes': additional_metadata}}
         else:
             post_user = {"apiVersion": 'v1alpha1',
                          'metadata': {'name': name, 'email': email,
                                       'phone': phone, 'institution': institution,
                                       'public_key': '',
+                                      'create_totp_secret': create_totp_secret,
                                       'additional_attributes': additional_metadata}}
         # PUT request to update user information
         r = requests.put(ciconnect_api_endpoint + '/v1alpha1/users/' +
@@ -1942,6 +1954,21 @@ def profile():
         # print(profile)
         if profile:
             profile = profile['metadata']
+            # The auth string should never get used if the totp_secret key doesn't exist anyhow.
+            try:
+                issuer = "OSG Connect"
+                authenticator_string = (
+                    "otpauth://totp/"
+                    + unix_name
+                    + "?secret="
+                    + profile["totp_secret"]
+                    + "&issuer="
+                    + issuer
+                )
+            except KeyError as e:
+                print("Could not create an authenticator string: ", e)
+                authenticator_string = None
+           
             # Check User's Status in OSG Group specifcally
             user_status = requests.get(ciconnect_api_endpoint
                                        + '/v1alpha1/users/'
@@ -1975,7 +2002,8 @@ def profile():
             session['next'] = get_safe_redirect()
         return render_template('profile.html', profile=profile,
                                user_status=user_status,
-                               user_login_nodes=user_login_nodes)
+                               user_login_nodes=user_login_nodes,
+                               authenticator_string=authenticator_string)
 
     elif request.method == 'POST':
         if 'next' in session:
