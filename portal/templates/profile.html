@@ -198,10 +198,14 @@
                             <li> <a href="https://apps.apple.com/us/app/google-authenticator/id388497605"> iOS </a> </li>
                             </ul>
                           </li>
-                          <li> Click the "+" icon in the lower righthand corner, and click "Scan a QR Code" </li>
-                          <li> Scan the following QR code: </li>
+                          <li> You will need to scan the QR code. If it is your first time using the authenticator app, the app will ask for camera access to scan the code. Otherwise, touch the "+" icon in the lower righthand corner, and touch "Scan a QR Code" </li>
+                          <li> Use your phone camera to scan the following QR code: </li>
                           <div> <img src="{{ qrcode(authenticator_string) }}"> </div>
-                          <li> Once the QR code has been scanned, the app will start to generate six digit security tokens. You will need to enter this token when logging in </li>
+                          <li> Once scanned, the app will store a cryptographic secret and begin generating six-digit security tokens every 30 seconds. </li>
+                          <li> When you use ssh to access the access point, you will be prompted for the current security token </li>
+                          <div>
+                            <kbd>Verification code: <i>type your token here </i></kbd>
+                          </div>
                         </ol>
                       </div>
                     </div>
