@@ -18,12 +18,9 @@
     </h4>
     {% if session.get('is_authenticated') %}
     {% else %}
-    <a role="button" href="{{url_for('login')}}" class="btn btn-primary">Login</a>
-    <a role="button" href="{{url_for('signup')}}" class="btn btn-primary">Sign Up</a>
+    <a role="button" href="https://portal.osg-htc.org/application" class="btn btn-primary">Sign Up for OSPool Access</a>
     {% endif %}
     <!-- <p class="lead" id='base-p'>Main OSG website may be found <a href="https://osgconnect.net/" target="_blank">here</a></p> -->
-    <br>
-    <a class="twitter-timeline" data-width="500" data-height="500" href="https://twitter.com/OSGConnect?ref_src=twsrc%5Etfw">Tweets by OSGConnect</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
   </div>
 </header>
 <br>
