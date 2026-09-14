@@ -1659,18 +1659,8 @@ def create_login_node(group_name):
 
 @app.route('/signup', methods=['GET'])
 def signup():
-    """Send the user to Globus Auth with signup=1."""
-    with open(markdown_dir + "/signup_content/signup_modal.md", "r") as file:
-        signup_modal_md = file.read()
-    with open(markdown_dir + "/signup_content/signup_instructions.md", "r") as file:
-        signup_instructions_md = file.read()
-    with open(markdown_dir + "/signup_content/signup.md", "r") as file:
-        signup_md = file.read()
-    # return redirect(url_for('authcallback', signup=1))
-    return render_template('signup.html',
-                           signup_modal_md=signup_modal_md,
-                           signup_instructions_md=signup_instructions_md,
-                           signup_md=signup_md)
+    """Redirect to the OSPool registration portal"""
+    return redirect('https://portal.osg-htc.org/application')
 
 
 @app.route('/aup', methods=['GET'])
